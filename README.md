@@ -1,15 +1,16 @@
-JBang / Eclipse integration POC
+J'Bang! / Eclipse integration POC
 ===============================
 
-Import JBang scripts in Eclipse: Import Project... > JBang > JBang script
+Import [J'Bang!](https://github.com/jbangdev/jbang) scripts in Eclipse: Import Project... > JBang > JBang script
 
 
 Currently expects to use JBang from `~/.sdkman/candidates/jbang/current/` and if it can’t find JAVA_HOME, for some reason, it'll use `~/.sdkman/candidates/java/current`. Yes it sucks, I know.
 
 Cuurently supports 
-- DEPS
-- JAVA
-- SOURCES
+- `//DEPS` / `@Grab` dependencies
+- `//JAVA` version
+- `//SOURCES` additional sources 
+
 
 Build
 -----
