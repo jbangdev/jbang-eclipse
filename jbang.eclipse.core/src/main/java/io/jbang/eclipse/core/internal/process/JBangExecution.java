@@ -75,7 +75,7 @@ public class JBangExecution {
 			if (resolutionErrors.isEmpty() && output.isBlank()) {
 				resolutionErrors.add(new JBangError("Failed to get JBang informations"));
 			}
-			if (!output.startsWith("{")) {
+			if (!output.isBlank() && !output.startsWith("{")) {
 				resolutionErrors.add(new JBangError(output));
 			}
 
