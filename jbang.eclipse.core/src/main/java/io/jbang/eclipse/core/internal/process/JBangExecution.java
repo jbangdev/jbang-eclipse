@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.launching.JavaRuntime;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -41,7 +43,14 @@ public class JBangExecution {
 					file);
 			Map<String, String> env = processBuilder.environment();
 			if (!env.containsKey("JAVA_HOME")) {
-				String javaHome = System.getProperty("user.home") + "/.sdkman/candidates/java/current";
+				String javaHome = System.getProperty("user.home") + "/.sdkman/candidates/java/current";				
+				var defaultVM = JavaRuntime.getDefaultVMInstall();
+				if (defaultVM != null) {
+					var defaultJavaHome = defaultVM.getInstallLocation();
+					if (defaultJavaHome != null) {
+						javaHome = defaultJavaHome.getAbsoluteFile().toString();
+					}
+				}
 				env.put("JAVA_HOME", javaHome);
 			}
 			// env.put("JAVA_HOME", System.getenv("JAVA_HOME"));
