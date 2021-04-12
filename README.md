@@ -10,6 +10,22 @@ Cuurently supports
 - `//JAVA` version
 - `//SOURCES` additional sources 
 
+Installation
+------------
+
+- go to https://github.com/fbricon/jbang.eclipse/actions?query=is%3Asuccess+branch%3Amaster++
+- click on the last successful build
+- download the jbang.eclipse.zip archive
+
+In Eclipse,
+- open Help > Install New Software...
+- click Add...
+- click Archive...
+- select the jbang.eclipse.zip archive, click Add
+- expand the category and select the Jbang Eclipse Feature
+- proceed with the installation
+- restart Eclipse
+
 
 Build
 -----
