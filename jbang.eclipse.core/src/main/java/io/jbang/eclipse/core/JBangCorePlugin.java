@@ -15,23 +15,29 @@ public class JBangCorePlugin extends Plugin {
 
 	// The shared instance
 	private static JBangCorePlugin plugin;
-	
-	private IJBang jbangManager; 
-	
+
+	private IJBang jbangManager;
+
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
+	 * 
+	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.
+	 * BundleContext)
 	 */
+	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		jbangManager = new JBangManager();
-		plugin  = this;
+		plugin = this;
 	}
 
 	/*
 	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
+	 * 
+	 * @see
+	 * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
 	 */
+	@Override
 	public void stop(BundleContext context) throws Exception {
 		jbangManager = null;
 		plugin = null;
@@ -48,9 +54,7 @@ public class JBangCorePlugin extends Plugin {
 	}
 
 	public static IJBang getJBangManager() {
-		return plugin == null? null: plugin.jbangManager;
+		return plugin == null ? null : plugin.jbangManager;
 	}
-	
-	
 
 }

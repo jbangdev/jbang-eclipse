@@ -28,7 +28,6 @@ import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.LineComment;
 import org.eclipse.jdt.core.dom.MarkerAnnotation;
-import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 import org.eclipse.jdt.core.manipulation.CoreASTProvider;
 
@@ -45,7 +44,7 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 
 	private static final Integer MISSING_HASH = -1;
 	private Map<IFile, Integer> configCache = new ConcurrentHashMap<>();
-	
+
 	@Override
 	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
 		IResourceDelta delta = getDelta(getProject());
@@ -54,13 +53,13 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 			delta.accept(visitor);
 			int filesModified = visitor.jbangFiles.size();
 			int filesDeleted = visitor.deletedJbangFiles.size();
-			SubMonitor subMonitor = SubMonitor.convert(monitor, filesModified+filesDeleted);
-			
+			SubMonitor subMonitor = SubMonitor.convert(monitor, filesModified + filesDeleted);
+
 			if (!visitor.jbangFiles.isEmpty()) {
 				configure(visitor.jbangFiles, subMonitor.split(filesModified));
 			}
 			if (!visitor.deletedJbangFiles.isEmpty()) {
-				unconfigure(visitor.deletedJbangFiles,  subMonitor.split(filesDeleted));
+				unconfigure(visitor.deletedJbangFiles, subMonitor.split(filesDeleted));
 			}
 			subMonitor.done();
 		}
@@ -75,12 +74,12 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 		}
 		var jbang = jbp.getRuntime();
 		for (IFile file : files) {
-			Integer oldConfigHash = configCache.getOrDefault(file,MISSING_HASH);
+			Integer oldConfigHash = configCache.getOrDefault(file, MISSING_HASH);
 			Integer newConfigHash = getConfigHash(file, monitor);
 			if (Objects.equals(oldConfigHash, newConfigHash)) {
 				continue;
 			}
-			monitor.setTaskName("Updating JBang configuration from "+file.getName());
+			monitor.setTaskName("Updating JBang configuration from " + file.getName());
 			configCache.put(file, newConfigHash);
 			System.err.println(file + " configuration changed, checking jbang info");
 			JBangExecution execution = new JBangExecution(jbang, file.getLocation().toFile());
@@ -102,7 +101,7 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 			}
 		}
 	}
-	
+
 	private String getSource(IFile file) throws JavaModelException {
 		ICompilationUnit typeRoot = JavaCore.createCompilationUnitFrom(file);
 		return typeRoot.getBuffer().getContents();
@@ -113,21 +112,21 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 	}
 
 	private void addErrorMarker(IFile file, String source, JBangError e) throws CoreException {
-        IMarker marker = file.createMarker(JBangConstants.MARKER_RESOLUTION_ID);
-        marker.setAttribute(IMarker.MESSAGE, e.getMessage());
-        marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-        marker.setAttribute(IMarker.TRANSIENT, true);
-        if (e instanceof JBangDependencyError) {
-        	String dependency= ((JBangDependencyError)e).getDependency();
-        	Position pos = findPosition(dependency, source);
-        	marker.setAttribute(IMarker.LINE_NUMBER, pos.line);
-        	if (pos.start > 0) {
-        		marker.setAttribute(IMarker.CHAR_START, pos.start);
-        		marker.setAttribute(IMarker.CHAR_END, pos.end);
-        	}
-        } else {
-        	marker.setAttribute(IMarker.LINE_NUMBER, 1);
-        }
+		IMarker marker = file.createMarker(JBangConstants.MARKER_RESOLUTION_ID);
+		marker.setAttribute(IMarker.MESSAGE, e.getMessage());
+		marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+		marker.setAttribute(IMarker.TRANSIENT, true);
+		if (e instanceof JBangDependencyError) {
+			String dependency = ((JBangDependencyError) e).getDependency();
+			Position pos = findPosition(dependency, source);
+			marker.setAttribute(IMarker.LINE_NUMBER, pos.line);
+			if (pos.start > 0) {
+				marker.setAttribute(IMarker.CHAR_START, pos.start);
+				marker.setAttribute(IMarker.CHAR_END, pos.end);
+			}
+		} else {
+			marker.setAttribute(IMarker.LINE_NUMBER, 1);
+		}
 	}
 
 	private Position findPosition(String dependency, String source) {
@@ -139,10 +138,10 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 			int i = l.indexOf(dependency);
 			if (i > -1) {
 				pos.line = line[0];
-				pos.start = lineOffset[0]+i;
-				pos.end = pos.start+ dependency.length();
+				pos.start = lineOffset[0] + i;
+				pos.end = pos.start + dependency.length();
 			}
-			lineOffset[0] += (1+l.length());
+			lineOffset[0] += (1 + l.length());
 			return i > 0;
 		}).findFirst();
 		return pos;
@@ -154,10 +153,10 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 	}
 
 	class JBangResourceDeltaVisitor implements IResourceDeltaVisitor {
-		
+
 		List<IFile> jbangFiles = new ArrayList<>();
 		List<IFile> deletedJbangFiles = new ArrayList<>();
-		
+
 		@Override
 		public boolean visit(IResourceDelta delta) {
 			if (delta != null) {
@@ -165,7 +164,7 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 				switch (resource.getType()) {
 				case IResource.PROJECT: {
 					if (delta.getKind() == IResourceDelta.REMOVED) {
-						
+
 						return false;
 					}
 					IProject project = (IProject) resource;
@@ -205,9 +204,9 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 	}
 
 	void cleanMarkers(IProject p) {
-		//TODO implement me
+		// TODO implement me
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	static Integer getConfigHash(IFile file, IProgressMonitor monitor) throws JavaModelException {
 		ICompilationUnit typeRoot = JavaCore.createCompilationUnitFrom(file);
@@ -217,22 +216,22 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 		}
 		JBangConfigVisitor configCollector = new JBangConfigVisitor(typeRoot.getSource());
 		root.accept(configCollector);
-		for (Comment comment : (List<Comment>)root.getCommentList()) {
-		    comment.accept(configCollector);
+		for (Comment comment : (List<Comment>) root.getCommentList()) {
+			comment.accept(configCollector);
 		}
 		return configCollector.getConfigElements().hashCode();
 	}
 
 	public static class JBangConfigVisitor extends ASTVisitor {
-				
+
 		private static final Pattern GROOVY_GRAPES = Pattern.compile("^(@Grab|@Grapes).*$");
-		
+
 		private static final Pattern JBANG_INSTRUCTIONS = Pattern.compile("^(//[A-Z]+ ).*$");
-		
+
 		private List<String> configElements = new ArrayList<>();
-		
+
 		private String source;
-		
+
 		public JBangConfigVisitor(String source) {
 			this.source = source;
 		}
@@ -240,41 +239,41 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 		public List<String> getConfigElements() {
 			return configElements;
 		}
-		
+
 		@Override
 		public boolean visit(SingleMemberAnnotation node) {
-	        String annotation = getContent(node);
-	        if (GROOVY_GRAPES.matcher(annotation).matches()) {
-	        	configElements.add(annotation);	
-	        }
+			String annotation = getContent(node);
+			if (GROOVY_GRAPES.matcher(annotation).matches()) {
+				configElements.add(annotation);
+			}
 			return super.visit(node);
 		}
-		
+
 		@Override
 		public boolean visit(MarkerAnnotation node) {
-	        String annotation = getContent(node);
-	        if (GROOVY_GRAPES.matcher(annotation).matches()) {
-	        	configElements.add(annotation);	
-	        }
+			String annotation = getContent(node);
+			if (GROOVY_GRAPES.matcher(annotation).matches()) {
+				configElements.add(annotation);
+			}
 			return super.visit(node);
 		}
-		
+
 		@Override
 		public boolean visit(LineComment node) {
 			if (node.isLineComment()) {
 				String comment = getContent(node);
 				if (JBANG_INSTRUCTIONS.matcher(comment).matches()) {
-					configElements.add(comment);									
+					configElements.add(comment);
 				}
 			}
 			return super.visit(node);
 		}
-		
+
 		private String getContent(ASTNode node) {
 			int start = node.getStartPosition();
 			int end = start + node.getLength();
 			return source.substring(start, end).trim();
 		}
-		
+
 	}
 }

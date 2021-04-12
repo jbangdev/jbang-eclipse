@@ -11,7 +11,7 @@ public class JBangManager implements IJBang {
 	}
 
 	private static class ProjectConfigurationManagerHolder {
-        static final ProjectConfigurationManager INSTANCE = new ProjectConfigurationManager();
-    }
+		static final ProjectConfigurationManager INSTANCE = new ProjectConfigurationManager();
+	}
 
 }

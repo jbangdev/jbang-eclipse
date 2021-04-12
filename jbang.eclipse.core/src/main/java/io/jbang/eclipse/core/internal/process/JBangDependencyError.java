@@ -5,7 +5,7 @@ public class JBangDependencyError extends JBangError {
 	private String dependency;
 
 	public JBangDependencyError(String dependency) {
-		super("Failed to resolve "+dependency);
+		super("Failed to resolve " + dependency);
 		this.setDependency(dependency);
 	}
 

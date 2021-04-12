@@ -6,13 +6,13 @@ import org.eclipse.core.resources.IProject;
 import io.jbang.eclipse.core.internal.runtine.JBangRuntime;
 
 public class JBangProject {
-	
+
 	private IProject project;
 
 	private IFile mainSourceFile;
-	
+
 	private JBangRuntime runtime;
-	
+
 	public JBangProject(IProject project) {
 		this.project = project;
 	}
@@ -36,9 +36,5 @@ public class JBangProject {
 	public void setRuntime(JBangRuntime runtime) {
 		this.runtime = runtime;
 	}
-	
-	
-	
-	
 
 }

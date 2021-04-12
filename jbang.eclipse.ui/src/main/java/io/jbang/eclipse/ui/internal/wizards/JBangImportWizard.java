@@ -13,32 +13,33 @@ import org.eclipse.ui.IWorkbench;
 import io.jbang.eclipse.core.internal.imports.ImportJBangScriptsJob;
 import io.jbang.eclipse.ui.Activator;
 
+public class JBangImportWizard extends Wizard implements IImportWizard {
 
-public class JBangImportWizard extends Wizard  implements IImportWizard {
-	
 	private JBangImportWizardPage page;
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		ImageDescriptor imgDescriptor = ResourceLocator.imageDescriptorFromBundle(Activator.PLUGIN_ID, "icons/jbang.png").get();
+		ImageDescriptor imgDescriptor = ResourceLocator
+				.imageDescriptorFromBundle(Activator.PLUGIN_ID, "icons/jbang.png").get();
 		setDefaultPageImageDescriptor(imgDescriptor);
 	}
 
 	@Override
 	public boolean performFinish() {
-	    if(!page.isPageComplete()) {
-	        return false;
-	      }
-	      Collection<Path> scripts = page.getScripts();
-	      ImportJBangScriptsJob job = new ImportJBangScriptsJob(scripts.toArray(new Path[scripts.size()]));
-	      job.schedule();
-	      return true;
+		if (!page.isPageComplete()) {
+			return false;
+		}
+		Collection<Path> scripts = page.getScripts();
+		ImportJBangScriptsJob job = new ImportJBangScriptsJob(scripts.toArray(new Path[scripts.size()]));
+		job.schedule();
+		return true;
 
 	}
-	
+
+	@Override
 	public void addPages() {
-	    page = new JBangImportWizardPage();
-	    addPage(page);
-	  }
+		page = new JBangImportWizardPage();
+		addPage(page);
+	}
 
 }

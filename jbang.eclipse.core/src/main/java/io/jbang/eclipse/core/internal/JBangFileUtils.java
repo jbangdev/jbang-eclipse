@@ -10,15 +10,17 @@ import org.eclipse.core.resources.IResource;
 public class JBangFileUtils {
 
 	private static Pattern JBANG_HEADERS = Pattern.compile("(//.*jbang.*)|(//[A-Z]+ ).*");
-	
+
 	private static Pattern JAVA_INSTRUCTION = Pattern.compile("//JAVA (\\S*).*");
-	
+
 	private static Pattern SOURCES_INSTRUCTION = Pattern.compile("//SOURCES (\\S*).*");
 
-	private JBangFileUtils() {}
-	
+	private JBangFileUtils() {
+	}
+
 	public static boolean isJBangFile(IResource resource) {
-		if (!(resource instanceof IFile) || (!"java".equals(resource.getFileExtension()) && !"jsh".equals(resource.getFileExtension()))) {
+		if (!(resource instanceof IFile)
+				|| (!"java".equals(resource.getFileExtension()) && !"jsh".equals(resource.getFileExtension()))) {
 			return false;
 		}
 		IFile file = (IFile) resource;
@@ -30,7 +32,7 @@ public class JBangFileUtils {
 		}
 		return false;
 	}
-	
+
 	public static boolean isJBangInstruction(String line) {
 		return JBANG_HEADERS.matcher(line).matches();
 	}
@@ -38,11 +40,11 @@ public class JBangFileUtils {
 	public static String getJavaVersion(String line) {
 		return getMatch(JAVA_INSTRUCTION, line);
 	}
-	
+
 	public static String getSource(String line) {
 		return getMatch(SOURCES_INSTRUCTION, line);
 	}
-	
+
 	private static String getMatch(Pattern pattern, String line) {
 		var matcher = pattern.matcher(line);
 		if (matcher.matches()) {
@@ -50,5 +52,5 @@ public class JBangFileUtils {
 		}
 		return null;
 	}
-	
+
 }

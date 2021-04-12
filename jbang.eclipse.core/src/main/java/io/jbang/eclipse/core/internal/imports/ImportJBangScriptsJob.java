@@ -9,7 +9,6 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import io.jbang.eclipse.core.JBangCorePlugin;
 
-
 public class ImportJBangScriptsJob extends Job {
 
 	private Path[] scripts;

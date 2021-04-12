@@ -39,13 +39,12 @@ public class JBangImportWizardPage extends WizardPage {
 		scriptCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false));
 		scriptCombo.setFocus();
 
-
 		final Button browseButton = new Button(composite, SWT.NONE);
 		browseButton.setText("Select script");
 		browseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		browseButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
 			FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
-			dialog.setFilterExtensions(new String[] {"*.java"});
+			dialog.setFilterExtensions(new String[] { "*.java" });
 			dialog.setText("Select script");
 			String result = dialog.open();
 			if (result != null) {

@@ -39,11 +39,11 @@ public class ProjectConfigurationManager {
 	private static final String JAR_SUFFIX = ".jar";
 
 	private static final String SOURCE_JAR_SUFFIX = "-sources.jar";
-	
+
 	private static final String JAVADOC_JAR_SUFFIX = "-javadoc.jar";
-	
+
 	private Map<IProject, JBangInfo> cache = new ConcurrentHashMap<>();
-	
+
 	public void addJBangNature(IProject project, IProgressMonitor monitor) throws CoreException {
 		if (!project.hasNature(JBangConstants.NATURE_ID)) {
 			IProjectDescription description = project.getDescription();
@@ -59,19 +59,19 @@ public class ProjectConfigurationManager {
 	public void configure(JBangProject jbp, JBangInfo info, IProgressMonitor monitor) throws CoreException {
 		IProject project = jbp.getProject();
 		if (Objects.equals(info, cache.get(project))) {
-			//Nothing changed
+			// Nothing changed
 			return;
 		}
 		IJavaProject jp = JavaCore.create(jbp.getProject());
 		if (jp != null) {
 			String environmentId = info.getTargetRuntime();
 			boolean hasJRE = false;
-			
+
 			Deque<IClasspathEntry> newEntries = new LinkedList<>();
 			List<String> resolvedClasspath = info.getResolvedDependencies() == null ? new ArrayList<>(0)
 					: new ArrayList<>(info.getResolvedDependencies());
 			IClasspathEntry[] classpath = jp.getRawClasspath();
-			
+
 			IExecutionEnvironment ee = null;
 			for (IClasspathEntry entry : classpath) {
 				if (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
@@ -83,7 +83,7 @@ public class ProjectConfigurationManager {
 					hasJRE = true;
 					String currentEnvironment = entry.getPath().lastSegment();
 					if (environmentId != null && !environmentId.endsWith(currentEnvironment)) {
-						ee= getExecutionEnvironment(environmentId);
+						ee = getExecutionEnvironment(environmentId);
 						newEntries.add(newJRE(ee));
 					} else {
 						newEntries.add(entry);
@@ -93,20 +93,20 @@ public class ProjectConfigurationManager {
 				}
 			}
 			if (!hasJRE) {
-				ee= getExecutionEnvironment(environmentId);
+				ee = getExecutionEnvironment(environmentId);
 				newEntries.addFirst(newJRE(ee));
 			}
-			//iterate over remaining entries
-			for(String path : resolvedClasspath) {
+			// iterate over remaining entries
+			for (String path : resolvedClasspath) {
 				if (!path.isBlank()) {
-					File jar = new File(path); 
-					newEntries.add(JavaCore.newLibraryEntry(new Path(path), getSources(jar), getJavadoc(jar)));					
+					File jar = new File(path);
+					newEntries.add(JavaCore.newLibraryEntry(new Path(path), getSources(jar), getJavadoc(jar)));
 				}
 			}
 			IClasspathEntry[] newClasspath = newEntries.toArray(new IClasspathEntry[newEntries.size()]);
 			if (!Objects.deepEquals(newClasspath, classpath)) {
 				if (ee != null) {
-					//TODO support JBANG_JAVAC_OPTIONS, JDK_JAVAC_OPTIONS, JAVAC_OPTIONS
+					// TODO support JBANG_JAVAC_OPTIONS, JDK_JAVAC_OPTIONS, JAVAC_OPTIONS
 					Map<String, String> options = jp.getOptions(false);
 					options.putAll(ee.getComplianceOptions());
 					jp.setOptions(options);
@@ -122,35 +122,36 @@ public class ProjectConfigurationManager {
 	 * @return
 	 */
 	private boolean isJRE(IClasspathEntry entry) {
-		return entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER && JavaRuntime.JRE_CONTAINER.equals(entry.getPath().segment(0));
+		return entry.getEntryKind() == IClasspathEntry.CPE_CONTAINER
+				&& JavaRuntime.JRE_CONTAINER.equals(entry.getPath().segment(0));
 	}
-	
-	private IClasspathEntry newJRE(IExecutionEnvironment executionEnvironment) {
-	    IClasspathEntry cpe;
-	    if(executionEnvironment == null) {
-	      cpe = JavaRuntime.getDefaultJREContainerEntry();
-	    } else {
-	      IPath containerPath = JavaRuntime.newJREContainerPath(executionEnvironment);
-	      cpe = JavaCore.newContainerEntry(containerPath);
-	    }
-	    return cpe;
-	  }
 
-	  private IExecutionEnvironment getExecutionEnvironment(String environmentId) {
-	    IExecutionEnvironmentsManager manager = JavaRuntime.getExecutionEnvironmentsManager();
-	    IExecutionEnvironment[] environments = manager.getExecutionEnvironments();
-	    if (environmentId != null) {
-	    	for(IExecutionEnvironment environment : environments) {
-	    		if(environment.getId().equals(environmentId)) {
-	    			return environment;
-	    		}
-	    	}	    	
-	    }
-	    return environments[environments.length-1];
-	  }
+	private IClasspathEntry newJRE(IExecutionEnvironment executionEnvironment) {
+		IClasspathEntry cpe;
+		if (executionEnvironment == null) {
+			cpe = JavaRuntime.getDefaultJREContainerEntry();
+		} else {
+			IPath containerPath = JavaRuntime.newJREContainerPath(executionEnvironment);
+			cpe = JavaCore.newContainerEntry(containerPath);
+		}
+		return cpe;
+	}
+
+	private IExecutionEnvironment getExecutionEnvironment(String environmentId) {
+		IExecutionEnvironmentsManager manager = JavaRuntime.getExecutionEnvironmentsManager();
+		IExecutionEnvironment[] environments = manager.getExecutionEnvironments();
+		if (environmentId != null) {
+			for (IExecutionEnvironment environment : environments) {
+				if (environment.getId().equals(environmentId)) {
+					return environment;
+				}
+			}
+		}
+		return environments[environments.length - 1];
+	}
 
 	public JBangProject getJBangProject(IProject project) {
-		//TODO use cache / project registry
+		// TODO use cache / project registry
 		if (!ProjectUtils.isJBangProject(project)) {
 			return null;
 		}
@@ -167,10 +168,10 @@ public class ProjectConfigurationManager {
 	private IPath getJavadoc(File jar) {
 		return getMatchingFile(jar, JAVADOC_JAR_SUFFIX);
 	}
-	
+
 	private IPath getMatchingFile(File jar, String suffix) {
 		String filename = jar.getName();
-		//See if there's a matching file in the same directory
+		// See if there's a matching file in the same directory
 		String sourceName = filename.substring(0, filename.lastIndexOf(JAR_SUFFIX)) + suffix;
 		File sourceJar = new File(jar.getParentFile(), sourceName);
 		if (sourceJar.isFile()) {
@@ -187,10 +188,10 @@ public class ProjectConfigurationManager {
 		var jbang = new JBangRuntime("~/.sdkman/candidates/jbang/current/");
 		var execution = new JBangExecution(jbang, script.toFile());
 		var info = execution.getInfo();
-		
+
 		String fileName = script.getFileName().toString();
 		String name = fileName.substring(0, fileName.lastIndexOf(".java"));
-		
+
 		IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(name);
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 		project.create(description, monitor);
@@ -198,35 +199,34 @@ public class ProjectConfigurationManager {
 		description.setNatureIds(new String[] { JBangConstants.NATURE_ID, JavaCore.NATURE_ID });
 		project.setDescription(description, monitor);
 		IJavaProject javaProject = JavaCore.create(project);
-		
-		
+
 		List<IClasspathEntry> classpaths = new ArrayList<>();
-		//Add source folder
+		// Add source folder
 		IFolder source = project.getFolder("src");
 		source.create(true, true, monitor);
 		IPackageFragmentRoot root = javaProject.getPackageFragmentRoot(source);
 		IClasspathEntry srcClasspath = JavaCore.newSourceEntry(root.getPath());
 		classpaths.add(srcClasspath);
 		javaProject.setRawClasspath(classpaths.toArray(new IClasspathEntry[0]), monitor);
-		
+
 		IFolder bin = project.getFolder("bin");
 		if (!bin.exists()) {
-			bin.create(true, true, monitor);			
+			bin.create(true, true, monitor);
 		}
 		javaProject.setOutputLocation(bin.getFullPath(), monitor);
-		
+
 		IFile mainFile = link(info.getBackingResource(), project, monitor);
 		if (info.getSources() != null && !info.getSources().isEmpty()) {
 			for (String s : info.getSources()) {
 				link(s, project, monitor);
 			}
 		}
-		
+
 		var jbp = new JBangProject(project);
 		jbp.setMainSourceFile(mainFile);
-		
-		configure(jbp,info, monitor);
-		
+
+		configure(jbp, info, monitor);
+
 		return jbp;
 	}
 
@@ -238,5 +238,5 @@ public class ProjectConfigurationManager {
 		fakeFile.createLink(p.toUri(), IResource.REPLACE, monitor);
 		return fakeFile;
 	}
-	
+
 }
