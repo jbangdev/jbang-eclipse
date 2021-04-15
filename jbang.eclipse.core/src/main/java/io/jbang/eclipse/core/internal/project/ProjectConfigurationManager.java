@@ -94,7 +94,7 @@ public class ProjectConfigurationManager {
 			}
 			if (!hasJRE) {
 				ee = getExecutionEnvironment(environmentId);
-				newEntries.addFirst(newJRE(ee));
+				newEntries.add(newJRE(ee));
 			}
 			// iterate over remaining entries
 			for (String path : resolvedClasspath) {
