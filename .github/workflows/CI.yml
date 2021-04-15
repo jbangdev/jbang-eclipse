@@ -34,5 +34,5 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: jbang.eclipse.site/target/repository/
+          publish_dir: jbang.eclipse.site/target/repository
           destination_dir: update
