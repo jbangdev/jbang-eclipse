@@ -147,7 +147,7 @@ public class ProjectConfigurationManager {
 				}
 			}
 		}
-		return environments[environments.length - 1];
+		return null;
 	}
 
 	public JBangProject getJBangProject(IProject project) {
