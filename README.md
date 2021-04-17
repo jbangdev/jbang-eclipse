@@ -1,7 +1,7 @@
 J'Bang! / Eclipse integration POC
 ===============================
 
-Import [J'Bang!](https://github.com/jbangdev/jbang) scripts in Eclipse: Import Project... > JBang > JBang script
+Import [JBang](https://github.com/jbangdev/jbang) scripts in Eclipse: Import Project... > JBang > JBang script
 
 Currently expects to use JBang from `~/.sdkman/candidates/jbang/current/`. Yes it sucks, I know.
 

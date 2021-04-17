@@ -138,13 +138,14 @@ public class ProjectConfigurationManager {
 	}
 
 	private IExecutionEnvironment getExecutionEnvironment(String environmentId) {
+		if (environmentId == null) {
+			return null;
+		}
 		IExecutionEnvironmentsManager manager = JavaRuntime.getExecutionEnvironmentsManager();
 		IExecutionEnvironment[] environments = manager.getExecutionEnvironments();
-		if (environmentId != null) {
-			for (IExecutionEnvironment environment : environments) {
-				if (environment.getId().equals(environmentId)) {
-					return environment;
-				}
+		for (IExecutionEnvironment environment : environments) {
+			if (environment.getId().equals(environmentId)) {
+				return environment;
 			}
 		}
 		return null;
