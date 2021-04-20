@@ -8,8 +8,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -99,6 +103,7 @@ public class JBangExecution {
 		try (BufferedReader reader = new BufferedReader(new FileReader(info.getBackingResource()))) {
 			String line;
 			List<String> sources = new ArrayList<>();
+			Map<String,String> files = new HashMap<>();
 			java.nio.file.Path baseDir = Paths.get(info.getBackingResource()).getParent();
 
 			while ((line = reader.readLine()) != null) {
@@ -118,9 +123,21 @@ public class JBangExecution {
 						sources.add(sourcePath);
 					}
 				}
+				if (info.getFiles() == null) {
+					String[] tuple = getFile(line);
+					if (tuple != null && tuple.length == 2) {
+						String linkPath = tuple[0];
+						String sourcePath = baseDir.resolve(tuple[1]).toString();
+						files.put(linkPath, sourcePath);
+					}
+				}
 			}
 			if (!sources.isEmpty()) {
+				collectAdditionalSources(sources);
 				info.setSources(sources);
+			}
+			if (!files.isEmpty()) {
+				info.setFiles(files);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -128,6 +145,39 @@ public class JBangExecution {
 
 	}
 
+	private void collectAdditionalSources(Collection<String> sources) {
+		Set<String> existingSources = new HashSet<>(sources);
+		for (String file : existingSources) {
+			sources.addAll(collectAdditionalSources(file, sources));
+		}
+	}
+	
+	private  Collection<String> collectAdditionalSources(String file, Collection<String> existingSources){
+		Set<String> newSources = new HashSet<>();
+		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+			String line;
+			java.nio.file.Path baseDir = Paths.get(file).getParent();
+			while ((line = reader.readLine()) != null) {
+				if (!line.isBlank() && !isJBangInstruction(line)) {
+					break;
+				}
+				String source = getSource(line);
+				if (source != null) {
+					String sourcePath = baseDir.resolve(source).toString();
+					if (!existingSources.contains(sourcePath)) {
+						newSources.add(sourcePath);
+					}
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		if (!newSources.isEmpty()) {
+			collectAdditionalSources(newSources);
+		}
+		return newSources;
+
+	}
 	private JBangError sanitizeError(String errorLine) {
 		// [jbang] Resolving eu.hansolo:tilesfx:1.3.4...[jbang] [ERROR] Could not
 		// resolve dependency

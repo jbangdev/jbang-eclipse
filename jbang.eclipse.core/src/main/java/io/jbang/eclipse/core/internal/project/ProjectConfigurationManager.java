@@ -30,6 +30,7 @@ import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 
 import io.jbang.eclipse.core.internal.JBangConstants;
 import io.jbang.eclipse.core.internal.ProjectUtils;
+import io.jbang.eclipse.core.internal.ResourceUtil;
 import io.jbang.eclipse.core.internal.process.JBangExecution;
 import io.jbang.eclipse.core.internal.process.JBangInfo;
 import io.jbang.eclipse.core.internal.runtine.JBangRuntime;
@@ -222,6 +223,11 @@ public class ProjectConfigurationManager {
 				link(s, project, monitor);
 			}
 		}
+		if (info.getFiles() != null && !info.getFiles().isEmpty()) {
+			for (Map.Entry<String, String> file : info.getFiles().entrySet()) {
+				link(file.getValue(), file.getKey(), project, monitor);
+			}
+		}
 
 		var jbp = new JBangProject(project);
 		jbp.setMainSourceFile(mainFile);
@@ -234,8 +240,15 @@ public class ProjectConfigurationManager {
 	private IFile link(String resource, IProject project, IProgressMonitor monitor) throws CoreException {
 		java.nio.file.Path p = Paths.get(resource);
 		String fileName = p.getFileName().toString();
-		IPath filePath = new Path("src").append(fileName);
+		return link(resource, fileName, project, monitor);
+	}
+	
+	private IFile link(String resource, String link, IProject project, IProgressMonitor monitor) throws CoreException {
+		IPath filePath = new Path("src").append(link);
 		IFile fakeFile = project.getFile(filePath);
+		IFolder parent = (IFolder) fakeFile.getParent();
+		ResourceUtil.createFolder(parent, monitor);
+		java.nio.file.Path p = Paths.get(resource);
 		fakeFile.createLink(p.toUri(), IResource.REPLACE, monitor);
 		return fakeFile;
 	}

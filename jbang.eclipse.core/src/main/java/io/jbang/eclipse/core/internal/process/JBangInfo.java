@@ -1,6 +1,7 @@
 package io.jbang.eclipse.core.internal.process;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 public class JBangInfo {
@@ -10,6 +11,8 @@ public class JBangInfo {
 	private List<String> resolvedDependencies;
 
 	private List<String> sources;
+	
+	private Map<String,String> files;
 
 	private List<JBangError> resolutionErrors;
 
@@ -30,6 +33,11 @@ public class JBangInfo {
 		if (sources != null && !sources.isEmpty()) {
 			sources.forEach(source -> {
 				sb.append(System.lineSeparator()).append("additional source: ").append(source);
+			});
+		}
+		if (files != null && !files.isEmpty()) {
+			files.forEach((link, file) -> {
+				sb.append(System.lineSeparator()).append("additional file: ").append(link).append("[").append(file).append("]");
 			});
 		}
 		if (resolvedDependencies != null && !resolvedDependencies.isEmpty()) {
@@ -99,6 +107,14 @@ public class JBangInfo {
 
 	public void setSources(List<String> sources) {
 		this.sources = sources;
+	}
+
+	public Map<String, String> getFiles() {
+		return files;
+	}
+
+	public void setFiles(Map<String, String> files) {
+		this.files = files;
 	}
 
 }

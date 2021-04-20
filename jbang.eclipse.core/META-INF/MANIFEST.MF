@@ -12,4 +12,10 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Import-Package: org.eclipse.core.resources
-Export-Package: io.jbang.eclipse.core.internal.imports;x-friends:="jbang.eclipse.ui"
+Export-Package: io.jbang.eclipse.core,
+ io.jbang.eclipse.core.internal;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui",
+ io.jbang.eclipse.core.internal.builder;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui",
+ io.jbang.eclipse.core.internal.imports;x-friends:="jbang.eclipse.ui,jbang.eclipse.ls",
+ io.jbang.eclipse.core.internal.process;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui",
+ io.jbang.eclipse.core.internal.project;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui",
+ io.jbang.eclipse.core.internal.runtine;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui"
