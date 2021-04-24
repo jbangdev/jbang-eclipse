@@ -8,7 +8,7 @@ public class JBangRuntime {
 	private static final IPath EXECUTABLE;
 
 	static {
-		if (System.getProperty("os.name", "").toLowerCase().indexOf("win") > -1) {
+		if (System.getProperty("os.name", "").toLowerCase().contains("win")) {
 			EXECUTABLE = new Path("jbang.cmd");
 		} else {
 			EXECUTABLE = new Path("jbang");

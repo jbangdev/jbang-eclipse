@@ -3,7 +3,7 @@ J'Bang! / Eclipse integration POC
 
 Import [JBang](https://github.com/jbangdev/jbang) scripts in Eclipse: Import Project... > JBang > JBang script
 
-Currently expects to use JBang from `~/.sdkman/candidates/jbang/current/`. Yes it sucks, I know.
+Currently expects to use JBang from the PATH.
 
 Cuurently supports 
 - `//DEPS` / `@Grab` dependencies

@@ -1,6 +1,10 @@
 package io.jbang.eclipse.core.internal.process;
 
-import static io.jbang.eclipse.core.internal.JBangFileUtils.*;
+import static io.jbang.eclipse.core.internal.JBangFileUtils.getFile;
+import static io.jbang.eclipse.core.internal.JBangFileUtils.getJavaVersion;
+import static io.jbang.eclipse.core.internal.JBangFileUtils.getSource;
+import static io.jbang.eclipse.core.internal.JBangFileUtils.isJBangInstruction;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -16,8 +20,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.eclipse.jdt.launching.JavaRuntime;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -43,21 +45,7 @@ public class JBangExecution {
 		result.setResolutionErrors(resolutionErrors);
 		result.setBackingResource(file);
 		try {
-			ProcessBuilder processBuilder = new ProcessBuilder(jbang.getExecutable().toOSString(), "info", "tools",
-					file);
-			Map<String, String> env = processBuilder.environment();
-			if (!env.containsKey("JAVA_HOME")) {
-				String javaHome = System.getProperty("user.home") + "/.sdkman/candidates/java/current";				
-				var defaultVM = JavaRuntime.getDefaultVMInstall();
-				if (defaultVM != null) {
-					var defaultJavaHome = defaultVM.getInstallLocation();
-					if (defaultJavaHome != null) {
-						javaHome = defaultJavaHome.getAbsoluteFile().toString();
-					}
-				}
-				env.put("JAVA_HOME", javaHome);
-			}
-			// env.put("JAVA_HOME", System.getenv("JAVA_HOME"));
+			ProcessBuilder processBuilder = new ProcessBuilder(jbang.getExecutable().toOSString(), "info", "tools", file);
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 			StringBuilder processOutput = new StringBuilder();
@@ -87,12 +75,10 @@ public class JBangExecution {
 				return result;
 			}
 
-			if (!output.isBlank()) {
-				Gson gson = new GsonBuilder().create();
-				result = gson.fromJson(output, JBangInfo.class);
-				result.setBackingResource(file);
-				scanForAdditionalInfos(result);
-			}
+			Gson gson = new GsonBuilder().create();
+			result = gson.fromJson(output, JBangInfo.class);
+			result.setBackingResource(file);
+			scanForAdditionalInfos(result);
 		} catch (IOException | InterruptedException e) {
 			resolutionErrors.add(new JBangError("Failed to execute JBang:" + e.getMessage()));
 		}
@@ -190,15 +176,4 @@ public class JBangExecution {
 		return new JBangError(error);
 	}
 
-	public static void main(String[] args) throws Exception {
-		var jbang = new JBangRuntime("~/.sdkman/candidates/jbang/current/");
-		var script = new File("/Users/fbricon/Dev/souk/javafx.java");
-		var execution = new JBangExecution(jbang, script);
-		// System.err.println(execution.getInfo());
-
-		script = new File("/Users/fbricon/Dev/workspaces/runtime-jbang/jbanged/src/jfxtiles.java");
-		execution = new JBangExecution(jbang, script);
-		System.err.println(execution.getInfo());
-
-	}
 }

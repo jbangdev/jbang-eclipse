@@ -34,6 +34,7 @@ import io.jbang.eclipse.core.internal.ResourceUtil;
 import io.jbang.eclipse.core.internal.process.JBangExecution;
 import io.jbang.eclipse.core.internal.process.JBangInfo;
 import io.jbang.eclipse.core.internal.runtine.JBangRuntime;
+import io.jbang.eclipse.core.internal.runtine.JBangRuntimeManager;
 
 public class ProjectConfigurationManager {
 
@@ -44,6 +45,12 @@ public class ProjectConfigurationManager {
 	private static final String JAVADOC_JAR_SUFFIX = "-javadoc.jar";
 
 	private Map<IProject, JBangInfo> cache = new ConcurrentHashMap<>();
+	
+	private JBangRuntimeManager runtimeManager;
+	
+	public ProjectConfigurationManager(JBangRuntimeManager runtimeManager) {
+		this.runtimeManager = runtimeManager;
+	}
 
 	public void addJBangNature(IProject project, IProgressMonitor monitor) throws CoreException {
 		if (!project.hasNature(JBangConstants.NATURE_ID)) {
@@ -152,13 +159,13 @@ public class ProjectConfigurationManager {
 		return null;
 	}
 
-	public JBangProject getJBangProject(IProject project) {
+	public JBangProject getJBangProject(IProject project, IProgressMonitor monitor) {
 		// TODO use cache / project registry
 		if (!ProjectUtils.isJBangProject(project)) {
 			return null;
 		}
 		JBangProject jbp = new JBangProject(project);
-		JBangRuntime jbang = new JBangRuntime(System.getProperty("jbang.path", "~/.sdkman/candidates/jbang/current/"));
+		JBangRuntime jbang = runtimeManager.getDefaultRuntime(monitor);
 		jbp.setRuntime(jbang);
 		return jbp;
 	}
@@ -187,7 +194,7 @@ public class ProjectConfigurationManager {
 	}
 
 	public JBangProject createJBangProject(java.nio.file.Path script, IProgressMonitor monitor) throws CoreException {
-		var jbang = new JBangRuntime("~/.sdkman/candidates/jbang/current/");
+		var jbang = runtimeManager.getDefaultRuntime(monitor);
 		var execution = new JBangExecution(jbang, script.toFile());
 		var info = execution.getInfo();
 

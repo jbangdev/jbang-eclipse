@@ -68,7 +68,7 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 
 	private void configure(List<IFile> files, IProgressMonitor monitor) throws CoreException {
 		ProjectConfigurationManager jbangManager = JBangCorePlugin.getJBangManager().getProjectConfigurationManager();
-		JBangProject jbp = jbangManager.getJBangProject(getProject());
+		JBangProject jbp = jbangManager.getJBangProject(getProject(), monitor);
 		if (jbp == null) {
 			return;
 		}
