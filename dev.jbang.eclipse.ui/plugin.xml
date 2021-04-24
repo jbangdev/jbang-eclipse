@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.ui.importWizards">
+     <category id="org.eclipse.ui.Basic" name="%category.general.name"/>
+     <category id="dev.jbang.eclipse" name="JBang"/>
+
+
+     <wizard id="dev.jbang.eclipse.ui.JBangImportWizard"
+             class="dev.jbang.eclipse.ui.internal.wizards.JBangImportWizard"
+             icon="icons/jbang.png"
+             category="dev.jbang.eclipse"
+             name="JBang script">
+        <description>Import JBang script as project</description>
+     </wizard>
+   </extension>
+
+</plugin>

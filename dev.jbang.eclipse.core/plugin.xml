@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension point="org.eclipse.core.resources.builders"
+              id="dev.jbang.eclipse.core.jbangbuilder"
+              name="JBang Project Builder">
+      <builder hasNature="true" isConfigurable="false">
+         <run class="dev.jbang.eclipse.core.internal.builder.JBangBuilder"/>
+      </builder>
+   </extension>
+   <extension point="org.eclipse.core.resources.natures"
+         id="dev.jbang.eclipse.core.jbangnature"
+         name="J'Bang">
+      <runtime>
+         <run class="dev.jbang.eclipse.core.internal.builder.JBangNature"/>
+      </runtime>
+      <builder id="dev.jbang.eclipse.core.jbangbuilder"/>
+   </extension>
+<extension point="org.eclipse.core.resources.markers"
+         id="dev.jbang.eclipse.core.jbangproblem"
+         name="JBang Problem">
+      <super type="org.eclipse.core.resources.problemmarker"/>
+      <persistent value="true"/>
+   </extension>
+   <extension point="org.eclipse.core.resources.markers"
+         id="dev.jbang.eclipse.core.jbangproblem.resolution"
+         name="JBang Resolution Problem">
+      <super type="dev.jbang.eclipse.core.jbangproblem"/>
+      <persistent value="true"/>
+   </extension>
+</plugin>

@@ -3,11 +3,11 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>io.jbang.eclipse</groupId>
-	<artifactId>io.jbang.eclipse</artifactId>
+	<groupId>dev.jbang.eclipse</groupId>
+	<artifactId>dev.jbang.eclipse</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>io.jbang.eclipse :: parent</name>
+	<name>dev.jbang.eclipse :: parent</name>
 	<description>JBang Eclipse integration</description>
 
 	<properties>
@@ -52,8 +52,8 @@
 					<pomDependencies>consider</pomDependencies>
 					<target>
 						<artifact>
-							<groupId>io.jbang.eclipse</groupId>
-							<artifactId>io.jbang.eclipse.target</artifactId>
+							<groupId>dev.jbang.eclipse</groupId>
+							<artifactId>dev.jbang.eclipse.target</artifactId>
 							<version>${project.version}</version>
 						</artifact>
 					</target>
@@ -153,11 +153,11 @@
 		</profile>
 	</profiles>
 	<modules>
-		<module>io.jbang.eclipse.target</module>
-		<module>io.jbang.eclipse.core</module>
-		<module>io.jbang.eclipse.ui</module>
-		<!--module>io.jbang.eclipse.ls</module-->
-		<module>io.jbang.eclipse.feature</module>
-		<module>io.jbang.eclipse.site</module>
+		<module>dev.jbang.eclipse.target</module>
+		<module>dev.jbang.eclipse.core</module>
+		<module>dev.jbang.eclipse.ui</module>
+		<!--module>dev.jbang.eclipse.ls</module-->
+		<module>dev.jbang.eclipse.feature</module>
+		<module>dev.jbang.eclipse.site</module>
 	</modules>
 </project>

@@ -1,4 +1,4 @@
-J'Bang! / Eclipse integration POC
+JBang / Eclipse integration POC
 ===============================
 
 Import [JBang](https://github.com/jbangdev/jbang) scripts in Eclipse: Import Project... > JBang > JBang script
@@ -29,7 +29,7 @@ Open a terminal and execute:
 
     ./mvnw clean package
     
-You can then install the generated update site from `jbang.eclipse.site/target/jbang.eclipse.site-<VERSION>-SNAPSHOT.zip`
+You can then install the generated update site from `dev.jbang.eclipse.site/target/dev.jbang.eclipse.site-<VERSION>-SNAPSHOT.zip`
 
 License
 -------

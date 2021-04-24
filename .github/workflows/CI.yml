@@ -28,11 +28,11 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: jbang.eclipse
-          path: jbang.eclipse.site/target/repository/*
+          path: dev.jbang.eclipse.site/target/repository/*
       - name: Deploy p2 update site
         if: github.ref == 'refs/heads/master'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: jbang.eclipse.site/target/repository
+          publish_dir: dev.jbang.eclipse.site/target/repository
           destination_dir: update

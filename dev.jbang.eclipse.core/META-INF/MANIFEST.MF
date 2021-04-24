@@ -1,0 +1,22 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JBang Eclipse Core Plugin
+Bundle-SymbolicName: dev.jbang.eclipse.core;singleton:=true
+Bundle-Version: 0.0.1.qualifier
+Bundle-Activator: dev.jbang.eclipse.core.JBangCorePlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jdt.core;bundle-version="3.10.0",
+ com.google.gson;bundle-version="2.8.2",
+ org.eclipse.jdt.core.manipulation;bundle-version="1.14.0",
+ org.eclipse.jdt.launching
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Import-Package: org.eclipse.core.resources
+Export-Package: dev.jbang.eclipse.core,
+ dev.jbang.eclipse.core.internal;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui",
+ dev.jbang.eclipse.core.internal.builder;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui",
+ dev.jbang.eclipse.core.internal.imports;x-friends:="jbang.eclipse.ui,jbang.eclipse.ls",
+ dev.jbang.eclipse.core.internal.process;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui",
+ dev.jbang.eclipse.core.internal.project;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui",
+ dev.jbang.eclipse.core.internal.runtine;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui"
+Automatic-Module-Name: dev.jbang.eclipse.core
