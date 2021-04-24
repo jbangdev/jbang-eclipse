@@ -1,9 +1,9 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: jbang.eclipse Test Fragment
-Bundle-SymbolicName: jbang.eclipse.core.test
+Bundle-Name: JBang Eclipse Test Fragment
+Bundle-SymbolicName: io.jbang.eclipse.core.test
 Bundle-Version: 0.0.1.qualifier
-Fragment-Host: jbang.eclipse.core;bundle-version="0.0.1"
+Fragment-Host: io.jbang.eclipse.core;bundle-version="0.0.1"
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Require-Bundle: org.eclipse.jdt.junit4.runtime;bundle-version="1.1.0",
  org.junit;bundle-version="4.11"
