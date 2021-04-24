@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
-      id="jbang.eclipse.feature"
+      id="io.jbang.eclipse.feature"
       label="JBang Eclipse Feature"
       version="0.0.1.qualifier">
 
@@ -302,14 +302,14 @@ version(s), and exceptions or additional permissions here}."
    </license>
 
    <plugin
-         id="jbang.eclipse.core"
+         id="io.jbang.eclipse.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
          
             <plugin
-         id="jbang.eclipse.ui"
+         id="io.jbang.eclipse.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

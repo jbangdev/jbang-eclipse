@@ -1,7 +1,7 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: jbang.eclipse Core Plugin
-Bundle-SymbolicName: jbang.eclipse.core;singleton:=true
+Bundle-Name: JBang Eclipse Core Plugin
+Bundle-SymbolicName: io.jbang.eclipse.core;singleton:=true
 Bundle-Version: 0.0.1.qualifier
 Bundle-Activator: io.jbang.eclipse.core.JBangCorePlugin
 Require-Bundle: org.eclipse.core.runtime,
@@ -19,3 +19,4 @@ Export-Package: io.jbang.eclipse.core,
  io.jbang.eclipse.core.internal.process;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui",
  io.jbang.eclipse.core.internal.project;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui",
  io.jbang.eclipse.core.internal.runtine;x-friends:="jbang.eclipse.ls,jbang.eclipse.ui"
+Automatic-Module-Name: io.jbang.eclipse.core

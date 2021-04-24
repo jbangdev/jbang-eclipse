@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<site>
-   <feature url="features/jbang.eclipse.feature_0.0.0.jar" id="jbang.eclipse.feature" version="0.0.0">
-    <category name="JBang Eclipse Integration"/>
-   </feature>
-   <feature url="features/jbang.eclipse.feature.source_0.0.0.jar" id="jbang.eclipse.feature.source" version="0.0.0">
-    <category name="JBang Eclipse Integration Developer Resources"/>
-   </feature>
-</site>

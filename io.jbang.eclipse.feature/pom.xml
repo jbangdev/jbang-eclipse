@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>jbang.eclipse</artifactId>
+    <artifactId>io.jbang.eclipse</artifactId>
     <groupId>io.jbang.eclipse</groupId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>jbang.eclipse.core</artifactId>
-  <packaging>eclipse-plugin</packaging>
-  <name>jbang.eclipse :: core</name>
-  <description>jbang.eclipse Core Plugin</description>
+  <artifactId>io.jbang.eclipse.feature</artifactId>
+  <packaging>eclipse-feature</packaging>
+  <name>io.jbang.eclipse :: feature</name>
 </project>
