@@ -16,7 +16,7 @@ Installation
 In Eclipse:
 
 - open Help > Install New Software...
-- work with: `http://fbricon.github.io/jbang.eclipse/update/`
+- work with: `https://fbricon.github.io/jbang.eclipse/update/`
 - expand the category and select the Jbang Eclipse Feature
 - proceed with the installation
 - restart Eclipse
