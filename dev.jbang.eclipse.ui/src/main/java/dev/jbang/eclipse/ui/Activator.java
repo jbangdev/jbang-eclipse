@@ -10,7 +10,7 @@ import org.osgi.framework.BundleContext;
 public class Activator extends AbstractUIPlugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "jbang.eclipse.ui";
+	public static final String PLUGIN_ID = "dev.jbang.eclipse.ui";
 
 	// The shared instance
 	private static Activator plugin;

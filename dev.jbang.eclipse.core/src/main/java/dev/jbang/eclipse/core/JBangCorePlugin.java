@@ -11,7 +11,7 @@ import dev.jbang.eclipse.core.internal.JBangManager;
 public class JBangCorePlugin extends Plugin {
 
 	// The plug-in ID
-	public static final String PLUGIN_ID = "jbang.eclipse.core";
+	public static final String PLUGIN_ID = "dev.jbang.eclipse.core";
 
 	// The shared instance
 	private static JBangCorePlugin plugin;

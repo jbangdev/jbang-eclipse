@@ -19,8 +19,7 @@ public class JBangImportWizard extends Wizard implements IImportWizard {
 
 	@Override
 	public void init(IWorkbench workbench, IStructuredSelection selection) {
-		ImageDescriptor imgDescriptor = ResourceLocator
-				.imageDescriptorFromBundle(Activator.PLUGIN_ID, "icons/jbang.png").get();
+		ImageDescriptor imgDescriptor = ResourceLocator.imageDescriptorFromBundle(Activator.PLUGIN_ID, "icons/jbang.png").get();
 		setDefaultPageImageDescriptor(imgDescriptor);
 	}
 
