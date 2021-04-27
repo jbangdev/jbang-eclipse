@@ -3,7 +3,7 @@ JBang / Eclipse integration POC
 
 Import [JBang](https://github.com/jbangdev/jbang) scripts in Eclipse: Import Project... > JBang > JBang script
 
-Currently expects to use JBang from the PATH.
+Currently expects to use JBang from the PATH. On Mac and Linux, Eclipse might not see the proper PATH, so it's best to launch Eclipse from a terminal.
 
 Cuurently supports 
 - `//DEPS` / `@Grab` dependencies
@@ -16,7 +16,7 @@ Installation
 In Eclipse:
 
 - open Help > Install New Software...
-- work with: `https://fbricon.github.io/jbang.eclipse/update/`
+- work with: `https://jbangdev.github.io/jbang-eclipse/update/`
 - expand the category and select the Jbang Eclipse Feature
 - proceed with the installation
 - restart Eclipse
