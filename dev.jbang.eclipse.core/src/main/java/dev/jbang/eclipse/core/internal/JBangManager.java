@@ -2,7 +2,7 @@ package dev.jbang.eclipse.core.internal;
 
 import dev.jbang.eclipse.core.IJBang;
 import dev.jbang.eclipse.core.internal.project.ProjectConfigurationManager;
-import dev.jbang.eclipse.core.internal.runtine.JBangRuntimeManager;
+import dev.jbang.eclipse.core.internal.runtime.JBangRuntimeManager;
 
 public class JBangManager implements IJBang {
 

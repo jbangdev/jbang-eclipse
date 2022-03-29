@@ -3,7 +3,7 @@ package dev.jbang.eclipse.core.internal.project;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 
-import dev.jbang.eclipse.core.internal.runtine.JBangRuntime;
+import dev.jbang.eclipse.core.internal.runtime.JBangRuntime;
 
 public class JBangProject {
 

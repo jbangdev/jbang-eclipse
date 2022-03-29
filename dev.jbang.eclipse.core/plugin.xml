@@ -28,4 +28,7 @@
       <super type="dev.jbang.eclipse.core.jbangproblem"/>
       <persistent value="true"/>
    </extension>
+   <extension point="org.eclipse.core.runtime.preferences">
+      <initializer class="dev.jbang.eclipse.core.internal.preferences.JBangPreferenceInitializer"/>
+   </extension>
 </plugin>

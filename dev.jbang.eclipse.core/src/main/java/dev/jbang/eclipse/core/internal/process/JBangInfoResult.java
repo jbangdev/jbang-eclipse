@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class JBangInfo {
+public class JBangInfoResult {
 
 	private String backingResource;
 
@@ -16,7 +16,11 @@ public class JBangInfo {
 
 	private List<JBangError> resolutionErrors;
 
-	private String javaVersion;
+	private String requestedJavaVersion;
+	
+	private List<String> compileOptions;
+	
+	private List<String> runtimeOptions;
 
 	public List<String> getResolvedDependencies() {
 		return resolvedDependencies;
@@ -45,10 +49,15 @@ public class JBangInfo {
 			sb.append(String.join("," + System.lineSeparator(), resolvedDependencies));
 			sb.append("]");
 		}
-		if (javaVersion != null && !javaVersion.isBlank()) {
-			sb.append(System.lineSeparator()).append("javaVersion: " + javaVersion);
+		if (requestedJavaVersion != null && !requestedJavaVersion.isBlank()) {
+			sb.append(System.lineSeparator()).append("requestedJavaVersion: " + requestedJavaVersion);
 		}
-
+		if (compileOptions != null && !compileOptions.isEmpty()) {
+			sb.append(System.lineSeparator()).append("compileOptions: " + compileOptions);
+		}
+		if (runtimeOptions != null && !runtimeOptions.isEmpty()) {
+			sb.append(System.lineSeparator()).append("runtimeOptions: " + runtimeOptions);
+		}
 		if (hasErrors()) {
 			sb.append(System.lineSeparator()).append("resolutionErrors: [");
 			sb.append(getResolutionErrors().stream().map(Object::toString).collect(Collectors.joining(", ")));
@@ -77,15 +86,15 @@ public class JBangInfo {
 		return resolutionErrors != null && !resolutionErrors.isEmpty();
 	}
 
-	public String getJavaVersion() {
-		return javaVersion;
+	public String getRequestedJavaVersion() {
+		return requestedJavaVersion;
 	}
 
 	public String getTargetRuntime() {
-		if (javaVersion == null || javaVersion.isBlank()) {
+		if (requestedJavaVersion == null || requestedJavaVersion.isBlank()) {
 			return null;
 		}
-		String version = javaVersion.endsWith("+") ? javaVersion.substring(0, javaVersion.length() - 1) : javaVersion;
+		String version = requestedJavaVersion.endsWith("+") ? requestedJavaVersion.substring(0, requestedJavaVersion.length() - 1) : requestedJavaVersion;
 		try {
 			int v = Integer.parseInt(version);
 			if (v < 9) {
@@ -97,8 +106,8 @@ public class JBangInfo {
 		return null;
 	}
 
-	public void setJavaVersion(String javaVersion) {
-		this.javaVersion = javaVersion;
+	public void setRequestedJavaVersion(String javaVersion) {
+		this.requestedJavaVersion = javaVersion;
 	}
 
 	public List<String> getSources() {
@@ -117,4 +126,34 @@ public class JBangInfo {
 		this.files = files;
 	}
 
+	public class Resource {
+		public String originalResource;
+		public String backingResource;
+	}
+
+	public class File extends Resource {
+		public String target;
+	}
+	
+	public class Source extends Resource {
+		public List<Source> sources;
+	}
+
+	public List<String> getCompileOptions() {
+		return compileOptions;
+	}
+
+	public void setCompileOptions(List<String> compileOptions) {
+		this.compileOptions = compileOptions;
+	}
+
+	public List<String> getRuntimeOptions() {
+		return runtimeOptions;
+	}
+
+	public void setRuntimeOptions(List<String> runtimeOptions) {
+		this.runtimeOptions = runtimeOptions;
+	}
+	
+	
 }

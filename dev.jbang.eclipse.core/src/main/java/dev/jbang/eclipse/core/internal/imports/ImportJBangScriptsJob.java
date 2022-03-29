@@ -8,6 +8,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import dev.jbang.eclipse.core.JBangCorePlugin;
+import dev.jbang.eclipse.core.internal.JBangFileUtils;
 
 public class ImportJBangScriptsJob extends Job {
 
@@ -15,7 +16,6 @@ public class ImportJBangScriptsJob extends Job {
 
 	public ImportJBangScriptsJob(Path[] scripts) {
 		super("Import JBang scripts");
-		// TODO Auto-generated constructor stub
 		this.scripts = scripts;
 	}
 
@@ -27,17 +27,14 @@ public class ImportJBangScriptsJob extends Job {
 		var projectManager = JBangCorePlugin.getJBangManager().getProjectConfigurationManager();
 		Path script = scripts[0];
 		try {
-			if (isJBangScript(script)) {
+			if (JBangFileUtils.isJBangFile(script)) {
 				projectManager.createJBangProject(script, monitor);
 			}
 		} catch (Exception e) {
 			return toStatus("Error configuring JBang Script", e);
 		}
+		
 		return Status.OK_STATUS;
-	}
-
-	private boolean isJBangScript(Path script) {
-		return true;
 	}
 
 	private IStatus toStatus(String msg, Exception e) {

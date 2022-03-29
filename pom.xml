@@ -13,11 +13,10 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<tycho.version>2.3.0</tycho.version>
+		<tycho.version>2.7.0</tycho.version>
 		<tycho.extras.version>${tycho.version}</tycho.extras.version>
 		<tycho.test.platformArgs />
 		<tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
-
 	</properties>
 
 	<licenses>
@@ -32,7 +31,7 @@
 		<repository>
 			<id>eclipse</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/2021-03</url>
+			<url>http://download.eclipse.org/releases/2022-03</url>
 		</repository>
 	</repositories>
 	<build>
@@ -47,6 +46,7 @@
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
 				<version>${tycho.version}</version>
+				<?m2e ignore?>
 				<configuration>
 					<resolver>p2</resolver>
 					<pomDependencies>consider</pomDependencies>
@@ -156,7 +156,6 @@
 		<module>dev.jbang.eclipse.target</module>
 		<module>dev.jbang.eclipse.core</module>
 		<module>dev.jbang.eclipse.ui</module>
-		<!--module>dev.jbang.eclipse.ls</module-->
 		<module>dev.jbang.eclipse.feature</module>
 		<module>dev.jbang.eclipse.site</module>
 	</modules>

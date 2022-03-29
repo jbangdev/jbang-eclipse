@@ -14,5 +14,24 @@
         <description>Import JBang script as project</description>
      </wizard>
    </extension>
+   
+   <extension point="org.eclipse.ui.keywords">
+      <keyword id="dev.jbang.eclipse" label="JBang"/>
+   </extension>
+   
+   <extension point="org.eclipse.ui.preferencePages">
+        <page id="dev.jbang.eclipse.ui.preferences.JBangPreferencesPage"
+         	class="dev.jbang.eclipse.ui.internal.preferences.JBangPreferencesPage"
+            name="JBang">
+         <keywordReference id="dev.jbang.eclipse"/>
+      </page>
+      <page id="dev.jbang.eclipse.ui.preferences.JBangInstallationsPreferencesPage"
+            category="dev.jbang.eclipse.ui.preferences.JBangPreferencesPage"
+            class="dev.jbang.eclipse.ui.internal.preferences.JBangInstallationsPreferencesPage"
+            name="Installations">
+         <keywordReference id="dev.jbang.eclipse"/>
+      </page>
+ 
+   </extension>
 
 </plugin>
