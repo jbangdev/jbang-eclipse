@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.jbang.eclipse</groupId>
 	<artifactId>dev.jbang.eclipse</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>dev.jbang.eclipse :: parent</name>
 	<description>JBang Eclipse integration</description>

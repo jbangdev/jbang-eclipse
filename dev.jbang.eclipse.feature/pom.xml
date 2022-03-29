@@ -4,7 +4,7 @@
   <parent>
     <artifactId>dev.jbang.eclipse</artifactId>
     <groupId>dev.jbang.eclipse</groupId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.2-SNAPSHOT</version>
   </parent>
   <artifactId>dev.jbang.eclipse.feature</artifactId>
   <packaging>eclipse-feature</packaging>
