@@ -6,13 +6,19 @@ import java.util.stream.Collectors;
 
 public class JBangInfoResult {
 
+	public class JBangFile {
+		public String originalResource;
+		public String backingResource;
+		public String target;
+	}
+	
 	private String backingResource;
 
 	private List<String> resolvedDependencies;
 
 	private List<String> sources;
 	
-	private Map<String,String> files;
+	private List<JBangFile> files;
 
 	private List<JBangError> resolutionErrors;
 
@@ -40,8 +46,8 @@ public class JBangInfoResult {
 			});
 		}
 		if (files != null && !files.isEmpty()) {
-			files.forEach((link, file) -> {
-				sb.append(System.lineSeparator()).append("additional file: ").append(link).append("[").append(file).append("]");
+			files.forEach(file -> {
+				sb.append(System.lineSeparator()).append("additional file: ").append(file.target).append("[").append(file.originalResource).append("]");
 			});
 		}
 		if (resolvedDependencies != null && !resolvedDependencies.isEmpty()) {
@@ -118,11 +124,11 @@ public class JBangInfoResult {
 		this.sources = sources;
 	}
 
-	public Map<String, String> getFiles() {
+	public List<JBangFile> getFiles() {
 		return files;
 	}
 
-	public void setFiles(Map<String, String> files) {
+	public void setFiles(List<JBangFile> files) {
 		this.files = files;
 	}
 

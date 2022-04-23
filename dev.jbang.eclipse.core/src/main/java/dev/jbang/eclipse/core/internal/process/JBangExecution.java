@@ -101,58 +101,10 @@ public class JBangExecution {
 
 			Gson gson = new GsonBuilder().create();
 			result = gson.fromJson(output, JBangInfoResult.class);
-			result.setBackingResource(file);
-			scanForAdditionalInfos(result);
 		} catch (IOException | InterruptedException e) {
 			resolutionErrors.add(new JBangError("Failed to execute JBang:" + e.getMessage()));
 		}
 		return result;
-	}
-
-	private void scanForAdditionalInfos(JBangInfoResult info) {
-		try (BufferedReader reader = new BufferedReader(new FileReader(info.getBackingResource()))) {
-			String line;
-			List<String> sources = new ArrayList<>();
-			Map<String,String> files = new HashMap<>();
-			java.nio.file.Path baseDir = Paths.get(info.getBackingResource()).getParent();
-
-			while ((line = reader.readLine()) != null) {
-				if (!line.isBlank() && !isJBangInstruction(line)) {
-					break;
-				}
-				if (info.getRequestedJavaVersion() == null) {
-					var javaVersion = getJavaVersion(line);
-					if (javaVersion != null) {
-						info.setRequestedJavaVersion(javaVersion);
-					}
-				}
-				if (info.getSources() == null) {
-					String source = getSource(line);
-					if (source != null) {
-						String sourcePath = baseDir.resolve(source).toString();
-						sources.add(sourcePath);
-					}
-				}
-				if (info.getFiles() == null) {
-					String[] tuple = getFile(line);
-					if (tuple != null && tuple.length == 2) {
-						String linkPath = tuple[0];
-						String sourcePath = baseDir.resolve(tuple[1]).toString();
-						files.put(linkPath, sourcePath);
-					}
-				}
-			}
-			if (!sources.isEmpty()) {
-				collectAdditionalSources(sources);
-				info.setSources(sources);
-			}
-			if (!files.isEmpty()) {
-				info.setFiles(files);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
 	}
 
 	private void collectAdditionalSources(Collection<String> sources) {

@@ -34,6 +34,7 @@ import dev.jbang.eclipse.core.internal.ProjectUtils;
 import dev.jbang.eclipse.core.internal.ResourceUtil;
 import dev.jbang.eclipse.core.internal.process.JBangExecution;
 import dev.jbang.eclipse.core.internal.process.JBangInfoResult;
+import dev.jbang.eclipse.core.internal.process.JBangInfoResult.JBangFile;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntime;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimeManager;
 
@@ -260,8 +261,8 @@ public class ProjectConfigurationManager {
 			}
 		}
 		if (info.getFiles() != null && !info.getFiles().isEmpty()) {
-			for (Map.Entry<String, String> file : info.getFiles().entrySet()) {
-				link(file.getValue(), file.getKey(), project, monitor);
+			for (JBangFile file : info.getFiles()) {
+				link(file.originalResource, file.target, project, monitor);
 			}
 		}
 
