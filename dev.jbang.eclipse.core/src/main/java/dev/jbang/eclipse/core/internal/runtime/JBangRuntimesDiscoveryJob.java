@@ -32,20 +32,29 @@ public class JBangRuntimesDiscoveryJob extends Job {
 		}
 		var existingRuntimes = new ArrayList<>(runtimeManager.getJBangRuntimes(false).stream().filter(r -> !JBangRuntime.SYSTEM.equals(r.getName())).collect(Collectors.toList()));
 		
+		var newRuntimes = new ArrayList<JBangRuntime>(usualSuspects.size());
+		
 		for (var candidate : usualSuspects.entrySet()) {
 			if (!Files.isDirectory(candidate.getValue())) {
 				continue;
 			}
 			JBangRuntime runtime = new JBangRuntime(candidate.getKey(), candidate.getValue().toString());
-			if (runtime.isValid()) {
+			if (!existingRuntimes.contains(runtime) && runtime.isValid()) {
 				runtime.detectVersion(monitor);
-				existingRuntimes.add(runtime);
-				runtimeManager.setRuntimes(existingRuntimes);
-				System.out.println("Setting default runtime as "+runtime);
-				runtimeManager.setDefaultRuntime(runtime);
-				break;
+				newRuntimes.add(runtime);
 			}
 		}
+		if (newRuntimes.size() == 0) {
+			return Status.OK_STATUS;
+		}
+		newRuntimes.sort((j1, j2) -> {
+			return Long.compare(j1.getExecutable().toFile().lastModified(), j2.getExecutable().toFile().lastModified());
+		});
+		existingRuntimes.addAll(newRuntimes);
+		runtimeManager.setRuntimes(existingRuntimes);
+		var defaultRuntime = newRuntimes.get(0);// Most recent JBang runtime
+		System.out.println("Setting default runtime as "+defaultRuntime);
+		runtimeManager.setDefaultRuntime(defaultRuntime);
 		return Status.OK_STATUS;
 	}
 

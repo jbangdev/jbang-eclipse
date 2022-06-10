@@ -1,7 +1,7 @@
 package dev.jbang.eclipse.core.internal.process;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class JBangInfoResult {
@@ -20,7 +20,7 @@ public class JBangInfoResult {
 	
 	private List<JBangFile> files;
 
-	private List<JBangError> resolutionErrors;
+	private Collection<JBangError> resolutionErrors;
 
 	private String requestedJavaVersion;
 	
@@ -80,11 +80,11 @@ public class JBangInfoResult {
 		this.backingResource = backingResource;
 	}
 
-	public List<JBangError> getResolutionErrors() {
+	public Collection<JBangError> getResolutionErrors() {
 		return resolutionErrors;
 	}
 
-	public void setResolutionErrors(List<JBangError> resolutionErrors) {
+	public void setResolutionErrors(Collection<JBangError> resolutionErrors) {
 		this.resolutionErrors = resolutionErrors;
 	}
 

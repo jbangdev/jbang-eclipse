@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -35,6 +36,7 @@ import dev.jbang.eclipse.core.internal.process.JBangExecution;
 import dev.jbang.eclipse.core.internal.process.JBangInfoResult;
 import dev.jbang.eclipse.core.internal.project.JBangProject;
 import dev.jbang.eclipse.core.internal.project.ProjectConfigurationManager;
+import dev.jbang.eclipse.core.internal.runtime.JBangRuntimesDiscoveryJob;
 
 public class JBangBuilder extends IncrementalProjectBuilder {
 
@@ -55,9 +57,9 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 
 			if (!visitor.jbangFiles.isEmpty()) {
 				long startConfig = System.currentTimeMillis();
-				configure(visitor.jbangFiles, subMonitor.split(filesModified));
-				long configured = System.currentTimeMillis() - startConfig;
-				logInfo("JBang Builder configured "+filesModified+" files in "+configured+" ms");
+				var executedJBang = configure(visitor.jbangFiles, subMonitor.split(filesModified));
+				long configured = System.currentTimeMillis() - startConfig;					
+				logInfo("JBang Builder "+(executedJBang?"configured ":"checked ")+filesModified+" files in "+configured+" ms");
 			}
 			if (!visitor.deletedJbangFiles.isEmpty()) {
 				unconfigure(visitor.deletedJbangFiles, subMonitor.split(filesDeleted));
@@ -65,17 +67,26 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 			subMonitor.done();
 		}
 		long elapsed = System.currentTimeMillis() - start;
-		logInfo("JBang Builder ran in "+elapsed+" ms");
+		logInfo("JBang Builder ran in "+elapsed+" ms in mode "+kind);
 		return new IProject[0];
 	}
 
-	private void configure(List<IFile> files, IProgressMonitor monitor) throws CoreException {
+	private boolean configure(List<IFile> files, IProgressMonitor monitor) throws CoreException {
+		
+		try {
+			//FIXME avoid potential deadlock
+			Job.getJobManager().join(JBangRuntimesDiscoveryJob.class, monitor);
+		} catch (Exception e) {
+			//ignore
+		}
+		
 		ProjectConfigurationManager jbangManager = JBangCorePlugin.getJBangManager().getProjectConfigurationManager();
 		JBangProject jbp = jbangManager.getJBangProject(getProject(), monitor);
 		if (jbp == null) {
-			return;
+			return false;
 		}
 		var jbang = jbp.getRuntime();
+		boolean executedJBang = false;
 		for (IFile file : files) {
 			Integer oldConfigHash = configCache.getOrDefault(file, MISSING_HASH);
 			Integer newConfigHash = getConfigHash(file, monitor);
@@ -86,6 +97,7 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 			configCache.put(file, newConfigHash);
 			//System.err.println(file + " configuration changed, checking jbang info");
 			var execution = new JBangExecution(jbang, file.getLocation().toFile(), null);
+			executedJBang = true;
 			JBangInfoResult info = execution.getInfo(monitor);
 			clearMarkers(file);
 			if (info != null) {
@@ -103,6 +115,7 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 				}
 			}
 		}
+		return executedJBang;
 	}
 
 	private String getSource(IFile file) throws JavaModelException {
@@ -226,8 +239,5 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 			comment.accept(configCollector);
 		}
 		return configCollector.getConfigElements().hashCode();
-	}
-
-	
-	
+	}	
 }
