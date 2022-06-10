@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.DefaultScope;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.IPreferencesService;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -30,7 +29,7 @@ public class JBangRuntimeManager {
 	  public JBangRuntimeManager() {
 	    this.preferenceStore = Platform.getPreferencesService();
 	    this.preferencesLookup[0] = InstanceScope.INSTANCE.getNode(JBangConstants.PLUGIN_ID);
-	    this.preferencesLookup[1] = DefaultScope.INSTANCE.getNode(JBangConstants.PLUGIN_ID);
+	   // this.preferencesLookup[1] = DefaultScope.INSTANCE.getNode(JBangConstants.PLUGIN_ID);
 	  }
 
 	  public JBangRuntime getRuntime(String name) {
@@ -147,7 +146,6 @@ public class JBangRuntimeManager {
 	        }
 	      }
 	    }
-
 	    return runtimes;
 	  }
 

@@ -3,9 +3,7 @@ package dev.jbang.eclipse.core.internal.project;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -21,6 +19,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -29,9 +28,12 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 
+import dev.jbang.eclipse.core.JBangCorePlugin;
+import dev.jbang.eclipse.core.internal.JBangClasspathUtils;
 import dev.jbang.eclipse.core.internal.JBangConstants;
 import dev.jbang.eclipse.core.internal.ProjectUtils;
 import dev.jbang.eclipse.core.internal.ResourceUtil;
+import dev.jbang.eclipse.core.internal.classpath.JBangClasspathContainer;
 import dev.jbang.eclipse.core.internal.process.JBangExecution;
 import dev.jbang.eclipse.core.internal.process.JBangInfoResult;
 import dev.jbang.eclipse.core.internal.process.JBangInfoResult.JBangFile;
@@ -47,9 +49,9 @@ public class ProjectConfigurationManager {
 	private static final String JAVADOC_JAR_SUFFIX = "-javadoc.jar";
 
 	private Map<IProject, JBangInfoResult> cache = new ConcurrentHashMap<>();
-	
+
 	private JBangRuntimeManager runtimeManager;
-	
+
 	public ProjectConfigurationManager(JBangRuntimeManager runtimeManager) {
 		this.runtimeManager = runtimeManager;
 	}
@@ -78,19 +80,15 @@ public class ProjectConfigurationManager {
 			String environmentId = info.getTargetRuntime();
 			boolean hasJRE = false;
 			boolean changedJRE = false;
-			Deque<IClasspathEntry> newEntries = new LinkedList<>();
+			List<IClasspathEntry> newEntries = new ArrayList<>();
 			List<String> resolvedClasspath = info.getResolvedDependencies() == null ? new ArrayList<>(0)
 					: new ArrayList<>(info.getResolvedDependencies());
 			IClasspathEntry[] classpath = jp.getRawClasspath();
 
 			IExecutionEnvironment ee = null;
+			IClasspathEntry jbangContainerEntry = null;
 			for (IClasspathEntry entry : classpath) {
-				if (entry.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
-					String path = entry.getPath().toOSString();
-					if (resolvedClasspath.remove(path)) {
-						newEntries.add(entry);
-					}
-				} else if (isJRE(entry)) {
+				if (isJRE(entry)) {
 					hasJRE = true;
 					String currentEnvironment = entry.getPath().lastSegment();
 					if (environmentId != null && !environmentId.endsWith(currentEnvironment)) {
@@ -98,6 +96,13 @@ public class ProjectConfigurationManager {
 						newEntries.add(newJRE(ee));
 						changedJRE = true;
 					} else {
+						newEntries.add(entry);
+					}
+				} else if (JBangClasspathUtils.isJBangClasspathContainer(entry.getPath())) {
+					jbangContainerEntry = entry;
+					newEntries.add(entry);
+				} else if (IClasspathEntry.CPE_LIBRARY == entry.getEntryKind()) {
+					if (entry.getPath() != null && !resolvedClasspath.contains(entry.getPath().toOSString())) {
 						newEntries.add(entry);
 					}
 				} else {
@@ -109,44 +114,61 @@ public class ProjectConfigurationManager {
 				newEntries.add(newJRE(ee));
 				changedJRE = true;
 			}
-			// iterate over remaining entries
+			// iterate over dependencies
+			List<IClasspathEntry> dependenciesList = new ArrayList<>();
 			for (String path : resolvedClasspath) {
 				if (!path.isBlank()) {
 					File jar = new File(path);
-					newEntries.add(JavaCore.newLibraryEntry(new Path(path), getSources(jar), getJavadoc(jar)));
+					dependenciesList.add(JavaCore.newLibraryEntry(new Path(path), getSources(jar), getJavadoc(jar)));
 				}
 			}
+			IClasspathEntry[] dependencies = dependenciesList.toArray(new IClasspathEntry[dependenciesList.size()]);
+			if (jbangContainerEntry == null) {
+				jbangContainerEntry = JBangClasspathUtils.getDefaultContainerEntry();
+				newEntries.add(jbangContainerEntry);
+			}
+			try {
+				IClasspathContainer container = new JBangClasspathContainer(jbangContainerEntry.getPath(), dependencies);
+				JavaCore.setClasspathContainer(container.getPath(), new IJavaProject[] { jp }, new IClasspathContainer[] { container }, monitor);
+				JBangClasspathUtils.saveContainerState(project, container);
+			} catch (CoreException ex) {
+				JBangCorePlugin.log(ex.getMessage(), ex);
+			}
+
 			IClasspathEntry[] newClasspath = newEntries.toArray(new IClasspathEntry[newEntries.size()]);
-			boolean updateCache= false;
-			if (changedJRE || oldInfo == null || !Objects.deepEquals(info.getCompileOptions(), oldInfo.getCompileOptions())) {
+			boolean updateCache = false;
+			if (changedJRE || oldInfo == null
+					|| !Objects.deepEquals(info.getCompileOptions(), oldInfo.getCompileOptions())) {
 				Map<String, String> oldOptions = jp.getOptions(false);
-				Map<String, String> options = new HashMap<>(oldOptions); 
+				Map<String, String> options = new HashMap<>(oldOptions);
 				if (ee != null) {
 					options.putAll(ee.getComplianceOptions());
 				}
 				// TODO support more JBANG_JAVAC_OPTIONS, JDK_JAVAC_OPTIONS, JAVAC_OPTIONS
-				String parameters = info.getCompileOptions() != null && info.getCompileOptions().contains("-parameters")?JavaCore.GENERATE:JavaCore.DO_NOT_GENERATE;
+				String parameters = info.getCompileOptions() != null && info.getCompileOptions().contains("-parameters")
+						? JavaCore.GENERATE
+						: JavaCore.DO_NOT_GENERATE;
 				options.put(JavaCore.COMPILER_CODEGEN_METHOD_PARAMETERS_ATTR, parameters);
-				
-				
-				String previewFeatures = info.getCompileOptions() != null && info.getCompileOptions().contains("--enable-preview")?JavaCore.ENABLED:JavaCore.DISABLED;
+
+				String previewFeatures = info.getCompileOptions() != null
+						&& info.getCompileOptions().contains("--enable-preview") ? JavaCore.ENABLED : JavaCore.DISABLED;
 				options.put(JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES, previewFeatures);
-			
+
 				if (!Objects.deepEquals(oldOptions, options)) {
-					jp.setOptions(options);				
+					jp.setOptions(options);
 					updateCache = true;
 				}
 			}
-				
+
 			if (!Objects.deepEquals(newClasspath, classpath)) {
 				jp.setRawClasspath(newClasspath, monitor);
 				updateCache = true;
 			}
-			
+
 			if (updateCache) {
 				cache.put(project, info);
 			}
-			
+
 		}
 	}
 
@@ -229,19 +251,19 @@ public class ProjectConfigurationManager {
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 		if (!project.exists()) {
 			IProjectDescription description = ResourcesPlugin.getWorkspace().newProjectDescription(name);
-			project.create(description, monitor);			
-			project.open(monitor);			
+			project.create(description, monitor);
+			project.open(monitor);
 			description.setNatureIds(new String[] { JBangConstants.NATURE_ID, JavaCore.NATURE_ID });
 			project.setDescription(description, monitor);
 		}
-		
+
 		IJavaProject javaProject = JavaCore.create(project);
 
 		List<IClasspathEntry> classpaths = new ArrayList<>();
 		// Add source folder
 		IFolder source = project.getFolder("src");
 		if (!source.exists()) {
-			source.create(true, true, monitor);			
+			source.create(true, true, monitor);
 		}
 		IPackageFragmentRoot root = javaProject.getPackageFragmentRoot(source);
 		IClasspathEntry srcClasspath = JavaCore.newSourceEntry(root.getPath());
@@ -279,7 +301,7 @@ public class ProjectConfigurationManager {
 		String fileName = p.getFileName().toString();
 		return link(resource, fileName, project, monitor);
 	}
-	
+
 	private IFile link(String resource, String link, IProject project, IProgressMonitor monitor) throws CoreException {
 		IPath filePath = new Path("src").append(link);
 		IFile fakeFile = project.getFile(filePath);

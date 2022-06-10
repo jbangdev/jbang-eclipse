@@ -22,18 +22,23 @@ public class JBangCorePlugin extends Plugin {
 	private static JBangCorePlugin plugin;
 
 	private IJBang jbangManager;
+	
+	private JBangRuntimesDiscoveryJob jbangRuntimesDiscoveryJob;
 
 	@Override
 	public void start(BundleContext context) throws Exception {
 		super.start(context);
 		jbangManager = new JBangManager();
-		new JBangRuntimesDiscoveryJob(jbangManager.getJBangRuntimeManager()).schedule();
+		jbangRuntimesDiscoveryJob = new JBangRuntimesDiscoveryJob(jbangManager.getJBangRuntimeManager());
+		jbangRuntimesDiscoveryJob.schedule();
 		plugin = this;
 	}
 
 	@Override
 	public void stop(BundleContext context) throws Exception {
 		jbangManager = null;
+		jbangRuntimesDiscoveryJob.cancel();
+		jbangRuntimesDiscoveryJob = null;
 		plugin = null;
 		super.stop(context);
 	}

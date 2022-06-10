@@ -89,7 +89,8 @@
 					<artifactId>tycho-surefire-plugin</artifactId>
 					<version>${tycho.version}</version>
 					<configuration>
-						<useUIHarness>true</useUIHarness>
+						<useUIHarness>false</useUIHarness>
+						<useUIThread>false</useUIThread>
 						<argLine>${tycho.test.jvmArgs}</argLine>
 						<!-- kill test JVM if tests take more than 1 minute (60 seconds) to 
 							finish -->
@@ -155,6 +156,7 @@
 	<modules>
 		<module>dev.jbang.eclipse.target</module>
 		<module>dev.jbang.eclipse.core</module>
+		<module>dev.jbang.eclipse.test</module>
 		<module>dev.jbang.eclipse.ui</module>
 		<module>dev.jbang.eclipse.feature</module>
 		<module>dev.jbang.eclipse.site</module>

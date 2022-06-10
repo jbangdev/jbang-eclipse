@@ -6,7 +6,8 @@ Bundle-Version: 0.0.2.qualifier
 Bundle-Activator: dev.jbang.eclipse.ui.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
- dev.jbang.eclipse.core
+ dev.jbang.eclipse.core,
+ org.eclipse.core.resources
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-11
 Automatic-Module-Name: dev.jbang.eclipse.ui

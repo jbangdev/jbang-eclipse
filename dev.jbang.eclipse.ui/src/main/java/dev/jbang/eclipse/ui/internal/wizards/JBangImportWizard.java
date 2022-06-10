@@ -3,6 +3,7 @@ package dev.jbang.eclipse.ui.internal.wizards;
 import java.nio.file.Path;
 import java.util.Collection;
 
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ResourceLocator;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -29,7 +30,7 @@ public class JBangImportWizard extends Wizard implements IImportWizard {
 			return false;
 		}
 		Collection<Path> scripts = page.getScripts();
-		ImportJBangScriptsJob job = new ImportJBangScriptsJob(scripts.toArray(new Path[scripts.size()]));
+		Job job = new ImportJBangScriptsJob(scripts.toArray(new Path[scripts.size()]));
 		job.schedule();
 		return true;
 

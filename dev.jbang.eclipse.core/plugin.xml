@@ -31,4 +31,11 @@
    <extension point="org.eclipse.core.runtime.preferences">
       <initializer class="dev.jbang.eclipse.core.internal.preferences.JBangPreferenceInitializer"/>
    </extension>
+   <extension point="org.eclipse.jdt.core.classpathContainerInitializer"
+              id="jbangClasspathContainer"
+              name="JBang Classpath Container">
+      <classpathContainerInitializer
+            id="dev.jbang.eclipse.core.JBANG_CLASSPATH_CONTAINER"
+            class="dev.jbang.eclipse.core.internal.classpath.JBangClasspathContainerInitializer"/>
+   </extension>
 </plugin>

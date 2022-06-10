@@ -11,7 +11,7 @@ public final class JBangConstants {
 	public static final String BUILDER_ID = PLUGIN_ID + ".jbangbuilder"; //$NON-NLS-1$
 
 	public static final String MARKER_ID = PLUGIN_ID + ".jbangproblem"; //$NON-NLS-1$
-
+	
 	public static final String MARKER_RESOLUTION_ID = MARKER_ID + ".resolution"; //$NON-NLS-1$
 	
 	private static final String PREFIX = "dev.jbang."; 
@@ -25,6 +25,7 @@ public final class JBangConstants {
 	  /** String */
 	public static final  String P_DEFAULT_RUNTIME = PREFIX + "defaultRuntime"; //$NON-NLS-1$
 
+	
 	  private JBangConstants(){
 		  //no instanciation
 	  }
