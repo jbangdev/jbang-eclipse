@@ -1,37 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension point="org.eclipse.ui.importWizards">
-     <category id="org.eclipse.ui.Basic" name="%category.general.name"/>
-     <category id="dev.jbang.eclipse" name="JBang"/>
+	<extension point="org.eclipse.ui.importWizards">
+		<category id="org.eclipse.ui.Basic" name="%category.general.name" />
+		<category id="dev.jbang.eclipse" name="JBang" />
+		<wizard id="dev.jbang.eclipse.ui.JBangImportWizard" 
+				class="dev.jbang.eclipse.ui.internal.wizards.JBangImportWizard" 
+				icon="icons/jbang.png" 
+				category="dev.jbang.eclipse" 
+				name="JBang script">
+			<description>Import JBang script as project</description>
+		</wizard>
+	</extension>
 
+	<extension point="org.eclipse.ui.keywords">
+		<keyword id="dev.jbang.eclipse" label="JBang" />
+	</extension>
 
-     <wizard id="dev.jbang.eclipse.ui.JBangImportWizard"
-             class="dev.jbang.eclipse.ui.internal.wizards.JBangImportWizard"
-             icon="icons/jbang.png"
-             category="dev.jbang.eclipse"
-             name="JBang script">
-        <description>Import JBang script as project</description>
-     </wizard>
-   </extension>
-   
-   <extension point="org.eclipse.ui.keywords">
-      <keyword id="dev.jbang.eclipse" label="JBang"/>
-   </extension>
-   
-   <extension point="org.eclipse.ui.preferencePages">
-        <page id="dev.jbang.eclipse.ui.preferences.JBangPreferencesPage"
-         	class="dev.jbang.eclipse.ui.internal.preferences.JBangPreferencesPage"
-            name="JBang">
-         <keywordReference id="dev.jbang.eclipse"/>
-      </page>
-      <page id="dev.jbang.eclipse.ui.preferences.JBangInstallationsPreferencesPage"
-            category="dev.jbang.eclipse.ui.preferences.JBangPreferencesPage"
-            class="dev.jbang.eclipse.ui.internal.preferences.JBangInstallationsPreferencesPage"
-            name="Installations">
-         <keywordReference id="dev.jbang.eclipse"/>
-      </page>
- 
-   </extension>
+	<extension point="org.eclipse.ui.preferencePages">
+		<page 	id="dev.jbang.eclipse.ui.preferences.JBangPreferencesPage" 
+				class="dev.jbang.eclipse.ui.internal.preferences.JBangPreferencesPage" 
+				name="JBang">
+			<keywordReference id="dev.jbang.eclipse" />
+		</page>
+		<page 	id="dev.jbang.eclipse.ui.preferences.JBangInstallationsPreferencesPage" 
+				category="dev.jbang.eclipse.ui.preferences.JBangPreferencesPage" 
+				class="dev.jbang.eclipse.ui.internal.preferences.JBangInstallationsPreferencesPage" 
+				name="Installations">
+			<keywordReference id="dev.jbang.eclipse" />
+		</page>
+	</extension>
 
+	<extension point="org.eclipse.ui.menus">
+		<menuContribution locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+			<command commandId="dev.jbang.eclipse.ui.commands.addjbangnature" style="push">
+				<visibleWhen>
+					<iterate operator="or" ifEmpty="false">
+						<adapt type="org.eclipse.core.resources.IProject">
+							<not>
+								<test forcePluginActivation="true" 
+									property="org.eclipse.core.resources.projectNature"
+									value="dev.jbang.eclipse.core.jbangnature" />
+							</not>
+						</adapt>
+					</iterate>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+		<menuContribution locationURI="popup:org.eclipse.ui.popup.any?after=additions">
+			<command commandId="dev.jbang.eclipse.ui.commands.synchronizejbang" style="push">
+				<visibleWhen>
+					<iterate ifEmpty="false" operator="or">
+						<reference definitionId="dev.jbang.eclipse.ui.expressions.isJBangResource" />
+					</iterate>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	<extension point="org.eclipse.ui.commands">
+		<category 
+			description="JBang commands"
+          	id="dev.jbang.eclipse"
+          	name="JBang"
+		/>
+		<command 
+			id="dev.jbang.eclipse.ui.commands.addjbangnature" 
+			categoryId="dev.jbang.eclipse" 
+			name="Add JBang support" 
+			description="Adds JBang support">
+		</command>
+		<command id="dev.jbang.eclipse.ui.commands.synchronizejbang" 
+			categoryId="dev.jbang.eclipse" 
+			name="Synchronize JBang" 
+			description="Adds JBang support">
+		</command>
+	</extension>
+
+	<extension point="org.eclipse.ui.handlers">
+		<handler commandId="dev.jbang.eclipse.ui.commands.addjbangnature" 
+				class="dev.jbang.eclipse.ui.internal.commands.AddJBangNatureHandler">
+			<activeWhen>
+				<iterate operator="or" ifEmpty="false">
+					<adapt type="org.eclipse.core.resources.IProject">
+						<not>
+							<test forcePluginActivation="true" 
+								property="org.eclipse.core.resources.projectNature" 
+								value="dev.jbang.eclipse.core.jbangnature"/>
+						</not>
+					</adapt>
+				</iterate>
+			</activeWhen>
+		</handler>
+		<handler 	commandId="dev.jbang.eclipse.ui.commands.synchronizejbang" 
+					class="dev.jbang.eclipse.ui.internal.commands.SynchronizeJBangHandler">
+			<activeWhen>
+				<iterate ifEmpty="false" operator="or">
+					<reference definitionId="dev.jbang.eclipse.ui.expressions.isJBangResource" />
+				</iterate>
+			</activeWhen>
+		</handler>
+	</extension>
+
+	<extension point="org.eclipse.core.expressions.definitions">
+		<definition id="dev.jbang.eclipse.ui.expressions.isJBangResource">
+		<or>
+			<adapt type="org.eclipse.core.resources.IResource">
+				<or>
+					<test forcePluginActivation="true" 
+						property="dev.jbang.eclipse.core.isJBangResource" 
+						value="true"/>
+				</or>
+			</adapt>
+			<and>
+				<with variable="activePart">
+					<instanceof value="org.eclipse.ui.IEditorPart" />
+				</with>
+				<with variable="activeEditorInput">
+					<adapt type="org.eclipse.core.resources.IResource">
+						<or>
+							<test forcePluginActivation="true" 
+								property="dev.jbang.eclipse.core.isJBangResource" 
+								value="true"/>
+						</or>
+					</adapt>
+				</with>
+			</and>
+		</or>
+		</definition>
+	</extension>
+
+	<extension point="org.eclipse.ui.commandImages">
+		<image commandId="dev.jbang.eclipse.ui.commands.addjbangnature" icon="icons/jbang16.png"></image>
+		<image commandId="dev.jbang.eclipse.ui.commands.synchronizejbang" icon="icons/jbang16.png"></image>
+	</extension>
 </plugin>

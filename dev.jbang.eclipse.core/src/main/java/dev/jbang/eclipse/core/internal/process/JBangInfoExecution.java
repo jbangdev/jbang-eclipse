@@ -9,12 +9,10 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -28,7 +26,7 @@ import com.google.gson.GsonBuilder;
 
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntime;
 
-public class JBangExecution {
+public class JBangInfoExecution {
 
 	private JBangRuntime jbang;
 	private String file;
@@ -40,7 +38,7 @@ public class JBangExecution {
 	private static final Pattern RESOLUTION_ERROR_4 = Pattern.compile(".*The following artifacts could not be resolved: (.*?): Could");
 	
 	
-	public JBangExecution(JBangRuntime jbang, File file, String javaHome) {
+	public JBangInfoExecution(JBangRuntime jbang, File file, String javaHome) {
 		this.jbang = jbang;
 		this.javaHome = javaHome;
 		this.file = file.toString();
@@ -54,6 +52,7 @@ public class JBangExecution {
 		try {
 			ProcessBuilder processBuilder = new ProcessBuilder(jbang.getExecutable().toOSString(), "--quiet", "info", "tools", file);
 			var env = processBuilder.environment();
+			env.put("NO_COLOR", "true");
 			var processJavaHome = env.get("JAVA_HOME");
 			if (processJavaHome == null || processJavaHome.isBlank()) {
 				if (javaHome == null || javaHome.isBlank()) {

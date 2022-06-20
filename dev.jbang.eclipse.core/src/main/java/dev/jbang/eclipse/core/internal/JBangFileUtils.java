@@ -1,15 +1,28 @@
 package dev.jbang.eclipse.core.internal;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.dom.ASTParser;
+import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.PackageDeclaration;
+import org.eclipse.jdt.internal.corext.dom.IASTSharedValues;
 
+@SuppressWarnings("restriction")
 public class JBangFileUtils {
 
 	private static Pattern JBANG_HEADERS = Pattern.compile("(//.*jbang.*)|(//[A-Z:]+ ).*");
@@ -19,21 +32,31 @@ public class JBangFileUtils {
 	private static Pattern SOURCES_INSTRUCTION = Pattern.compile("//SOURCES (\\S*).*");
 	
 	private static Pattern FILES_INSTRUCTION = Pattern.compile("//FILES (\\S*).*");
-
+	
+	private static final Set<String> EXTENSIONS = new LinkedHashSet<>();
+	
+	static {
+		EXTENSIONS.add("java");
+		EXTENSIONS.add("jsh");
+		EXTENSIONS.add("kt");
+		EXTENSIONS.add("groovy");
+	}
+	
 	private JBangFileUtils() {
 	}
 
 	public static boolean isJBangFile(IResource resource) {
-		if (!(resource instanceof IFile)
-				|| (!"java".equals(resource.getFileExtension()) && !"jsh".equals(resource.getFileExtension()))) {
+		if (!(resource instanceof IFile)) {
+			return false;
+		}
+		if (EXTENSIONS.stream().filter(ext -> ext.equals(resource.getFileExtension())).findAny().isEmpty()) {
 			return false;
 		}
 		IFile file = (IFile) resource;
-		try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getContents()))) {
-			String firstLine = reader.readLine().toString();
-			return isJBangInstruction(firstLine);
+		try {
+			return isJBangContent(new InputStreamReader(file.getContents()));			
 		} catch (Exception e) {
-			e.printStackTrace();
+			//ignore
 		}
 		return false;
 	}
@@ -43,14 +66,27 @@ public class JBangFileUtils {
 			return false;
 		}
 		String fileName = file.getFileName().toString().toLowerCase();
-		if (!fileName.endsWith(".java") && !fileName.endsWith(".jsh")) {
+		
+		if (EXTENSIONS.stream().filter(ext -> fileName.endsWith("."+ext)).findAny().isEmpty()) {
 			return false;
 		}
-		String firstLine;
 		try {
-			firstLine = Files.lines(file).filter(line -> !line.isBlank()).findFirst().get();
-			return isJBangInstruction(firstLine);
-		} catch (IOException e) {
+			return isJBangContent(Files.newBufferedReader(file));			
+		} catch (Exception e) {
+			//ignore
+		}
+		return false;
+	}
+	
+	private static boolean isJBangContent(Reader r) throws IOException {
+		try (BufferedReader reader = new BufferedReader(r)) {
+			String line;
+			while((line = reader.readLine()) != null) {
+				//XXX, only check the first n lines then bail?
+				if (!line.isBlank()) {					
+					return isJBangInstruction(line);
+				}
+			}
 		}
 		return false;
 	}
@@ -87,4 +123,24 @@ public class JBangFileUtils {
 		return null;
 	}
 
+	public static String getPackageName(IJavaProject javaProject, IFile file) {
+		//TODO probably not the most efficient way to get the package name as this reads the whole file;
+		char[] source = null;
+		try (InputStream is = new BufferedInputStream(file.getContents(true))) {
+			source = IOUtils.toCharArray(is, file.getCharset());
+		} catch (IOException | CoreException e) {
+			e.printStackTrace();
+		}
+		if (source == null) {
+			return null;
+		}
+		
+		ASTParser parser = ASTParser.newParser(IASTSharedValues.SHARED_AST_LEVEL);
+		parser.setProject(javaProject);
+		parser.setIgnoreMethodBodies(true);
+		parser.setSource(source);
+		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
+		PackageDeclaration pkg = ast.getPackage();
+		return (pkg == null || pkg.getName() == null)? null :pkg.getName().getFullyQualifiedName();
+	}
 }

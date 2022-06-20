@@ -4,13 +4,16 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Objects;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
@@ -89,8 +92,32 @@ public class JBangClasspathUtils {
 	    }
 	  }
 	  
-	  static File getContainerStateFile(IProject project) {
-		    return new File(STATE_LOCATION_DIR, project.getName() + ".container"); //$NON-NLS-1$
-	  }
+	static File getContainerStateFile(IProject project) {
+	    return new File(STATE_LOCATION_DIR, project.getName() + ".container"); //$NON-NLS-1$
+	}
+
+  
+	public static boolean isOnClasspath(IJavaProject javaProject, IFile script) throws CoreException {
+		if (script != null && JavaCore.isJavaLikeFileName(script.getName())) {
+			IClasspathEntry[] entries = javaProject.getRawClasspath();
+			for (IClasspathEntry entry : entries) {
+				if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE &&
+						entry.getPath().isPrefixOf(script.getFullPath())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	  
+	public static boolean hasAttribute(IClasspathEntry entry, String attribute) throws CoreException {
+		for (IClasspathAttribute attr : entry.getExtraAttributes()) {
+			if (Objects.equals(attribute, attr.getName())) {
+				return true;
+			}
+		}
+		return false;
+	}
 
 }
