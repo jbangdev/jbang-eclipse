@@ -1,5 +1,9 @@
 package dev.jbang.eclipse.core.internal.project;
 
+import static dev.jbang.eclipse.core.JBangCorePlugin.log;
+import static dev.jbang.eclipse.core.internal.ProjectUtils.isJBangProject;
+import static dev.jbang.eclipse.core.internal.ProjectUtils.isJavaProject;
+
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -11,6 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -19,11 +24,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
@@ -31,10 +39,11 @@ import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 import dev.jbang.eclipse.core.JBangCorePlugin;
 import dev.jbang.eclipse.core.internal.JBangClasspathUtils;
 import dev.jbang.eclipse.core.internal.JBangConstants;
-import dev.jbang.eclipse.core.internal.ProjectUtils;
 import dev.jbang.eclipse.core.internal.ResourceUtil;
 import dev.jbang.eclipse.core.internal.classpath.JBangClasspathContainer;
-import dev.jbang.eclipse.core.internal.process.JBangExecution;
+import dev.jbang.eclipse.core.internal.process.JBangDependencyError;
+import dev.jbang.eclipse.core.internal.process.JBangError;
+import dev.jbang.eclipse.core.internal.process.JBangInfoExecution;
 import dev.jbang.eclipse.core.internal.process.JBangInfoResult;
 import dev.jbang.eclipse.core.internal.process.JBangInfoResult.JBangFile;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntime;
@@ -56,20 +65,12 @@ public class ProjectConfigurationManager {
 		this.runtimeManager = runtimeManager;
 	}
 
-	public void addJBangNature(IProject project, IProgressMonitor monitor) throws CoreException {
-		if (!project.hasNature(JBangConstants.NATURE_ID)) {
-			IProjectDescription description = project.getDescription();
-			String[] prevNatures = description.getNatureIds();
-			String[] newNatures = new String[prevNatures.length + 1];
-			System.arraycopy(prevNatures, 0, newNatures, 1, prevNatures.length);
-			newNatures[0] = JBangConstants.NATURE_ID;
-			description.setNatureIds(newNatures);
-			project.setDescription(description, monitor);
-		}
-	}
 
 	public void configure(JBangProject jbp, JBangInfoResult info, IProgressMonitor monitor) throws CoreException {
 		IProject project = jbp.getProject();
+		if (!isJavaProject(project)) {
+			return;
+		}
 		var oldInfo = cache.get(project);
 		if (Objects.equals(info, oldInfo)) {
 			// Nothing changed
@@ -208,10 +209,11 @@ public class ProjectConfigurationManager {
 
 	public JBangProject getJBangProject(IProject project, IProgressMonitor monitor) {
 		// TODO use cache / project registry
-		if (!ProjectUtils.isJBangProject(project)) {
+		if (!isJBangProject(project)) {
 			return null;
 		}
 		JBangProject jbp = new JBangProject(project);
+		//TODO use JBang runtime specific to this project
 		JBangRuntime jbang = runtimeManager.getDefaultRuntime();
 		jbp.setRuntime(jbang);
 		return jbp;
@@ -242,11 +244,11 @@ public class ProjectConfigurationManager {
 
 	public JBangProject createJBangProject(java.nio.file.Path script, IProgressMonitor monitor) throws CoreException {
 		var jbang = runtimeManager.getDefaultRuntime();
-		var execution = new JBangExecution(jbang, script.toFile(), null);
+		var execution = new JBangInfoExecution(jbang, script.toFile(), null);
 		var info = execution.getInfo(monitor);
 
 		String fileName = script.getFileName().toString();
-		String name = fileName.substring(0, fileName.lastIndexOf(".java"));
+		String name = fileName; //fileName.substring(0, fileName.lastIndexOf("."));
 
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 		if (!project.exists()) {
@@ -263,17 +265,19 @@ public class ProjectConfigurationManager {
 		// Add source folder
 		IFolder source = project.getFolder("src");
 		if (!source.exists()) {
-			source.create(true, true, monitor);
+			ResourceUtil.createFolder(source, monitor);
+		}
+		IFolder bin = project.getFolder(".jbang/bin");
+		if (!bin.exists()) {
+			ResourceUtil.createFolder(bin, monitor);
 		}
 		IPackageFragmentRoot root = javaProject.getPackageFragmentRoot(source);
-		IClasspathEntry srcClasspath = JavaCore.newSourceEntry(root.getPath());
+		
+		IClasspathAttribute jbangScopeAttr = JavaCore.newClasspathAttribute("jbang.scope", "main");
+		IClasspathEntry srcClasspath = JavaCore.newSourceEntry(root.getPath(), null, null, null, new IClasspathAttribute[] {jbangScopeAttr} );
 		classpaths.add(srcClasspath);
 		javaProject.setRawClasspath(classpaths.toArray(new IClasspathEntry[0]), monitor);
 
-		IFolder bin = project.getFolder("bin");
-		if (!bin.exists()) {
-			bin.create(true, true, monitor);
-		}
 		javaProject.setOutputLocation(bin.getFullPath(), monitor);
 
 		IFile mainFile = link(info.getBackingResource(), project, monitor);
@@ -313,6 +317,80 @@ public class ProjectConfigurationManager {
 		java.nio.file.Path p = Paths.get(resource);
 		fakeFile.createLink(p.toUri(), IResource.REPLACE, monitor);
 		return fakeFile;
+	}
+	
+	public void synchronize(IFile file, IProgressMonitor monitor) throws CoreException {
+		monitor.setTaskName("Updating JBang configuration from " + file.getName());
+		//System.err.println(file + " configuration changed, checking jbang info");
+		JBangProject jbp = getJBangProject(file.getProject(), monitor);
+		if (jbp == null) {
+			return;
+		}
+		var jbang = jbp.getRuntime();
+		
+		var execution = new JBangInfoExecution(jbang, file.getLocation().toFile(), null);
+		JBangInfoResult info = execution.getInfo(monitor);
+		clearMarkers(file);
+		if (info != null) {
+			if (info.getResolutionErrors() == null || info.getResolutionErrors().isEmpty()) {
+				configure(jbp, info, monitor);
+			} else {
+				String source = getSource(file);
+				info.getResolutionErrors().forEach(e -> {
+					try {
+						addErrorMarker(file, source, e);
+					} catch (CoreException e1) {
+						log(e1);
+					}
+				});
+			}
+		}
+		
+	}
+	
+	private String getSource(IFile file) throws JavaModelException {
+		ICompilationUnit typeRoot = JavaCore.createCompilationUnitFrom(file);
+		return typeRoot.getBuffer().getContents();
+	}
+
+	private void clearMarkers(IFile file) throws CoreException {
+		file.deleteMarkers(JBangConstants.MARKER_ID, true, 1);
+	}
+
+	private void addErrorMarker(IFile file, String source, JBangError e) throws CoreException {
+		IMarker marker = file.createMarker(JBangConstants.MARKER_RESOLUTION_ID);
+		marker.setAttribute(IMarker.MESSAGE, e.getMessage());
+		marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+		marker.setAttribute(IMarker.TRANSIENT, true);
+		if (e instanceof JBangDependencyError) {
+			String dependency = ((JBangDependencyError) e).getDependency();
+			TextPosition pos = findPosition(dependency, source);
+			marker.setAttribute(IMarker.LINE_NUMBER, pos.line);
+			if (pos.start > 0) {
+				marker.setAttribute(IMarker.CHAR_START, pos.start);
+				marker.setAttribute(IMarker.CHAR_END, pos.end);
+			}
+		} else {
+			marker.setAttribute(IMarker.LINE_NUMBER, 1);
+		}
+	}
+
+	private TextPosition findPosition(String dependency, String source) {
+		TextPosition pos = new TextPosition();
+		int line[] = new int[1];
+		int lineOffset[] = new int[1];
+		source.lines().filter(l -> {
+			line[0]++;
+			int i = l.indexOf(dependency);
+			if (i > -1) {
+				pos.line = line[0];
+				pos.start = lineOffset[0] + i;
+				pos.end = pos.start + dependency.length();
+			}
+			lineOffset[0] += (1 + l.length());
+			return i > 0;
+		}).findFirst();
+		return pos;
 	}
 
 }

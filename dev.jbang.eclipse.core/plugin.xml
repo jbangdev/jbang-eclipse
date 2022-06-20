@@ -10,7 +10,7 @@
    </extension>
    <extension point="org.eclipse.core.resources.natures"
          id="dev.jbang.eclipse.core.jbangnature"
-         name="J'Bang">
+         name="JBang">
       <runtime>
          <run class="dev.jbang.eclipse.core.internal.builder.JBangNature"/>
       </runtime>
@@ -38,4 +38,15 @@
             id="dev.jbang.eclipse.core.JBANG_CLASSPATH_CONTAINER"
             class="dev.jbang.eclipse.core.internal.classpath.JBangClasspathContainerInitializer"/>
    </extension>
+   
+   <extension
+          point="org.eclipse.core.expressions.propertyTesters">
+       <propertyTester
+             class="dev.jbang.eclipse.core.internal.expressions.JBangResourceTester"
+             id="dev.jbang.eclipse.core.JBangResourceTester"
+             namespace="dev.jbang.eclipse.core"
+             properties="isJBangResource"
+             type="org.eclipse.core.resources.IResource">
+       </propertyTester>
+    </extension>
 </plugin>
