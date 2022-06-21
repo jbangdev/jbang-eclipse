@@ -154,18 +154,16 @@ public class SynchronizeJBangHandler extends AbstractHandler {
 			var newClasspath = new ArrayList<>(classpath.length);
 			IClasspathEntry srcClasspath = null;
 			for (IClasspathEntry cpe : classpath) {
-				if (cpe.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-					if (Objects.equals(src.getFullPath(), cpe.getPath())) {
-						srcClasspath = cpe;
-						if (!hasAttribute(cpe, "jbang.scope")) {
-							var prevAttr = cpe.getExtraAttributes();
-							var newAttr = new IClasspathAttribute[prevAttr.length + 1];
-							System.arraycopy(prevAttr, 0, newAttr, 1, prevAttr.length);
-							newAttr[0] = JavaCore.newClasspathAttribute("jbang.scope", "main");
-							srcClasspath =  JavaCore.newSourceEntry(cpe.getPath(), cpe.getInclusionPatterns(), cpe.getExclusionPatterns(), cpe.getOutputLocation(), newAttr );
-						}
-						newClasspath.add(srcClasspath);										
+				if (cpe.getEntryKind() == IClasspathEntry.CPE_SOURCE && Objects.equals(src.getFullPath(), cpe.getPath())) {
+					srcClasspath = cpe;
+					if (!hasAttribute(cpe, "jbang.scope")) {
+						var prevAttr = cpe.getExtraAttributes();
+						var newAttr = new IClasspathAttribute[prevAttr.length + 1];
+						System.arraycopy(prevAttr, 0, newAttr, 1, prevAttr.length);
+						newAttr[0] = JavaCore.newClasspathAttribute("jbang.scope", "main");
+						srcClasspath =  JavaCore.newSourceEntry(cpe.getPath(), cpe.getInclusionPatterns(), cpe.getExclusionPatterns(), cpe.getOutputLocation(), newAttr );
 					}
+					newClasspath.add(srcClasspath);
 				} else {
 					newClasspath.add(cpe);
 				}
