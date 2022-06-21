@@ -41,6 +41,11 @@ The source folder containing the JBang file will automatically be added to the p
 - Other build tools (m2e/buildship) might conflict with the classpath changes. Typically, Updating the Maven project configuration would remove the JBang source folder and its classpath container. Re-running `Synchronize JBang` will be necessary to get completion and validation in JBang scripts.
 
 
+## Recommended 3rd party plugins
+
+* Automatic source downloads: Currently, JBang dependencies sources are not automatically fetched. You can install the [PDE source lookup](https://marketplace.eclipse.org/content/pde-source-lookup) plugin to automatically download sources from Maven Central, when opening a type from a JBang dependency. 
+* Automatic JBang-managed JDK detection: The [JRE Discovery](https://marketplace.eclipse.org/content/jre-discovery) plugin will automatically detect JDKs installed by JBang, as soon as they're installed.
+
 Installation
 ------------
 
