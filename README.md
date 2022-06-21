@@ -3,7 +3,7 @@ JBang / Eclipse integration POC
 
 This experimental plugin aims to let you author [JBang](https://github.com/jbangdev/jbang) scripts in Eclipse with ease.
 
-##Features:
+## Features:
 
 - Import JBang Scripts as projects
 - Synchronize JBang Dependencies to existing projects
