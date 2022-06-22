@@ -1,5 +1,8 @@
 package dev.jbang.eclipse.core.internal.builder;
 
+import static dev.jbang.eclipse.core.internal.StringSanitizer.normalizeSpaces;
+import static dev.jbang.eclipse.core.internal.StringSanitizer.removeAllSpaces;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -16,7 +19,6 @@ class JBangConfigVisitor extends ASTVisitor {
 
 		private static final Pattern JBANG_INSTRUCTIONS = Pattern.compile("^(//[A-Z_]+ ).*$");
 
-		private static final Pattern SANITIZER = Pattern.compile("[\\s|\\r|\\n]");
 
 		private List<String> configElements = new ArrayList<>();
 
@@ -34,7 +36,7 @@ class JBangConfigVisitor extends ASTVisitor {
 		public boolean visit(SingleMemberAnnotation node) {
 			String annotation = getContent(node);
 			if (GROOVY_GRAPES.matcher(annotation).matches()) {
-				configElements.add(removeWhiteSpaces(annotation));
+				configElements.add(removeAllSpaces(annotation));
 			}
 			return super.visit(node);
 		}
@@ -43,7 +45,7 @@ class JBangConfigVisitor extends ASTVisitor {
 		public boolean visit(MarkerAnnotation node) {
 			String annotation = getContent(node);
 			if (GROOVY_GRAPES.matcher(annotation).matches()) {
-				configElements.add(removeWhiteSpaces(annotation));
+				configElements.add(removeAllSpaces(annotation));
 			}
 			return super.visit(node);
 		}
@@ -52,8 +54,9 @@ class JBangConfigVisitor extends ASTVisitor {
 		public boolean visit(LineComment node) {
 			if (node.isLineComment()) {
 				String comment = getContent(node);
+				//FIXME line comments are stripped of leading spaces, so we unfortunately detect false-positive JBang instructions
 				if (JBANG_INSTRUCTIONS.matcher(comment).matches()) {
-					configElements.add(removeWhiteSpaces(comment));
+					configElements.add(normalizeSpaces(comment));
 				}
 			}
 			return super.visit(node);
@@ -65,8 +68,6 @@ class JBangConfigVisitor extends ASTVisitor {
 			return source.substring(start, end).trim();
 		}
 
-		private String removeWhiteSpaces(String content) {
-			return SANITIZER.matcher(content).replaceAll("");
-		}
+
 
 	}
