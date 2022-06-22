@@ -16,6 +16,7 @@ class JBangConfigVisitor extends ASTVisitor {
 
 		private static final Pattern JBANG_INSTRUCTIONS = Pattern.compile("^(//[A-Z_]+ ).*$");
 
+		private static final Pattern SANITIZER = Pattern.compile("[\\s|\\r|\\n]");
 
 		private List<String> configElements = new ArrayList<>();
 
@@ -33,7 +34,7 @@ class JBangConfigVisitor extends ASTVisitor {
 		public boolean visit(SingleMemberAnnotation node) {
 			String annotation = getContent(node);
 			if (GROOVY_GRAPES.matcher(annotation).matches()) {
-				configElements.add(annotation);
+				configElements.add(removeWhiteSpaces(annotation));
 			}
 			return super.visit(node);
 		}
@@ -42,7 +43,7 @@ class JBangConfigVisitor extends ASTVisitor {
 		public boolean visit(MarkerAnnotation node) {
 			String annotation = getContent(node);
 			if (GROOVY_GRAPES.matcher(annotation).matches()) {
-				configElements.add(annotation);
+				configElements.add(removeWhiteSpaces(annotation));
 			}
 			return super.visit(node);
 		}
@@ -52,7 +53,7 @@ class JBangConfigVisitor extends ASTVisitor {
 			if (node.isLineComment()) {
 				String comment = getContent(node);
 				if (JBANG_INSTRUCTIONS.matcher(comment).matches()) {
-					configElements.add(comment);
+					configElements.add(removeWhiteSpaces(comment));
 				}
 			}
 			return super.visit(node);
@@ -62,6 +63,10 @@ class JBangConfigVisitor extends ASTVisitor {
 			int start = node.getStartPosition();
 			int end = start + node.getLength();
 			return source.substring(start, end).trim();
+		}
+
+		private String removeWhiteSpaces(String content) {
+			return SANITIZER.matcher(content).replaceAll("");
 		}
 
 	}
