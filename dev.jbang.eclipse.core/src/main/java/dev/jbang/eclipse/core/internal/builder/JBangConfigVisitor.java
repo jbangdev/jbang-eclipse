@@ -12,7 +12,7 @@ import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 
 class JBangConfigVisitor extends ASTVisitor {
 
-		private static final Pattern GROOVY_GRAPES = Pattern.compile("^(@Grab|@Grapes).*$");
+		private static final Pattern GROOVY_GRAPES = Pattern.compile("^\\s*(@Grab|@Grapes).*", Pattern.DOTALL);
 
 		private static final Pattern JBANG_INSTRUCTIONS = Pattern.compile("^(//[A-Z_]+ ).*$");
 

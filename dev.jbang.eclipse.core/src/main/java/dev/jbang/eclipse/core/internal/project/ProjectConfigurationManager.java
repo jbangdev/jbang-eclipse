@@ -379,6 +379,8 @@ public class ProjectConfigurationManager {
 		TextPosition pos = new TextPosition();
 		int line[] = new int[1];
 		int lineOffset[] = new int[1];
+		//FIXME only apply to //DEPS or @Grab lines
+		//FIXME also match @Grab annotations using the verbose @Grab(group = "ch.qos.reload4j", module = "reload4j", version = "1.2.19") notation
 		source.lines().filter(l -> {
 			line[0]++;
 			int i = l.indexOf(dependency);
