@@ -23,16 +23,21 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots verify
+        run: mvn --batch-mode --update-snapshots verify -Pflat-repo
+
       - name: Upload p2 update site
         uses: actions/upload-artifact@v3
         with:
           name: jbang.eclipse
           path: dev.jbang.eclipse.site/target/repository/*
+
       - name: Deploy p2 update site
         if: github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v3
+        uses: marvinpinto/action-automatic-releases@latest
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: dev.jbang.eclipse.site/target/repository
-          destination_dir: update
+          repo_token: "${{secrets.GITHUB_TOKEN}}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            dev.jbang.eclipse.site/target/flat-repository/*
