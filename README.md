@@ -58,7 +58,7 @@ _JBang Eclipse Integration_ is available in the [Eclipse Marketplace](https://ma
 Alternatively, in Eclipse:
 
 - open Help > Install New Software...
-- work with: `https://jbangdev.github.io/jbang-eclipse/update/`
+- work with: `https://github.com/jbangdev/jbang-eclipse/releases/download/latest/`
 - expand the category and select the Jbang Eclipse Feature
 - proceed with the installation
 - restart Eclipse
