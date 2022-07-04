@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.jobs.Job;
 
 import dev.jbang.eclipse.core.JBangCorePlugin;
 import dev.jbang.eclipse.core.internal.JBangFileUtils;
+import dev.jbang.eclipse.core.internal.project.JBangProjectConfiguration;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimesDiscoveryJob;
 
 public class ImportJBangScriptsJob extends WorkspaceJob	 {
@@ -32,13 +33,15 @@ public class ImportJBangScriptsJob extends WorkspaceJob	 {
 			//ignore
 		}
 		var projectManager = JBangCorePlugin.getJBangManager().getProjectConfigurationManager();
-		Path script = scripts[0];
-		try {
-			if (JBangFileUtils.isJBangFile(script)) {
-				projectManager.createJBangProject(script, monitor);
+		var configuration = new JBangProjectConfiguration();
+		for (Path script : scripts) {
+			try {
+				if (JBangFileUtils.isJBangFile(script)) {
+					projectManager.createJBangProject(script, configuration, monitor);
+				}
+			} catch (Exception e) {
+				return toStatus("Error configuring JBang Script", e);
 			}
-		} catch (Exception e) {
-			return toStatus("Error configuring JBang Script", e);
 		}
 		
 		return Status.OK_STATUS;

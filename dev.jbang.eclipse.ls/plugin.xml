@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         id="importers"
+         point="org.eclipse.jdt.ls.core.importers">
+         <importer
+            id = "jbangProjectImporter"
+            order ="1100"
+            class = "dev.jbang.eclipse.ls.internal.JBangImporter"/>
+   </extension>
+   <extension point="org.eclipse.jdt.ls.core.delegateCommandHandler">
+      <delegateCommandHandler class="dev.jbang.eclipse.ls.internal.JBangDelegateCommandHandler">      
+            <command id="jbang/synchronize"/>
+       </delegateCommandHandler>
+   </extension>
+</plugin>

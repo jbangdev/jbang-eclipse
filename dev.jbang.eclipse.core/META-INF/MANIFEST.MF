@@ -17,9 +17,9 @@ Export-Package: dev.jbang.eclipse.core,
  dev.jbang.eclipse.core.internal;x-friends:="dev.jbang.eclipse.ui,dev.jbang.eclipse.ls",
  dev.jbang.eclipse.core.internal.builder;x-friends:="dev.jbang.eclipse.ui,dev.jbang.eclipse.ls",
  dev.jbang.eclipse.core.internal.imports;x-friends:="dev.jbang.eclipse.ui,dev.jbang.eclipse.ls",
- dev.jbang.eclipse.core.internal.preferences;x-friends:="dev.jbang.eclipse.ui",
- dev.jbang.eclipse.core.internal.process;x-friends:="dev.jbang.eclipse.ui",
- dev.jbang.eclipse.core.internal.project;x-friends:="dev.jbang.eclipse.ui",
- dev.jbang.eclipse.core.internal.runtime;x-friends:="dev.jbang.eclipse.ui",
- dev.jbang.eclipse.core.preferences
+ dev.jbang.eclipse.core.internal.preferences;x-friends:="dev.jbang.eclipse.ui,dev.jbang.eclipse.ls",
+ dev.jbang.eclipse.core.internal.process;x-friends:="dev.jbang.eclipse.ui,dev.jbang.eclipse.ls",
+ dev.jbang.eclipse.core.internal.project;x-friends:="dev.jbang.eclipse.ui,dev.jbang.eclipse.ls",
+ dev.jbang.eclipse.core.internal.runtime;x-friends:="dev.jbang.eclipse.ui,dev.jbang.eclipse.ls",
+ dev.jbang.eclipse.core.preferences;x-friends:="dev.jbang.eclipse.ls"
 Automatic-Module-Name: dev.jbang.eclipse.core

@@ -6,6 +6,7 @@
    <feature url="features/dev.jbang.eclipse.feature.source_0.0.0.jar" id="dev.jbang.eclipse.feature.source" version="0.0.0">
     <category name="jbang.sources"/>
    </feature>
+   <bundle url="dev.jbang.eclipse.ls_0.0.0.jar" id="dev.jbang.eclipse.ls" version="0.0.0" />
    <category-def name="jbang" label="JBang Eclipse Integration"/>
    <category-def name="jbang.sources" label="JBang Eclipse Integration Developer Resources"/>
 </site>

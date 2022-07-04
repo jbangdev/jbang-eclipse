@@ -157,6 +157,7 @@
 		<module>dev.jbang.eclipse.target</module>
 		<module>dev.jbang.eclipse.core</module>
 		<module>dev.jbang.eclipse.test</module>
+		<module>dev.jbang.eclipse.ls</module>
 		<module>dev.jbang.eclipse.ui</module>
 		<module>dev.jbang.eclipse.feature</module>
 		<module>dev.jbang.eclipse.site</module>

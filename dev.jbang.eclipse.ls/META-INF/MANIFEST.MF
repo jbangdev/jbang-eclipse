@@ -1,0 +1,16 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: JBang Eclipse LS Plugin
+Bundle-SymbolicName: dev.jbang.eclipse.ls;singleton:=true
+Bundle-Version: 0.0.2.qualifier
+Bundle-Activator: dev.jbang.eclipse.ls.internal.JBangLSPlugin
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.jdt.core,
+ com.google.gson,
+ org.eclipse.jdt.core.manipulation,
+ org.eclipse.jdt.launching,
+ org.eclipse.jdt.ls.core,
+ dev.jbang.eclipse.core
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-11
+Import-Package: org.eclipse.core.resources

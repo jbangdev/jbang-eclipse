@@ -242,7 +242,8 @@ public class ProjectConfigurationManager {
 		cache.remove(project);
 	}
 
-	public JBangProject createJBangProject(java.nio.file.Path script, IProgressMonitor monitor) throws CoreException {
+	public JBangProject createJBangProject(java.nio.file.Path script, JBangProjectConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+
 		var jbang = runtimeManager.getDefaultRuntime();
 		var execution = new JBangInfoExecution(jbang, script.toFile(), null);
 		var info = execution.getInfo(monitor);
@@ -263,10 +264,17 @@ public class ProjectConfigurationManager {
 
 		List<IClasspathEntry> classpaths = new ArrayList<>();
 		// Add source folder
-		IFolder source = project.getFolder("src");
+		if (configuration == null) {
+			configuration = new JBangProjectConfiguration();
+		}
+		IFolder source = project.getFolder(configuration.getSourceFolder());
 		if (!source.exists()) {
 			ResourceUtil.createFolder(source, monitor);
 		}
+		if (configuration.getLinkedSourceFolder() != null) {
+			source.createLink(configuration.getLinkedSourceFolder(), IResource.REPLACE, monitor);
+		}
+		
 		IFolder bin = project.getFolder(".jbang/bin");
 		if (!bin.exists()) {
 			ResourceUtil.createFolder(bin, monitor);
@@ -280,19 +288,19 @@ public class ProjectConfigurationManager {
 
 		javaProject.setOutputLocation(bin.getFullPath(), monitor);
 
-		IFile mainFile = link(info.getBackingResource(), project, monitor);
+		IFile mainFile = link(info.getBackingResource(), project, configuration, monitor);
 		if (info.getSources() != null && !info.getSources().isEmpty()) {
 			for (String s : info.getSources()) {
-				link(s, project, monitor);
+				link(s, project, configuration, monitor);
 			}
 		}
 		if (info.getFiles() != null && !info.getFiles().isEmpty()) {
 			for (JBangFile file : info.getFiles()) {
                 String target = file.target;
                 if (target == null) {
-                    link(file.originalResource, project, monitor);
+                    link(file.originalResource, project, configuration, monitor);
                 } else {
-                    link(file.originalResource, file.target, project, monitor);
+                    link(file.originalResource, file.target, project, configuration, monitor);
                 }
 			}
 		}
@@ -305,14 +313,14 @@ public class ProjectConfigurationManager {
 		return jbp;
 	}
 
-	private IFile link(String resource, IProject project, IProgressMonitor monitor) throws CoreException {
+	private IFile link(String resource, IProject project,  JBangProjectConfiguration configuration, IProgressMonitor monitor) throws CoreException {
 		java.nio.file.Path p = Paths.get(resource);
 		String fileName = p.getFileName().toString();
-		return link(resource, fileName, project, monitor);
+		return link(resource, fileName, project, configuration, monitor);
 	}
 
-	private IFile link(String resource, String link, IProject project, IProgressMonitor monitor) throws CoreException {
-		IPath filePath = new Path("src").append(link);
+	private IFile link(String resource, String link, IProject project, JBangProjectConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+		IPath filePath = new Path(configuration.getSourceFolder()).append(link);
 		IFile fakeFile = project.getFile(filePath);
 		if (fakeFile.exists()) {
 			return fakeFile;
@@ -360,7 +368,7 @@ public class ProjectConfigurationManager {
 	}
 
 	private void clearMarkers(IFile file) throws CoreException {
-		file.deleteMarkers(JBangConstants.MARKER_ID, true, 1);
+		file.deleteMarkers(JBangConstants.MARKER_ID, true, IResource.DEPTH_ZERO);
 	}
 
 	private void addErrorMarker(IFile file, String source, JBangError e) throws CoreException {
