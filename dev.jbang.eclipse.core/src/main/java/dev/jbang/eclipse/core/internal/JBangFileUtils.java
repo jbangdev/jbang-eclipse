@@ -2,6 +2,7 @@ package dev.jbang.eclipse.core.internal;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -12,7 +13,6 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -126,8 +126,13 @@ public class JBangFileUtils {
 	public static String getPackageName(IJavaProject javaProject, IFile file) {
 		//TODO probably not the most efficient way to get the package name as this reads the whole file;
 		char[] source = null;
-		try (InputStream is = new BufferedInputStream(file.getContents(true))) {
-			source = IOUtils.toCharArray(is, file.getCharset());
+		try (InputStream is = new BufferedInputStream(file.getContents(true));
+			 ByteArrayOutputStream result = new ByteArrayOutputStream()) {
+			 byte[] buffer = new byte[1024];
+			 for (int length; (length = is.read(buffer)) != -1; ) {
+			     result.write(buffer, 0, length);
+			 }
+			 source = result.toString(file.getCharset()).toCharArray();
 		} catch (IOException | CoreException e) {
 			e.printStackTrace();
 		}

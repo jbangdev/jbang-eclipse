@@ -12,8 +12,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.expressions
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-11
-Import-Package: org.apache.commons.io,
- org.eclipse.core.resources
+Import-Package: org.eclipse.core.resources
 Export-Package: dev.jbang.eclipse.core,
  dev.jbang.eclipse.core.internal;x-friends:="dev.jbang.eclipse.ui,dev.jbang.eclipse.ls",
  dev.jbang.eclipse.core.internal.builder;x-friends:="dev.jbang.eclipse.ui,dev.jbang.eclipse.ls",
