@@ -51,7 +51,7 @@ The source folder containing the JBang file will automatically be added to the p
 Installation
 ------------
 
-_JBang Eclipse Integration_ is available in the [Eclipse Marketplace](https://marketplace.eclipse.org/content/jbang-eclipse-integration). Drag the following button to your running Eclipse workspace. (⚠ *Requires the Eclipse Marketplace Client*)
+_JBang Eclipse Integration_ is available in the [Eclipse Marketplace](https://marketplace.eclipse.org/content/jbang-eclipse-integration). Drag the following button to your running Eclipse workspace. (⚠️ *Requires the Eclipse Marketplace Client*)
 
 [![Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client](https://marketplace.eclipse.org/sites/all/themes/solstice/public/images/marketplace/btn-install.svg)](http://marketplace.eclipse.org/marketplace-client-intro?mpc_install=5391163 "Drag to your running Eclipse* workspace. *Requires Eclipse Marketplace Client")
 
