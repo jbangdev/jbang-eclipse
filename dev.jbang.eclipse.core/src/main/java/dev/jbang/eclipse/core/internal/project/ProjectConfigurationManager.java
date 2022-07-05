@@ -288,7 +288,12 @@ public class ProjectConfigurationManager {
 		}
 		if (info.getFiles() != null && !info.getFiles().isEmpty()) {
 			for (JBangFile file : info.getFiles()) {
-				link(file.originalResource, file.target, project, monitor);
+                String target = file.target;
+                if (target == null) {
+                    link(file.originalResource, project, monitor);
+                } else {
+                    link(file.originalResource, file.target, project, monitor);
+                }
 			}
 		}
 
