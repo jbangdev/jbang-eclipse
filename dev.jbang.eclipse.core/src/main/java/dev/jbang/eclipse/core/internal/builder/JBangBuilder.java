@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.Comment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.manipulation.CoreASTProvider;
@@ -100,6 +99,7 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 			}
 			configCache.put(file, newConfigHash);
 			configManager.synchronize(file, monitor);
+			executedJBang = true;
 		}
 		return executedJBang;
 	}
@@ -165,7 +165,7 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 	}
 
 	@SuppressWarnings("unchecked")
-	static Integer getConfigHash(IFile file, IProgressMonitor monitor) throws JavaModelException {
+	static Integer getConfigHash(IFile file, IProgressMonitor monitor) throws CoreException {
 		if (!"java".equals(file.getFileExtension())) {
 			return null;
 		}

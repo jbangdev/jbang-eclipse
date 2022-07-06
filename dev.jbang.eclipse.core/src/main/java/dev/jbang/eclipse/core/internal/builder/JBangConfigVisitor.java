@@ -1,11 +1,12 @@
 package dev.jbang.eclipse.core.internal.builder;
 
+import static dev.jbang.eclipse.core.internal.JBangFileUtils.GROOVY_GRAPES;
+import static dev.jbang.eclipse.core.internal.JBangFileUtils.JBANG_INSTRUCTIONS;
 import static dev.jbang.eclipse.core.internal.StringSanitizer.normalizeSpaces;
 import static dev.jbang.eclipse.core.internal.StringSanitizer.removeAllSpaces;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -14,11 +15,6 @@ import org.eclipse.jdt.core.dom.MarkerAnnotation;
 import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 
 class JBangConfigVisitor extends ASTVisitor {
-
-		private static final Pattern GROOVY_GRAPES = Pattern.compile("^\\s*(@Grab|@Grapes).*", Pattern.DOTALL);
-
-		private static final Pattern JBANG_INSTRUCTIONS = Pattern.compile("^(//[A-Z_]+ ).*$");
-
 
 		private List<String> configElements = new ArrayList<>();
 
@@ -67,7 +63,5 @@ class JBangConfigVisitor extends ASTVisitor {
 			int end = start + node.getLength();
 			return source.substring(start, end).trim();
 		}
-
-
 
 	}

@@ -25,14 +25,20 @@ import org.eclipse.jdt.internal.corext.dom.IASTSharedValues;
 @SuppressWarnings("restriction")
 public class JBangFileUtils {
 
-	private static Pattern JBANG_HEADERS = Pattern.compile("(//.*jbang.*)|(//[A-Z:]+ ).*");
-
-	private static Pattern JAVA_INSTRUCTION = Pattern.compile("//JAVA (\\S*).*");
-
-	private static Pattern SOURCES_INSTRUCTION = Pattern.compile("//SOURCES (\\S*).*");
+	public static final Pattern GROOVY_GRAPES = Pattern.compile("^\\s*(@Grab|@Grapes).*", Pattern.DOTALL);
 	
-	private static Pattern FILES_INSTRUCTION = Pattern.compile("//FILES (\\S*).*");
+	public static final Pattern JBANG_INSTRUCTIONS = Pattern.compile("^(//[A-Z_:]+ ).*$");
+
+	private static final Pattern JBANG_HEADER = Pattern.compile("//.*jbang.*");
 	
+	private static final Pattern JAVA_INSTRUCTION = Pattern.compile("//JAVA (\\S*).*");
+
+	private static final Pattern SOURCES_INSTRUCTION = Pattern.compile("//SOURCES (\\S*).*");
+	
+	private static final Pattern FILES_INSTRUCTION = Pattern.compile("//FILES (\\S*).*");
+
+	private static final int LINE_LIMIT = 300;
+
 	private static final Set<String> EXTENSIONS = new LinkedHashSet<>();
 	
 	static {
@@ -54,9 +60,9 @@ public class JBangFileUtils {
 		}
 		IFile file = (IFile) resource;
 		try {
-			return isJBangContent(new InputStreamReader(file.getContents()));			
+			return hasJBangInstructions(new InputStreamReader(file.getContents(true)));
 		} catch (Exception e) {
-			//ignore
+			e.printStackTrace();
 		}
 		return false;
 	}
@@ -71,30 +77,13 @@ public class JBangFileUtils {
 			return false;
 		}
 		try {
-			return isJBangContent(Files.newBufferedReader(file));			
+			return hasJBangInstructions(Files.newBufferedReader(file));
 		} catch (Exception e) {
-			//ignore
+			e.printStackTrace();
 		}
 		return false;
 	}
 	
-	private static boolean isJBangContent(Reader r) throws IOException {
-		try (BufferedReader reader = new BufferedReader(r)) {
-			String line;
-			while((line = reader.readLine()) != null) {
-				//XXX, only check the first n lines then bail?
-				if (!line.isBlank()) {					
-					return isJBangInstruction(line);
-				}
-			}
-		}
-		return false;
-	}
-
-	public static boolean isJBangInstruction(String line) {
-		return JBANG_HEADERS.matcher(line).matches();
-	}
-
 	public static String getJavaVersion(String line) {
 		return getMatch(JAVA_INSTRUCTION, line);
 	}
@@ -147,5 +136,28 @@ public class JBangFileUtils {
 		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
 		PackageDeclaration pkg = ast.getPackage();
 		return (pkg == null || pkg.getName() == null)? null :pkg.getName().getFullyQualifiedName();
+	}
+
+	private static boolean hasJBangInstructions(Reader reader) throws IOException {
+		try (BufferedReader br = new BufferedReader(reader)) {
+			String line = null;
+			for(int i = 0; (line = br.readLine()) != null && i < LINE_LIMIT; i++ ) {
+				if (line.isBlank()) {
+					continue;
+				}
+		        if (isJBangInstruction(line)) {
+		        	return true;
+		        }
+		    }
+		}
+		return false;
+	}
+
+	private static boolean isConfigElement(String line) {
+		return JBANG_INSTRUCTIONS.matcher(line).matches() || GROOVY_GRAPES.matcher(line).matches();
+	}
+
+	public static boolean isJBangInstruction(String line) {
+		return JBANG_HEADER.matcher(line).matches() || isConfigElement(line);
 	}
 }
