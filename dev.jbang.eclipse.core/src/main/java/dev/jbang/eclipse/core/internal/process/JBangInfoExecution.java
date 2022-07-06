@@ -1,17 +1,10 @@
 package dev.jbang.eclipse.core.internal.process;
 
-import static dev.jbang.eclipse.core.internal.JBangFileUtils.getSource;
-import static dev.jbang.eclipse.core.internal.JBangFileUtils.isJBangInstruction;
-
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -105,40 +98,6 @@ public class JBangInfoExecution {
 			resolutionErrors.add(new JBangError("Failed to execute JBang:" + e.getMessage()));
 		}
 		return result;
-	}
-
-	private void collectAdditionalSources(Collection<String> sources) {
-		Set<String> existingSources = new HashSet<>(sources);
-		for (String file : existingSources) {
-			sources.addAll(collectAdditionalSources(file, sources));
-		}
-	}
-	
-	private  Collection<String> collectAdditionalSources(String file, Collection<String> existingSources){
-		Set<String> newSources = new HashSet<>();
-		try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-			String line;
-			java.nio.file.Path baseDir = Paths.get(file).getParent();
-			while ((line = reader.readLine()) != null) {
-				if (!line.isBlank() && !isJBangInstruction(line)) {
-					break;
-				}
-				String source = getSource(line);
-				if (source != null) {
-					String sourcePath = baseDir.resolve(source).toString();
-					if (!existingSources.contains(sourcePath)) {
-						newSources.add(sourcePath);
-					}
-				}
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		if (!newSources.isEmpty()) {
-			collectAdditionalSources(newSources);
-		}
-		return newSources;
-
 	}
 	
 	public static Set<JBangError> sanitizeError(String errorLine) {
