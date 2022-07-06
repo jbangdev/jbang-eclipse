@@ -299,7 +299,7 @@ public class ProjectConfigurationManager {
 
 		var jbp = new JBangProject(project);
 		jbp.setMainSourceFile(mainFile);
-
+		
 		configure(jbp, info, monitor);
 
 		return jbp;
@@ -331,6 +331,7 @@ public class ProjectConfigurationManager {
 		if (jbp == null) {
 			return;
 		}
+		jbp.setMainSourceFile(file);
 		var jbang = jbp.getRuntime();
 		
 		var execution = new JBangInfoExecution(jbang, file.getLocation().toFile(), null);

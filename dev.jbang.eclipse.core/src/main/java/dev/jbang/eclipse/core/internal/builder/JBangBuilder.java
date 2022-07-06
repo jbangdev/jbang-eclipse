@@ -27,6 +27,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.manipulation.CoreASTProvider;
 
 import dev.jbang.eclipse.core.JBangCorePlugin;
+import dev.jbang.eclipse.core.internal.project.JBangProject;
 import dev.jbang.eclipse.core.internal.project.ProjectConfigurationManager;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimesDiscoveryJob;
 
@@ -40,26 +41,42 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 	protected IProject[] build(int kind, Map<String, String> args, IProgressMonitor monitor) throws CoreException {
 		long start = System.currentTimeMillis();
 		IResourceDelta delta = getDelta(getProject());
+		List<IFile> modified = new ArrayList<>();
+		List<IFile> deleted = new ArrayList<>();
 		if (delta != null) {
 			JBangResourceDeltaVisitor visitor = new JBangResourceDeltaVisitor();
 			delta.accept(visitor);
-			int filesModified = visitor.jbangFiles.size();
-			int filesDeleted = visitor.deletedJbangFiles.size();
-			SubMonitor subMonitor = SubMonitor.convert(monitor, filesModified + filesDeleted);
-
-			if (!visitor.jbangFiles.isEmpty()) {
-				long startConfig = System.currentTimeMillis();
-				var executedJBang = configure(visitor.jbangFiles, subMonitor.split(filesModified));
-				long configured = System.currentTimeMillis() - startConfig;					
-				logInfo("JBang Builder "+(executedJBang?"configured ":"checked ")+filesModified+" files in "+configured+" ms");
+			if (visitor.jbangFiles != null) {
+				modified.addAll(visitor.jbangFiles);
 			}
-			if (!visitor.deletedJbangFiles.isEmpty()) {
-				unconfigure(visitor.deletedJbangFiles, subMonitor.split(filesDeleted));
+			if (visitor.deletedJbangFiles != null) {
+				deleted.addAll(visitor.deletedJbangFiles);
 			}
-			subMonitor.done();
+		} else if (kind == FULL_BUILD) {
+			ProjectConfigurationManager configManager = JBangCorePlugin.getJBangManager().getProjectConfigurationManager();
+			JBangProject jbp = configManager.getJBangProject(getProject(), monitor);
+			IFile mainScriptFile = jbp.getMainSourceFile();
+			if (mainScriptFile != null) {
+				modified.add(mainScriptFile);
+			} //TODO else find jbang source folder, find first jbang script ?
 		}
+		
+		int filesModified = modified.size();
+		int filesDeleted = deleted.size();
+		SubMonitor subMonitor = SubMonitor.convert(monitor, filesModified + filesDeleted);
+		
+		if (!modified.isEmpty()) {
+			long startConfig = System.currentTimeMillis();
+			var executedJBang = configure(modified, subMonitor.split(filesModified));
+			long configured = System.currentTimeMillis() - startConfig;
+			logInfo("JBang Builder "+(executedJBang?"configured ":"checked ")+filesModified+" files in "+configured+" ms");
+		}
+		if (!deleted.isEmpty()) {
+			unconfigure(deleted, subMonitor.split(filesDeleted));
+		}
+		subMonitor.done();
 		long elapsed = System.currentTimeMillis() - start;
-		logInfo("JBang Builder ran in "+elapsed+" ms in mode "+kind);
+		logInfo("JBang Builder ran in "+elapsed+" ms ["+ (kind == FULL_BUILD?"Full":"Incremental")+" build]");
 		return new IProject[0];
 	}
 
