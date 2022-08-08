@@ -1,5 +1,7 @@
 package dev.jbang.eclipse.core.internal;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.runtime.CoreException;
@@ -29,6 +31,22 @@ public class ProjectUtils {
 		}
 	}
 	
+	public static boolean isJBangProjectOnly(IProject project) {
+		IProjectDescription description;
+		try {
+			description = project.getDescription();
+			var natures = List.of(description.getNatureIds());
+			if (natures.contains(JBangConstants.NATURE_ID) && natures.size() <= 2) {
+				if (natures.size() > 1 && !natures.contains(JavaCore.NATURE_ID)) {
+					return false;
+				}
+				return true;
+			}
+		} catch (CoreException e) {
+			//ignore
+		}
+		return false;
+	}
 
 	public static boolean addNature(IProject project, String natureId, IProgressMonitor monitor) throws CoreException {
 		boolean addedNature = false;

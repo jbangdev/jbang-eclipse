@@ -7,11 +7,13 @@ import static dev.jbang.eclipse.core.internal.ProjectUtils.isJavaProject;
 import java.io.File;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -24,6 +26,11 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.apt.core.internal.util.FactoryContainer;
+import org.eclipse.jdt.apt.core.internal.util.FactoryContainer.FactoryType;
+import org.eclipse.jdt.apt.core.internal.util.FactoryPath;
+import org.eclipse.jdt.apt.core.util.AptConfig;
+import org.eclipse.jdt.apt.core.util.IFactoryPath;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -39,7 +46,9 @@ import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 import dev.jbang.eclipse.core.JBangCorePlugin;
 import dev.jbang.eclipse.core.internal.JBangClasspathUtils;
 import dev.jbang.eclipse.core.internal.JBangConstants;
+import dev.jbang.eclipse.core.internal.ProjectUtils;
 import dev.jbang.eclipse.core.internal.ResourceUtil;
+import dev.jbang.eclipse.core.internal.classpath.AnnotationProcessorUtils;
 import dev.jbang.eclipse.core.internal.classpath.JBangClasspathContainer;
 import dev.jbang.eclipse.core.internal.process.JBangDependencyError;
 import dev.jbang.eclipse.core.internal.process.JBangError;
@@ -50,6 +59,8 @@ import dev.jbang.eclipse.core.internal.runtime.JBangRuntime;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimeManager;
 
 public class ProjectConfigurationManager {
+
+	private static final String M2_REPO = "M2_REPO";
 
 	private static final String JAR_SUFFIX = ".jar";
 
@@ -64,7 +75,6 @@ public class ProjectConfigurationManager {
 	public ProjectConfigurationManager(JBangRuntimeManager runtimeManager) {
 		this.runtimeManager = runtimeManager;
 	}
-
 
 	public void configure(JBangProject jbp, JBangInfoResult info, IProgressMonitor monitor) throws CoreException {
 		IProject project = jbp.getProject();
@@ -169,8 +179,63 @@ public class ProjectConfigurationManager {
 			if (updateCache) {
 				cache.put(project, info);
 			}
-
+			
+			configureAnnotationProcessors(jp, info.getCompileOptions(), resolvedClasspath);
 		}
+	}
+
+	//Code mostly copied from https://github.com/eclipse-m2e/m2e-core/blob/bb14b75bfa14a7548fd59707965e3e281c7bb415/org.eclipse.m2e.apt.core/src/org/eclipse/m2e/apt/internal/AbstractAptConfiguratorDelegate.java#L191-L225
+	@SuppressWarnings("restriction")
+	private void configureAnnotationProcessors(IJavaProject javaProject, List<String> options, List<String> resolvedClasspath) throws CoreException {
+
+		List<File> jars = resolvedClasspath.stream().map(s -> new File(s))
+			  				.filter(AnnotationProcessorUtils::isJar)
+			  				.collect(Collectors.toList());
+
+		if (!AnnotationProcessorUtils.containsAptProcessors(jars)) {
+			if (AptConfig.isEnabled(javaProject) && ProjectUtils.isJBangProjectOnly(javaProject.getProject()) ) {
+				AptConfig.setEnabled(javaProject, false);
+			}
+			return;
+		}
+
+		List<File> resolvedJarArtifactsInReverseOrder = new ArrayList<>(jars);
+	    Collections.reverse(resolvedJarArtifactsInReverseOrder);
+	    IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
+
+	    //Disable Plugin factories, has they're unknown to JBang
+	    for(FactoryContainer fc : ((FactoryPath) factoryPath).getEnabledContainers().keySet()) {
+	      if(FactoryType.PLUGIN.equals(fc.getType())) {
+	        factoryPath.disablePlugin(fc.getId());
+	      }
+	    }
+
+	    //Reuse M2_REPO variable if it exists
+	    IPath m2RepoPath = JavaCore.getClasspathVariable(M2_REPO);
+
+	    for(File resolvedJarArtifact : resolvedJarArtifactsInReverseOrder) {
+	      IPath absolutePath = new Path(resolvedJarArtifact.getAbsolutePath());
+	      //reference jars in a portable way
+	      if((m2RepoPath != null) && m2RepoPath.isPrefixOf(absolutePath)) {
+	        IPath relativePath = absolutePath.removeFirstSegments(m2RepoPath.segmentCount()).makeRelative().setDevice(null);
+	        IPath variablePath = new Path(M2_REPO).append(relativePath);
+	        factoryPath.addVarJar(variablePath);
+	      } else {
+	        //fall back on using absolute references.
+	        factoryPath.addExternalJar(resolvedJarArtifact);
+	      }
+	    }
+
+	    Map<String, String> currentOptions = AptConfig.getRawProcessorOptions(javaProject);
+	    Map<String, String> newOptions = AnnotationProcessorUtils.parseProcessorOptions(options);
+	    if(!currentOptions.equals(newOptions)) {
+	      AptConfig.setProcessorOptions(newOptions, javaProject);
+	    }
+
+	    // Apply that IFactoryPath to the project
+	    AptConfig.setFactoryPath(javaProject, factoryPath);
+
+		AptConfig.setEnabled(javaProject, true);
 	}
 
 	/**

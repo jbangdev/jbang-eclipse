@@ -10,6 +10,7 @@ This experimental plugin aims to let you author [JBang](https://github.com/jbang
 - Import JBang Scripts as projects
 - Synchronize JBang Dependencies to existing projects
 - Validation of JBang scripts on file save
+- Automatic configuration of Annotation Processors
 - JBang runtime management
 
 Cuurently supports 
