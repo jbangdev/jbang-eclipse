@@ -9,7 +9,17 @@
 	<artifactId>dev.jbang.eclipse.site</artifactId>
 	<packaging>eclipse-repository</packaging>
 	<name>dev.jbang.eclipse :: update site</name>
+	<properties>
+	<skipFlatRepo>false</skipFlatRepo>
+	</properties>
 	<profiles>
+	   <profile>
+	   		<id>skip-flat-repo</id>
+		   <activation><os><family>windows</family></os></activation>
+		   <properties>
+		   	<skipFlatRepo>true</skipFlatRepo>
+		   </properties>
+	   </profile>
 		<profile>
 			<id>flat-repo</id>
 			<build>
@@ -26,13 +36,11 @@
 									<goal>run</goal>
 								</goals>
 								<configuration>
-									<script>https://gist.github.com/fbricon/3c718d03f55c3ceba5dea570af4af5f8</script>
+									<skip>${skipFlatRepo}</skip>
+									<script>${project.basedir}/src/jbang/java/repoflattener.java</script>
 									<args>
 										<arg>${project.basedir}</arg>
 									</args>
-									<trusts>
-										<trust>https://gist.github.com</trust>
-									</trusts>
 								</configuration>
 							</execution>
 						</executions>

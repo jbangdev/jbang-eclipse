@@ -54,6 +54,7 @@ public class JBangRuntimesDiscoveryJob extends Job {
 		runtimeManager.setRuntimes(existingRuntimes);
 		var defaultRuntime = newRuntimes.get(0);// Most recent JBang runtime
 		System.out.println("Setting default runtime as "+defaultRuntime);
+		
 		runtimeManager.setDefaultRuntime(defaultRuntime);
 		return Status.OK_STATUS;
 	}

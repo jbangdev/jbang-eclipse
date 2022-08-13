@@ -355,8 +355,8 @@ public class ProjectConfigurationManager {
 
 		IFile mainFile = link(info.getBackingResource(), project, configuration, monitor);
 		if (info.getSources() != null && !info.getSources().isEmpty()) {
-			for (String s : info.getSources()) {
-				link(s, project, configuration, monitor);
+			for (JBangFile s : info.getSources()) {
+				link(s.originalResource, project, configuration, monitor);
 			}
 		}
 		if (info.getFiles() != null && !info.getFiles().isEmpty()) {

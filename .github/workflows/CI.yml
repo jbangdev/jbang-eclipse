@@ -4,14 +4,17 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macOS-latest, ubuntu-latest]
 
     steps:
       - uses: actions/checkout@v3
-      - name: Set up JDK 11
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: '11'
+          java-version: '17'
           distribution: 'temurin'
       - name: Cache local Maven repository
         uses: actions/cache@v3
@@ -23,16 +26,17 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
       - name: Build with Maven
-        run: mvn --batch-mode --update-snapshots verify -Pflat-repo
+        run: ./mvnw --batch-mode --update-snapshots verify -Pflat-repo
 
       - name: Upload p2 update site
         uses: actions/upload-artifact@v3
+        if: runner.os == 'Linux'
         with:
           name: jbang.eclipse
           path: dev.jbang.eclipse.site/target/repository/*
 
       - name: Deploy p2 update site
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && runner.os == 'Linux'
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
@@ -41,3 +45,11 @@ jobs:
           title: "Development Build"
           files: |
             dev.jbang.eclipse.site/target/flat-repository/*
+      - name: Upload code coverage
+        uses: codecov/codecov-action@v2
+        if:  github.ref == 'refs/heads/main' && runner.os == 'Linux'
+        with:
+          files: ./coverage/target/site/jacoco-aggregate/jacoco.xml
+          flags: ${{ runner.os }} # optional
+          name: ${{ runner.os }}-tests # optional
+          verbose: true # optional (default = false)

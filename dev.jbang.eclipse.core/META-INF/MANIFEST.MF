@@ -4,6 +4,7 @@ Bundle-Name: JBang Eclipse Core Plugin
 Bundle-SymbolicName: dev.jbang.eclipse.core;singleton:=true
 Bundle-Version: 0.0.2.qualifier
 Bundle-Activator: dev.jbang.eclipse.core.JBangCorePlugin
+Bundle-Vendor: jbangdev
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.core;bundle-version="3.10.0",
  com.google.gson;bundle-version="2.8.2",

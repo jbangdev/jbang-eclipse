@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.util.Locale;
+import java.util.Objects;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -71,6 +72,7 @@ public class JBangRuntime {
 	}
 	
 	public boolean isValid() {
+		//FIXME Doesn't make sense for jbang found on the PATH
 		return Files.isExecutable(getExecutable().toFile().toPath());
 	}
 	
@@ -127,6 +129,25 @@ public class JBangRuntime {
 	
 	public boolean isEditable() {
 		return !SYSTEM.equals(this.name);
+	}
+	
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(location, name, version);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		JBangRuntime other = (JBangRuntime) obj;
+		return Objects.equals(location, other.location) && Objects.equals(name, other.name)
+				&& Objects.equals(version, other.version);
 	}
 	
 }
