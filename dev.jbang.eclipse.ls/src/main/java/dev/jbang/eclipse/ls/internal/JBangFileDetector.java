@@ -172,16 +172,5 @@ public class JBangFileDetector {
 		}
 		return excluded;
 	}
-	
-	public static void main(String[] args) throws CoreException {
-		long start = System.currentTimeMillis();
-		Path root = Path.of("/Users/fbricon/Dev/souk/jbang-examples/examples");
-		var scanner = new JBangFileDetector(root);
-		var results = scanner.scan(new NullProgressMonitor());
-		long elapsed = System.currentTimeMillis() - start;
-		System.out.println("Found scripts:"+results.size() + " in "+elapsed+"ms");
-		results.forEach(System.out::println);
-		
-	}
 
 }

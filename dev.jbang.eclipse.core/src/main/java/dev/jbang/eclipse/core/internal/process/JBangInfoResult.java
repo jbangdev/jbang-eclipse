@@ -16,7 +16,7 @@ public class JBangInfoResult {
 
 	private List<String> resolvedDependencies;
 
-	private List<String> sources;
+	private List<JBangFile> sources;
 	
 	private List<JBangFile> files;
 
@@ -116,11 +116,11 @@ public class JBangInfoResult {
 		this.requestedJavaVersion = javaVersion;
 	}
 
-	public List<String> getSources() {
+	public List<JBangFile> getSources() {
 		return sources;
 	}
 
-	public void setSources(List<String> sources) {
+	public void setSources(List<JBangFile> sources) {
 		this.sources = sources;
 	}
 

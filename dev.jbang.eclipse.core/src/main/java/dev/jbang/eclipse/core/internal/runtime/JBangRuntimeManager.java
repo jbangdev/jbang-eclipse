@@ -22,6 +22,8 @@ public class JBangRuntimeManager {
 
 	  public static final String EXTERNAL = "EXTERNAL"; //$NON-NLS-1$
 
+	  private static final JBangRuntime DEFAULT_RUNTIME = new JBangRuntime();
+
 	  private final IEclipsePreferences[] preferencesLookup = new IEclipsePreferences[2];
 
 	  private final IPreferencesService preferenceStore;
@@ -47,7 +49,7 @@ public class JBangRuntimeManager {
 	    String name = preferenceStore.get(JBangConstants.P_DEFAULT_RUNTIME, null, preferencesLookup);
 	    JBangRuntime runtime = getRuntimes().get(name);
 	    if(runtime == null || !runtime.isValid()) {
-	      runtime = new JBangRuntime();
+	      runtime = DEFAULT_RUNTIME;
 	    }
 	    return runtime;
 	  }
@@ -134,7 +136,7 @@ public class JBangRuntimeManager {
 
 	  public Map<String, JBangRuntime> getRuntimes() {
 	    Map<String, JBangRuntime> runtimes = new LinkedHashMap<>();
-	    runtimes.put(DEFAULT, new JBangRuntime());
+	    runtimes.put(DEFAULT, DEFAULT_RUNTIME);
 
 	    String runtimesPreference = preferenceStore.get(JBangConstants.P_RUNTIMES, null, preferencesLookup);
 	    if(runtimesPreference != null && runtimesPreference.length() > 0) {

@@ -2,6 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JBang Eclipse Test Fragment
 Bundle-SymbolicName: dev.jbang.eclipse.core.test
+Bundle-Vendor: jbangdev
 Bundle-Version: 0.0.2.qualifier
 Fragment-Host: dev.jbang.eclipse.core;bundle-version="0.0.2"
 Bundle-RequiredExecutionEnvironment: JavaSE-11

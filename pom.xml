@@ -17,6 +17,9 @@
 		<tycho.extras.version>${tycho.version}</tycho.extras.version>
 		<tycho.test.platformArgs />
 		<tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
+		<tycho.scmUrl>scm:git:https://github.com/jbangdev/jbang-eclipse.git</tycho.scmUrl>
+		<coverage.filter>dev.jbang.eclipse.*</coverage.filter>
+		<generateSourceRef>true</generateSourceRef>
 	</properties>
 
 	<licenses>
@@ -72,6 +75,22 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>tycho-packaging-plugin</artifactId>
+				<configuration>
+					<sourceReferences>
+						<generate>${generateSourceRef}</generate>
+					</sourceReferences>
+				</configuration>
+				<dependencies>
+					<dependency>
+						<groupId>org.eclipse.tycho.extras</groupId>
+						<artifactId>tycho-sourceref-jgit</artifactId>
+						<version>${tycho.extras.version}</version>
+					</dependency>
+				</dependencies>
+			</plugin>
 		</plugins>
 
 		<pluginManagement>
@@ -91,16 +110,51 @@
 					<configuration>
 						<useUIHarness>false</useUIHarness>
 						<useUIThread>false</useUIThread>
-						<argLine>${tycho.test.jvmArgs}</argLine>
+						<argLine>${tycho.testArgLine} ${tycho.test.jvmArgs}</argLine>
 						<!-- kill test JVM if tests take more than 1 minute (60 seconds) to 
 							finish -->
-						<forkedProcessTimeoutInSeconds>60</forkedProcessTimeoutInSeconds>
+						<forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
 					</configuration>
 				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
 	<profiles>
+	<profile>
+			<id>code-coverage</id>
+			<activation>
+				<!-- Enable jacoco only on plugin projects -->
+				<file>
+					<exists>META-INF/MANIFEST.MF</exists>
+				</file>
+			</activation>
+			<properties>
+				<jacoco.dataFile>${project.basedir}/../target/jacoco.exec</jacoco.dataFile>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.jacoco</groupId>
+						<artifactId>jacoco-maven-plugin</artifactId>
+						<version>0.8.8</version>
+						<executions>
+							<execution>
+								<goals>
+									<goal>prepare-agent</goal>
+								</goals>
+								<configuration>
+								<skip>true</skip>
+									<includes>
+										<include>${coverage.filter}</include>
+									</includes>
+									<!-- Merge reports from all executions -->
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
 		<profile>
 			<id>macosx</id>
 			<activation>
@@ -111,6 +165,26 @@
 			<properties>
 				<tycho.test.platformArgs>-XstartOnFirstThread</tycho.test.platformArgs>
 			</properties>
+			<build>
+				<pluginManagement>
+					<plugins>
+						<plugin>
+							<groupId>org.eclipse.tycho</groupId>
+							<artifactId>tycho-surefire-plugin</artifactId>
+							<version>${tycho.version}</version>
+							<configuration>
+								<dependencies>
+									<dependency>
+										<artifactId>org.eclipse.jdt</artifactId>
+										<version>0.0.0</version>
+										<type>eclipse-feature</type>
+									</dependency>
+								</dependencies>
+							</configuration>
+						</plugin>
+					</plugins>
+				</pluginManagement>
+			</build>
 		</profile>
 		<profile>
 			<id>source-feature</id>
@@ -161,5 +235,6 @@
 		<module>dev.jbang.eclipse.ui</module>
 		<module>dev.jbang.eclipse.feature</module>
 		<module>dev.jbang.eclipse.site</module>
+		<module>coverage</module>
 	</modules>
 </project>

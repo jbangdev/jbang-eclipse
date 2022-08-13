@@ -2,6 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: JBang Eclipse LS Plugin
 Bundle-SymbolicName: dev.jbang.eclipse.ls;singleton:=true
+Bundle-Vendor: jbangdev
 Bundle-Version: 0.0.2.qualifier
 Bundle-Activator: dev.jbang.eclipse.ls.internal.JBangLSPlugin
 Require-Bundle: org.eclipse.core.runtime,

@@ -1,13 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<parent>
 		<artifactId>dev.jbang.eclipse</artifactId>
 		<groupId>dev.jbang.eclipse</groupId>
 		<version>0.0.2-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
-  <artifactId>dev.jbang.eclipse.core.test</artifactId>
-  <packaging>eclipse-test-plugin</packaging>
-  <name>dev.jbang.eclipse :: test</name>
-  <description>JBang Eclipse Test Plugin</description>
+	<artifactId>dev.jbang.eclipse.core.test</artifactId>
+	<packaging>eclipse-test-plugin</packaging>
+	<name>dev.jbang.eclipse :: test</name>
+	<description>JBang Eclipse Test Plugin</description>
+
+	<properties>
+	  <jbang.download.url>https://www.jbang.dev/releases/latest/download/jbang.zip</jbang.download.url>
+	  <jbang.version>latest</jbang.version>
+	</properties>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>com.googlecode.maven-download-plugin</groupId>
+				<artifactId>download-maven-plugin</artifactId>
+				<version>1.6.8</version>
+				<executions>
+					<execution>
+						<id>install-jbang</id>
+						<phase>validate</phase>
+						<goals>
+							<goal>wget</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<url>${jbang.download.url}</url>
+					<unpack>true</unpack>
+					<followRedirects>true</followRedirects>
+					<outputDirectory>${project.build.directory}/</outputDirectory>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+	<profiles>
+		<profile>
+			<id>specific-jbang</id>
+			<activation>
+				<property>
+					<name>jbang.version</name>
+				</property>
+			</activation>
+			<properties>
+				<jbang.download.url>https://github.com/jbangdev/jbang/releases/download/v${jbang.version}/jbang-${jbang.version}.zip</jbang.download.url>
+			</properties>
+		</profile>
+	</profiles>
 </project>
