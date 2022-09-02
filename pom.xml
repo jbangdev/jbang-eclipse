@@ -15,7 +15,7 @@
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 		<tycho.version>2.7.4</tycho.version>
 		<tycho.extras.version>${tycho.version}</tycho.extras.version>
-		<tycho.test.platformArgs />
+		<tycho.test.platformArgs></tycho.test.platformArgs>
 		<tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
 		<tycho.scmUrl>scm:git:https://github.com/jbangdev/jbang-eclipse.git</tycho.scmUrl>
 		<coverage.filter>dev.jbang.eclipse.*</coverage.filter>
@@ -128,9 +128,6 @@
 					<exists>META-INF/MANIFEST.MF</exists>
 				</file>
 			</activation>
-			<properties>
-				<jacoco.dataFile>${project.basedir}/../target/jacoco.exec</jacoco.dataFile>
-			</properties>
 			<build>
 				<plugins>
 					<plugin>
@@ -143,7 +140,6 @@
 									<goal>prepare-agent</goal>
 								</goals>
 								<configuration>
-								<skip>true</skip>
 									<includes>
 										<include>${coverage.filter}</include>
 									</includes>
