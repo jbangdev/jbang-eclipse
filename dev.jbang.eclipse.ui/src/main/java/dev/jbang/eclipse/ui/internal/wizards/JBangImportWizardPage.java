@@ -66,7 +66,7 @@ public class JBangImportWizardPage extends WizardPage {
 		browseButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false));
 		browseButton.addSelectionListener(SelectionListener.widgetSelectedAdapter(e -> {
 			FileDialog dialog = new FileDialog(getShell(), SWT.NONE);
-			dialog.setFilterExtensions(new String[] { "*.java","*.jsh","*.kt","*.groovy" });
+			dialog.setFilterExtensions(new String[] { "*.java","*.jsh","*.kt","*.groovy", "build.jbang" });
 			dialog.setText("Select script");
 			String result = dialog.open();
 			if (result != null) {

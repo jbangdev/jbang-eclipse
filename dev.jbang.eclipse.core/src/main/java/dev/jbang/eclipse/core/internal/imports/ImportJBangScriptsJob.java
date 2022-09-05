@@ -36,7 +36,7 @@ public class ImportJBangScriptsJob extends WorkspaceJob	 {
 		var configuration = new JBangProjectConfiguration();
 		for (Path script : scripts) {
 			try {
-				if (JBangFileUtils.isJBangFile(script)) {
+				if (JBangFileUtils.isJBangFile(script) || JBangFileUtils.isJBangBuildFile(script)) {
 					projectManager.createJBangProject(script, configuration, monitor);
 				}
 			} catch (Exception e) {

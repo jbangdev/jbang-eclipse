@@ -16,6 +16,7 @@ import org.eclipse.jdt.ls.core.internal.JavaLanguageServerPlugin;
 import org.eclipse.jdt.ls.core.internal.ProjectUtils;
 
 import dev.jbang.eclipse.core.JBangCorePlugin;
+import dev.jbang.eclipse.core.internal.JBangFileUtils;
 import dev.jbang.eclipse.core.internal.project.JBangProjectConfiguration;
 
 @SuppressWarnings("restriction")
@@ -44,6 +45,9 @@ public class JBangImporter extends AbstractProjectImporter  {
 		for (Path script : scripts) {
 			try {
 				String name = script.getFileName().toString();
+				if (JBangFileUtils.isJBangBuildFile(script) || JBangFileUtils.isMainFile(script)) {
+					name = script.getParent().getFileName().toString();
+				}
 				IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 				//TODO Better check the script is actually bound to that project
 				//TODO Trigger classpath update on the project
@@ -72,6 +76,5 @@ public class JBangImporter extends AbstractProjectImporter  {
 	public void reset() {
 		scripts = null;
 	}
-
 
 }

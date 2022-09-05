@@ -98,11 +98,29 @@ public class JBangClasspathUtils {
 
   
 	public static boolean isOnClasspath(IJavaProject javaProject, IFile script) throws CoreException {
-		if (script != null && JavaCore.isJavaLikeFileName(script.getName())) {
+		if (script != null && (JavaCore.isJavaLikeFileName(script.getName()) || JBangFileUtils.isJBangBuildFile(script)) ) {
 			IClasspathEntry[] entries = javaProject.getRawClasspath();
 			for (IClasspathEntry entry : entries) {
 				if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE &&
 						entry.getPath().isPrefixOf(script.getFullPath())) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public static boolean isOnOutputLocation(IJavaProject javaProject, IFile script) throws CoreException {
+		if (script != null) {
+			if (javaProject.getOutputLocation() != null && javaProject.getOutputLocation().isPrefixOf(script.getFullPath())) {
+				return true;
+			}
+			
+			IClasspathEntry[] entries = javaProject.getRawClasspath();
+			for (IClasspathEntry entry : entries) {
+				if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE &&
+						entry.getOutputLocation() != null &&
+						entry.getOutputLocation().isPrefixOf(script.getFullPath())) {
 					return true;
 				}
 			}

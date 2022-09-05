@@ -44,6 +44,9 @@ public class JBangFileDetector {
 	private static final String METADATA_FOLDER = "**/.metadata";
 	private static final Set<FileVisitOption> FOLLOW_LINKS_OPTION = EnumSet.of(FileVisitOption.FOLLOW_LINKS);
 	private List<Path> scripts;
+	private List<Path> mains;
+	private List<Path> builds;
+	
 	private Path rootDir;
 	private int maxDepth = 2;
 	private Set<String> exclusions = new LinkedHashSet<>(1);
@@ -62,6 +65,8 @@ public class JBangFileDetector {
 	public JBangFileDetector(Path rootDir) {
 		this.rootDir = rootDir;
 		scripts = new ArrayList<>();
+		builds = new ArrayList<>();
+		mains = new ArrayList<>();
 		addExclusions(METADATA_FOLDER);
 		List<String> javaImportExclusions = JavaLanguageServerPlugin.getPreferencesManager().getPreferences().getJavaImportExclusions();
 		if (javaImportExclusions != null) {
@@ -96,11 +101,27 @@ public class JBangFileDetector {
 	}
 
 	/**
-	 * Returns the scripts found to be containing the sought-after file.
+	 * Returns the scripts found.
 	 * @return an unmodifiable collection of {@link Path}s.
 	 */
 	public Collection<Path> getScripts() {
 		return Collections.unmodifiableList(scripts);
+	}
+	
+	/**
+	 * Returns the "main.java" scripts found.
+	 * @return an unmodifiable collection of {@link Path}s.
+	 */
+	public Collection<Path> getMains() {
+		return Collections.unmodifiableList(mains);
+	}
+	
+	/**
+	 * Returns the build.jbang files found.
+	 * @return an unmodifiable collection of {@link Path}s.
+	 */
+	public Collection<Path> getBuildFiles() {
+		return Collections.unmodifiableList(builds);
 	}
 
 	/**
@@ -115,6 +136,13 @@ public class JBangFileDetector {
 		} catch (IOException e) {
 			throw new CoreException(StatusFactory.newErrorStatus("Failed to scan "+rootDir, e));
 		}
+		if (!builds.isEmpty()) {
+			return getBuildFiles();
+		}
+		if (!mains.isEmpty()) {
+			return getMains();
+		}
+		
 		return getScripts();
 	}
 
@@ -134,7 +162,11 @@ public class JBangFileDetector {
 			
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				if (JBangFileUtils.isJBangFile(file)) {
+				if (JBangFileUtils.isJBangBuildFile(file)) {
+					builds.add(file);
+				} else if (JBangFileUtils.isMainFile(file)) {
+					mains.add(file);
+				} else if (JBangFileUtils.isJBangFile(file)) {
 					scripts.add(file);
 				}
 				return CONTINUE;

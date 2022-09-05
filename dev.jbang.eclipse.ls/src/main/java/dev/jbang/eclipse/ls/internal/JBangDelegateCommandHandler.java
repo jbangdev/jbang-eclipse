@@ -1,6 +1,6 @@
 package dev.jbang.eclipse.ls.internal;
 
-import static dev.jbang.eclipse.core.internal.JBangFileUtils.isJBangFile;
+import static dev.jbang.eclipse.core.internal.JBangFileUtils.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -65,7 +65,7 @@ public class JBangDelegateCommandHandler implements IDelegateCommandHandler {
 					return f1.getProjectRelativePath().segmentCount() - f2.getProjectRelativePath().segmentCount();
 				});
 				IFile file = files[0];
-				if (file != null && isJBangFile(file)) {
+				if (file != null && (isJBangFile(file) || isJBangBuildFile(file)) ) {
 					jbangFiles.add(file);
 				}
 			}

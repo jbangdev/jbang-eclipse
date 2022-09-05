@@ -26,7 +26,7 @@ public class ImportScriptUtils {
 		for (String relativePath : relativePaths) {
 			var scriptPath = scriptsDir.resolve(relativePath);
 			if (!Files.exists(scriptPath)) {
-				throw new IOException(scriptPath + " does not exist");
+				throw new IOException("Import failed: "+scriptPath + " does not exist");
 			}
 		
 			var destPath = copy(workDir, scriptPath);
@@ -47,7 +47,7 @@ public class ImportScriptUtils {
 		var destPath = destFolder.resolve(scriptsDir.relativize(scriptPath));
 		
 		Files.deleteIfExists(destPath);
-		
+		Files.createDirectories(destPath.getParent());
 		Files.copy(scriptPath, destPath);
 		return destPath;
 	}

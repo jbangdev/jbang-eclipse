@@ -17,7 +17,7 @@ public class JBangResourceTester extends PropertyTester {
     public boolean test(Object receiver, String property, Object[] args, Object expectedValue) {
     	if (receiver instanceof IResource) {
         	IResource resource = (IResource) receiver; 
-        	boolean isJBangFile = JBangFileUtils.isJBangFile(resource);
+        	boolean isJBangFile = JBangFileUtils.isJBangFile(resource) || JBangFileUtils.isJBangBuildFile(resource);
         	return Objects.equals(isJBangFile, expectedValue);
         }
     	return false;

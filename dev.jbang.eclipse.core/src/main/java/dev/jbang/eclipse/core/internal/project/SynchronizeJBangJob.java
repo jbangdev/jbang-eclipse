@@ -2,6 +2,7 @@ package dev.jbang.eclipse.core.internal.project;
 
 import static dev.jbang.eclipse.core.internal.JBangClasspathUtils.hasAttribute;
 import static dev.jbang.eclipse.core.internal.JBangClasspathUtils.isOnClasspath;
+import static dev.jbang.eclipse.core.internal.JBangClasspathUtils.isOnOutputLocation;
 import static dev.jbang.eclipse.core.internal.JBangFileUtils.getPackageName;
 import static dev.jbang.eclipse.core.internal.ProjectUtils.addJBangNature;
 import static dev.jbang.eclipse.core.internal.ProjectUtils.addJavaNature;
@@ -66,6 +67,9 @@ public class SynchronizeJBangJob extends WorkspaceJob {
 
 				//check source folder
 				IJavaProject javaProject = JavaCore.create(project);
+				if (isOnOutputLocation(javaProject, file)) {
+					continue;
+				}
 				if (!isOnClasspath(javaProject, file) || newJavaProject) {
 					//TODO display wizard to configure build output?
 					configureJava(javaProject, file, monitor);
