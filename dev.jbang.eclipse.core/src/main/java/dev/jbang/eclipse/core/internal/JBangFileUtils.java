@@ -1,10 +1,7 @@
 package dev.jbang.eclipse.core.internal;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Files;
@@ -15,7 +12,6 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -67,6 +63,13 @@ public class JBangFileUtils {
 		return false;
 	}
 	
+	public static boolean isJBangBuildFile(IResource resource) {
+		if (!(resource instanceof IFile)) {
+			return false;
+		}
+		return JBangConstants.JBANG_BUILD.equals(((IFile) resource).getName());
+	}
+	
 	public static boolean isJBangFile(Path file) {
 		if (!(Files.isRegularFile(file))) {
 			return false;
@@ -82,6 +85,20 @@ public class JBangFileUtils {
 			e.printStackTrace();
 		}
 		return false;
+	}
+	
+	public static boolean isJBangBuildFile(Path file) {
+		if (!(Files.isRegularFile(file))) {
+			return false;
+		}
+		return JBangConstants.JBANG_BUILD.equals(file.getFileName().toString());
+	}
+	
+	public static boolean isMainFile(Path file) {
+		if (!(Files.isRegularFile(file))) {
+			return false;
+		}
+		return JBangConstants.JBANG_MAIN.equals(file.getFileName().toString());
 	}
 	
 	public static String getJavaVersion(String line) {
@@ -114,28 +131,33 @@ public class JBangFileUtils {
 
 	public static String getPackageName(IJavaProject javaProject, IFile file) {
 		//TODO probably not the most efficient way to get the package name as this reads the whole file;
-		char[] source = null;
-		try (InputStream is = new BufferedInputStream(file.getContents(true));
-			 ByteArrayOutputStream result = new ByteArrayOutputStream()) {
-			 byte[] buffer = new byte[1024];
-			 for (int length; (length = is.read(buffer)) != -1; ) {
-			     result.write(buffer, 0, length);
-			 }
-			 source = result.toString(file.getCharset()).toCharArray();
-		} catch (IOException | CoreException e) {
+		var ast = createCompilationUnit(file);
+		if (ast != null) {
+			PackageDeclaration pkg = ast.getPackage();
+			if (pkg != null && pkg.getName() != null) {
+				return pkg.getName().getFullyQualifiedName();
+			}
+		}
+		return null;
+	}
+	
+	public static CompilationUnit createCompilationUnit(IFile file) {
+		String content = null;
+		try {
+			content = ResourceUtil.getContent(file);
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		if (source == null) {
+		if (content == null) {
 			return null;
 		}
+		char[] source = content.toCharArray();
 		
 		ASTParser parser = ASTParser.newParser(IASTSharedValues.SHARED_AST_LEVEL);
-		parser.setProject(javaProject);
 		parser.setIgnoreMethodBodies(true);
 		parser.setSource(source);
 		CompilationUnit ast = (CompilationUnit) parser.createAST(null);
-		PackageDeclaration pkg = ast.getPackage();
-		return (pkg == null || pkg.getName() == null)? null :pkg.getName().getFullyQualifiedName();
+		return ast;
 	}
 
 	private static boolean hasJBangInstructions(Reader reader) throws IOException {

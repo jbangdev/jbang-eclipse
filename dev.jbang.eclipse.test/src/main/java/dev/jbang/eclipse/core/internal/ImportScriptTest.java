@@ -58,4 +58,18 @@ public class ImportScriptTest extends AbstractJBangTest {
 		var dependency = script.getParent().getFile(new Path("dependency.java"));
 		assertTrue(dependency.exists(), dependency.getName() + " doesn't exist");
 	}
+	
+	@Test
+	public void importJBangBuild() throws Exception {
+		var jbp = importJBangScript("foo/build.jbang", "foo/foo.java");
+		assertNotNull(jbp);
+		assertEquals("foo", jbp.getProject().getName());
+		waitForJobsToComplete();
+		IProject project = jbp.getProject();
+		assertNoErrors(project);
+		var build = jbp.getMainSourceFile();
+		assertEquals("build.jbang", build.getName());
+		var foo = build.getParent().getFile(new Path("foo.java"));
+		assertTrue(foo.exists(), foo.getName() + " doesn't exist");
+	}
 }

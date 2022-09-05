@@ -1,0 +1,7 @@
+///usr/bin/env jbang "$0" "$@" ; exit $?
+//DEPS info.picocli:picocli:LATEST
+//DESCRIPTION For testing purposes
+//GAV dev.jbang.itests:foo
+//SOURCES foo.java
+//JAVA 11+
+//JAVA_OPTIONS -Dfoo=bar "-Dbar=aap noot mies"

@@ -1,5 +1,6 @@
 package dev.jbang.eclipse.ui.internal.commands;
 
+import static dev.jbang.eclipse.core.internal.JBangFileUtils.isJBangBuildFile;
 import static dev.jbang.eclipse.core.internal.JBangFileUtils.isJBangFile;
 
 import java.util.LinkedHashSet;
@@ -63,7 +64,7 @@ public class SynchronizeJBangHandler extends AbstractHandler {
 		Set<IFile> files = new LinkedHashSet<>();
 		for (Object element : elements) {
 			IResource file = Adapters.adapt(element, IResource.class);
-			if (file != null && isJBangFile(file) && file.getLocation() != null) {
+			if (file != null && (isJBangFile(file) || isJBangBuildFile(file)) && file.getLocation() != null) {
 				files.add((IFile) file);
 			}
 		}

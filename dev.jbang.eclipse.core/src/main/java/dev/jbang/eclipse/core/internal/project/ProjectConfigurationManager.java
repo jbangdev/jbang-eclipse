@@ -38,7 +38,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
@@ -46,6 +45,7 @@ import org.eclipse.jdt.launching.environments.IExecutionEnvironmentsManager;
 import dev.jbang.eclipse.core.JBangCorePlugin;
 import dev.jbang.eclipse.core.internal.JBangClasspathUtils;
 import dev.jbang.eclipse.core.internal.JBangConstants;
+import dev.jbang.eclipse.core.internal.JBangFileUtils;
 import dev.jbang.eclipse.core.internal.ProjectUtils;
 import dev.jbang.eclipse.core.internal.ResourceUtil;
 import dev.jbang.eclipse.core.internal.classpath.AnnotationProcessorUtils;
@@ -315,6 +315,9 @@ public class ProjectConfigurationManager {
 
 		String fileName = script.getFileName().toString();
 		String name = fileName; //fileName.substring(0, fileName.lastIndexOf("."));
+		if (JBangFileUtils.isJBangBuildFile(script) || JBangFileUtils.isMainFile(script)) {
+			name = script.getParent().getFileName().toString();
+		}
 
 		IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(name);
 		if (!project.exists()) {
@@ -353,7 +356,12 @@ public class ProjectConfigurationManager {
 
 		javaProject.setOutputLocation(bin.getFullPath(), monitor);
 
-		IFile mainFile = link(info.getBackingResource(), project, configuration, monitor);
+		IFile mainFile;
+		if (JBangFileUtils.isJBangBuildFile(script)) {
+			mainFile = link(script.toAbsolutePath().toString(), project, configuration, monitor);
+		} else {
+			mainFile = link(info.getBackingResource(), project, configuration, monitor);
+		}
 		if (info.getSources() != null && !info.getSources().isEmpty()) {
 			for (JBangFile s : info.getSources()) {
 				link(s.originalResource, project, configuration, monitor);
@@ -398,12 +406,18 @@ public class ProjectConfigurationManager {
 	}
 	
 	public void synchronize(IFile file, IProgressMonitor monitor) throws CoreException {
-		monitor.setTaskName("Updating JBang configuration from " + file.getName());
 		//System.err.println(file + " configuration changed, checking jbang info");
-		JBangProject jbp = getJBangProject(file.getProject(), monitor);
+		IProject project = file.getProject();
+		JBangProject jbp = getJBangProject(project, monitor);
 		if (jbp == null) {
 			return;
 		}
+		
+		if (isJavaProject(project) && JBangClasspathUtils.isOnOutputLocation(JavaCore.create(project), file)) {
+			return;
+		}
+		monitor.setTaskName("Updating JBang configuration from " + file.getName());
+		
 		jbp.setMainSourceFile(file);
 		var jbang = jbp.getRuntime();
 		
@@ -424,10 +438,12 @@ public class ProjectConfigurationManager {
 				});
 			}
 		}
-		
 	}
 	
-	private String getSource(IFile file) throws JavaModelException {
+	private String getSource(IFile file) throws CoreException {
+		if (JBangFileUtils.isJBangBuildFile(file)) {
+			return ResourceUtil.getContent(file);
+		}
 		ICompilationUnit typeRoot = JavaCore.createCompilationUnitFrom(file);
 		return typeRoot.getBuffer().getContents();
 	}

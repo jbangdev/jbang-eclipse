@@ -37,7 +37,7 @@
             <unit id="org.eclipse.sdk.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.xtend.sdk.feature.group" version="0.0.0"/>
             <unit id="org.eclipse.xtext.sdk.feature.group" version="0.0.0"/>
-            <unit id="org.eclipse.jdt.junit5.runtime" version="0.0.0" />
+            <unit id="org.eclipse.jdt.junit5.runtime" version="0.0.0"/>
             <repository location="https://download.eclipse.org/releases/2022-09//"/>
         </location>
         <location includeAllPlatforms="false" includeConfigurePhase="false" includeMode="planner" includeSource="false" type="InstallableUnit">

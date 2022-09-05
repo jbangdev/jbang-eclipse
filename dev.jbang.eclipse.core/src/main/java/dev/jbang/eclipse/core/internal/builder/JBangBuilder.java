@@ -1,6 +1,8 @@
 package dev.jbang.eclipse.core.internal.builder;
 
 import static dev.jbang.eclipse.core.JBangCorePlugin.logInfo;
+import static dev.jbang.eclipse.core.internal.JBangFileUtils.createCompilationUnit;
+import static dev.jbang.eclipse.core.internal.JBangFileUtils.isJBangBuildFile;
 import static dev.jbang.eclipse.core.internal.JBangFileUtils.isJBangFile;
 
 import java.util.ArrayList;
@@ -26,6 +28,7 @@ import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.manipulation.CoreASTProvider;
 
 import dev.jbang.eclipse.core.JBangCorePlugin;
+import dev.jbang.eclipse.core.internal.ResourceUtil;
 import dev.jbang.eclipse.core.internal.project.JBangProject;
 import dev.jbang.eclipse.core.internal.project.ProjectConfigurationManager;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimesDiscoveryJob;
@@ -143,7 +146,7 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 					case IResourceDelta.CHANGED: {
 						// if the content has changed clean + scan
 						if ((delta.getFlags() & IResourceDelta.CONTENT) > 0) {
-							if (isJBangFile(resource)) {
+							if (isJBangBuildFile(resource) || isJBangFile(resource)) {
 								jbangFiles.add((IFile) resource);
 							}
 							return true;
@@ -166,21 +169,34 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 
 	@SuppressWarnings("unchecked")
 	static Integer getConfigHash(IFile file, IProgressMonitor monitor) throws CoreException {
-		if (!"java".equals(file.getFileExtension())) {
+		if (!JavaCore.isJavaLikeFileName(file.getName()) && !isJBangBuildFile(file) ) {
 			return null;
 		}
-		ICompilationUnit typeRoot = JavaCore.createCompilationUnitFrom(file);
-		//FIXME This is uber slow. Once a file is saved, its AST is disposed, we're not benefiting from reusing a cached AST, 
-		// hence pay the price of recomputing it from scratch
-		CompilationUnit root = CoreASTProvider.getInstance().getAST(typeRoot, CoreASTProvider.WAIT_YES, monitor);
+		
+		CompilationUnit root = null;
+		String source = null;
+		if (isJBangBuildFile(file)) {
+			root = createCompilationUnit(file);
+			source = ResourceUtil.getContent(file);
+		} else {
+			ICompilationUnit typeRoot = JavaCore.createCompilationUnitFrom(file);
+			if (typeRoot != null) {
+				//FIXME This is uber slow. Once a file is saved, its AST is disposed, we're not benefiting from reusing a cached AST, 
+				// hence pay the price of recomputing it from scratch
+				root = CoreASTProvider.getInstance().getAST(typeRoot, CoreASTProvider.WAIT_YES, monitor);
+				source = typeRoot.getSource();				
+			}
+		}
 		if (root == null) {
 			return 0;
 		}
-		JBangConfigVisitor configCollector = new JBangConfigVisitor(typeRoot.getSource());
+		
+		JBangConfigVisitor configCollector = new JBangConfigVisitor(source);
 		root.accept(configCollector);
 		for (Comment comment : (List<Comment>) root.getCommentList()) {
 			comment.accept(configCollector);
 		}
 		return configCollector.getConfigElements().hashCode();
-	}	
+	}
+
 }
