@@ -14,4 +14,12 @@
             <command id="jbang/synchronize"/>
        </delegateCommandHandler>
    </extension>
+    <extension
+         id="buildSupport"
+         point="org.eclipse.jdt.ls.core.buildSupport">
+         <buildSupport
+            id="jbangBuildSupport"
+            order="500"
+            class="dev.jbang.eclipse.ls.internal.JBangBuildSupport" />
+   </extension>
 </plugin>
