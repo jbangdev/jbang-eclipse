@@ -1,5 +1,7 @@
 package dev.jbang.eclipse.core.internal;
 
+import static dev.jbang.eclipse.core.internal.ExceptionFactory.newException;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,9 +12,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IClasspathAttribute;
 import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -87,8 +87,8 @@ public class JBangClasspathUtils {
 	    try (FileInputStream is = new FileInputStream(containerStateFile)) {
 	      return new ClasspathContainerSaveHelper().readContainer(is);
 	    } catch(IOException | ClassNotFoundException ex) {
-	      throw new CoreException(new Status(IStatus.ERROR, JBangConstants.PLUGIN_ID, -1, //
-	          "Can't read JBang classpath container state for " + project.getName(), ex));
+	      throw newException(
+	          "Can't read JBang classpath container state for " + project.getName(), ex);
 	    }
 	  }
 	  

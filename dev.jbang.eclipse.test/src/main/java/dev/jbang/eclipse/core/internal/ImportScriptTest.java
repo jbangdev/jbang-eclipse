@@ -1,6 +1,7 @@
 package dev.jbang.eclipse.core.internal;
 
 import static dev.jbang.eclipse.core.internal.utils.ClasspathHelpers.assertJava;
+import static dev.jbang.eclipse.core.internal.utils.ImportScriptUtils.importJBangFolder;
 import static dev.jbang.eclipse.core.internal.utils.ImportScriptUtils.importJBangScript;
 import static dev.jbang.eclipse.core.internal.utils.JobHelpers.waitForJobsToComplete;
 import static dev.jbang.eclipse.core.internal.utils.WorkspaceHelpers.assertNoErrors;
@@ -71,6 +72,21 @@ public class ImportScriptTest extends AbstractJBangTest {
 		assertEquals("build.jbang", build.getName());
 		var foo = build.getParent().getFile(new Path("foo.java"));
 		assertTrue(foo.exists(), foo.getName() + " doesn't exist");
+	}
+	
+	@Test
+	public void importFolderAsProject() throws Exception {
+		var jbp = importJBangFolder("project-per-folder/");
+		assertNotNull(jbp);
+		assertEquals("foo.java", jbp.getProject().getName());
+		waitForJobsToComplete();
+		IProject project = jbp.getProject();
+		assertNoErrors(project);
+		var foo = jbp.getMainSourceFile();
+		assertTrue(foo.exists(), foo.getName() + " doesn't exist");
+		
+		var bar = project.getFile("src/bar.java");
+		assertTrue(bar.exists(), bar.getName() + " doesn't exist");
 	}
 	
 	@Test

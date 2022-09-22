@@ -1,13 +1,17 @@
 package dev.jbang.eclipse.core.internal.utils;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import dev.jbang.eclipse.core.JBangCorePlugin;
+import dev.jbang.eclipse.core.internal.project.JBangFileDetector;
 import dev.jbang.eclipse.core.internal.project.JBangProject;
 import dev.jbang.eclipse.core.internal.project.JBangProjectConfiguration;
 
@@ -17,6 +21,7 @@ public class ImportScriptUtils {
 	
 	private ImportScriptUtils() {}
 	
+	
 	public static JBangProject importJBangScript(String... relativePaths) throws Exception {
 		Path mainScript = null;
 		
@@ -24,12 +29,12 @@ public class ImportScriptUtils {
 		Files.createDirectories(workDir);
 		
 		for (String relativePath : relativePaths) {
-			var scriptPath = scriptsDir.resolve(relativePath);
-			if (!Files.exists(scriptPath)) {
-				throw new IOException("Import failed: "+scriptPath + " does not exist");
+			var sourcetPath = scriptsDir.resolve(relativePath);
+			if (!Files.exists(sourcetPath)) {
+				throw new IOException("Import failed: "+sourcetPath + " does not exist");
 			}
 		
-			var destPath = copy(workDir, scriptPath);
+			var destPath = copy(sourcetPath, workDir);
 			if (mainScript == null) {
 				mainScript = destPath;
 			}
@@ -41,14 +46,35 @@ public class ImportScriptUtils {
 		
 		return jbangProject;
 	}
+	
 
-	private static Path copy(Path destFolder, Path scriptPath) throws IOException {
-		
-		var destPath = destFolder.resolve(scriptsDir.relativize(scriptPath));
-		
+	private static Path copy(Path sourcePath, Path destFolder) throws IOException {
+		var destPath = destFolder.resolve(scriptsDir.relativize(sourcePath));
 		Files.deleteIfExists(destPath);
 		Files.createDirectories(destPath.getParent());
-		Files.copy(scriptPath, destPath);
+		Files.copy(sourcePath, destPath);
 		return destPath;
+	}
+
+	
+	public static JBangProject importJBangFolder(String folder) throws Exception {
+		var srcDir = scriptsDir.resolve(folder);
+		var workDir = Paths.get("target", "workdir");
+		Files.createDirectories(workDir);
+		
+		
+		FileUtils.copyDirectoryToDirectory(srcDir.toFile(), workDir.toFile());
+		
+		var destDir = workDir.resolve(srcDir.getFileName());
+		var monitor = new NullProgressMonitor();
+		var scripts = new JBangFileDetector(destDir).scan(monitor);
+		assertFalse(scripts.isEmpty(), "No scripts found under "+destDir);
+		Path mainScript = scripts.iterator().next();
+		
+		var projectManager = JBangCorePlugin.getJBangManager().getProjectConfigurationManager();
+		var config = new JBangProjectConfiguration();
+		config.setLinkedSourceFolder(destDir.toUri());
+		var jbangProject = projectManager.createJBangProject(mainScript, config,monitor);
+		return jbangProject;
 	}
 }
