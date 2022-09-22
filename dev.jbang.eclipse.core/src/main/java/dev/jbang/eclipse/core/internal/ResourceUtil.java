@@ -1,5 +1,7 @@
 package dev.jbang.eclipse.core.internal;
 
+import static dev.jbang.eclipse.core.internal.ExceptionFactory.newException;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,8 +15,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 
 public class ResourceUtil {
 
@@ -43,7 +43,7 @@ public class ResourceUtil {
 		try (InputStream newContent = new ByteArrayInputStream(content.getBytes())) {
 			file.setContents(newContent, IResource.FORCE, null);
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, JBangConstants.PLUGIN_ID,  "Can not write to " + file.getRawLocation(), e));
+			throw newException("Can not write to " + file.getRawLocation(), e);
 		}
 	}
 
@@ -60,7 +60,7 @@ public class ResourceUtil {
 			}
 			return out.toString();
 		} catch (IOException e) {
-			throw new CoreException(new Status(IStatus.ERROR, JBangConstants.PLUGIN_ID, "Can not get " + file.getRawLocation() + " content", e));
+			throw newException("Can not get " + file.getRawLocation() + " content", e);
 		}
 	}
 }

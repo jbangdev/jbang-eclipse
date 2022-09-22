@@ -1,10 +1,13 @@
 package dev.jbang.eclipse.core.internal.project;
 
 import static dev.jbang.eclipse.core.JBangCorePlugin.log;
+import static dev.jbang.eclipse.core.internal.ExceptionFactory.newException;
 import static dev.jbang.eclipse.core.internal.ProjectUtils.isJBangProject;
 import static dev.jbang.eclipse.core.internal.ProjectUtils.isJavaProject;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -356,25 +359,58 @@ public class ProjectConfigurationManager {
 
 		javaProject.setOutputLocation(bin.getFullPath(), monitor);
 
-		IFile mainFile;
-		if (JBangFileUtils.isJBangBuildFile(script)) {
-			mainFile = link(script.toAbsolutePath().toString(), project, configuration, monitor);
-		} else {
-			mainFile = link(info.getBackingResource(), project, configuration, monitor);
-		}
-		if (info.getSources() != null && !info.getSources().isEmpty()) {
-			for (JBangFile s : info.getSources()) {
-				link(s.originalResource, project, configuration, monitor);
+		IFile mainFile = null;
+		
+		
+		if (configuration.getLinkedSourceFolder() == null) {
+						
+			if (JBangFileUtils.isJBangBuildFile(script)) {
+				mainFile = link(script.toAbsolutePath().toString(), project, configuration, monitor);
+			} else {
+				mainFile = link(info.getBackingResource(), project, configuration, monitor);
 			}
-		}
-		if (info.getFiles() != null && !info.getFiles().isEmpty()) {
-			for (JBangFile file : info.getFiles()) {
-                String target = file.target;
-                if (target == null) {
-                    link(file.originalResource, project, configuration, monitor);
-                } else {
-                    link(file.originalResource, file.target, project, configuration, monitor);
-                }
+			
+			
+			if (info.getSources() != null && !info.getSources().isEmpty()) {
+				for (JBangFile s : info.getSources()) {
+					link(s.originalResource, project, configuration, monitor);
+				}
+			}
+			if (info.getFiles() != null && !info.getFiles().isEmpty()) {
+				for (JBangFile file : info.getFiles()) {
+					String target = file.target;
+					if (target == null) {
+						link(file.originalResource, project, configuration, monitor);
+					} else {
+						link(file.originalResource, file.target, project, configuration, monitor);
+					}
+				}
+			}			
+		} else {
+			var scriptUri = script.toAbsolutePath().toUri();
+			IFile[] mainCandidates = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(scriptUri);
+			if (mainCandidates.length == 0) {
+				//FIXME Move that fugly hack to some other utility class
+				//FFS Eclipse on case-insensitive Macs!
+				var sUri = scriptUri.toString();
+				if (sUri.startsWith("file:///Users/")) {
+					try {
+						scriptUri = new URI(sUri.replaceFirst("file:///Users", "file:/USERS"));
+						mainCandidates = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(scriptUri);
+					} catch (URISyntaxException nooope) {
+						//can't happen
+					}
+				}
+			}
+			
+			for (IFile candidate : mainCandidates) {
+				if (project.equals(candidate.getProject())) {
+					mainFile = candidate;
+					break;
+				}
+			}
+			if (mainFile == null) {
+				throw newException("Couldn't file main script O_o" );
 			}
 		}
 

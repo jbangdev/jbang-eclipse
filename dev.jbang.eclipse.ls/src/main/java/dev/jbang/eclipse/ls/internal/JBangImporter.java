@@ -5,6 +5,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -14,9 +16,11 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.jdt.ls.core.internal.AbstractProjectImporter;
 import org.eclipse.jdt.ls.core.internal.JavaLanguageServerPlugin;
 import org.eclipse.jdt.ls.core.internal.ProjectUtils;
+import org.eclipse.jdt.ls.core.internal.handlers.MapFlattener;
 
 import dev.jbang.eclipse.core.JBangCorePlugin;
 import dev.jbang.eclipse.core.internal.JBangFileUtils;
+import dev.jbang.eclipse.core.internal.project.JBangFileDetector;
 import dev.jbang.eclipse.core.internal.project.JBangProjectConfiguration;
 
 @SuppressWarnings("restriction")
@@ -27,7 +31,8 @@ public class JBangImporter extends AbstractProjectImporter  {
 	@Override
 	public boolean applies(IProgressMonitor monitor) throws OperationCanceledException, CoreException {
 		scripts = new HashSet<>();
-		JBangFileDetector scanner = new JBangFileDetector(Paths.get(rootFolder.toURI()));
+		List<String> javaImportExclusions = JavaLanguageServerPlugin.getPreferencesManager().getPreferences().getJavaImportExclusions();
+		JBangFileDetector scanner = new JBangFileDetector(Paths.get(rootFolder.toURI()), javaImportExclusions);
 		scripts.addAll(scanner.scan(monitor));
 		return !scripts.isEmpty();
 	}
@@ -40,9 +45,15 @@ public class JBangImporter extends AbstractProjectImporter  {
 
 		var jbang = JBangCorePlugin.getJBangManager();
 		JBangProjectConfiguration configuration = new JBangProjectConfiguration();
-		//configuration.setLinkedSourceFolder(rootFolder.toURI());//Linking whole directory doesn't work is messy if there are multiple JBang scripts in that directory
 		configuration.setSourceFolder(ProjectUtils.WORKSPACE_LINK); 
-		for (Path script : scripts) {
+		boolean projectPerScript = MapFlattener.getBoolean(getPreferences().asMap(), "java.jbang.import.projectPerScript"); 
+		if (!projectPerScript) {
+			configuration.setLinkedSourceFolder(rootFolder.toURI());//Linking whole directory doesn't work is messy if there are multiple JBang scripts in that directory			
+		}
+		JavaLanguageServerPlugin.logInfo("JBang import : " + ((projectPerScript)?" 1 project per script" : "1 project per folder"));
+		
+		Collection<Path> toImport = (projectPerScript)? scripts: Set.of(scripts.iterator().next());
+		for (Path script : toImport) {
 			try {
 				String name = script.getFileName().toString();
 				if (JBangFileUtils.isJBangBuildFile(script) || JBangFileUtils.isMainFile(script)) {

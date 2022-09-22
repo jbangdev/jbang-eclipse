@@ -1,5 +1,7 @@
 package dev.jbang.eclipse.core.internal.process;
 
+import static dev.jbang.eclipse.core.internal.ExceptionFactory.newException;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -10,9 +12,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.Status;
 
-import dev.jbang.eclipse.core.JBangCorePlugin;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntime;
 
 public class JBangTemplatesExecution {
@@ -59,7 +59,7 @@ public class JBangTemplatesExecution {
 				process.waitFor();
 			}
 		} catch (IOException | InterruptedException e) {
-			throw new CoreException(new Status(Status.ERROR, JBangCorePlugin.PLUGIN_ID, "Failed to load JBang templates", e));
+			throw newException( "Failed to load JBang templates", e);
 		}
 		return templates;
 	}

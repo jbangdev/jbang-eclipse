@@ -1,6 +1,7 @@
 package dev.jbang.eclipse.ls.internal;
 
-import static dev.jbang.eclipse.core.internal.JBangFileUtils.*;
+import static dev.jbang.eclipse.core.internal.JBangFileUtils.isJBangBuildFile;
+import static dev.jbang.eclipse.core.internal.JBangFileUtils.isJBangFile;
 
 import java.net.URI;
 import java.net.URISyntaxException;

@@ -12,6 +12,7 @@
  *******************************************************************************/
 package dev.jbang.eclipse.core.internal.utils;
 
+import static dev.jbang.eclipse.core.internal.ExceptionFactory.newException;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -32,10 +33,8 @@ import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
 
 import dev.jbang.eclipse.core.internal.JBangConstants;
 
@@ -68,9 +67,8 @@ public class WorkspaceHelpers {
     }
 
     // must be a timeout
-    throw new CoreException(
-        new Status(IStatus.ERROR, JBangConstants.PLUGIN_ID, "Could not delete workspace resources (after " + i
-            + " retries): " + Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects()), cause));
+    throw newException ("Could not delete workspace resources (after " + i
+            + " retries): " + Arrays.asList(ResourcesPlugin.getWorkspace().getRoot().getProjects()), cause);
   }
 
   private static void doCleanWorkspace() throws InterruptedException, CoreException, IOException {

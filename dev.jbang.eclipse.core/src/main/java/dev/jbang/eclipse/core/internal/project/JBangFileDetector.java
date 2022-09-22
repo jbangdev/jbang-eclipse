@@ -1,4 +1,4 @@
-package dev.jbang.eclipse.ls.internal;
+package dev.jbang.eclipse.core.internal.project;
 
 import static java.nio.file.FileVisitResult.CONTINUE;
 import static java.nio.file.FileVisitResult.SKIP_SUBTREE;
@@ -29,9 +29,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.jdt.ls.core.internal.JavaLanguageServerPlugin;
-import org.eclipse.jdt.ls.core.internal.StatusFactory;
 
+import dev.jbang.eclipse.core.internal.ExceptionFactory;
 import dev.jbang.eclipse.core.internal.JBangFileUtils;
 
 /**
@@ -48,12 +47,12 @@ public class JBangFileDetector {
 	private List<Path> builds;
 	
 	private Path rootDir;
-	private int maxDepth = 2;
+	private int maxDepth = 3;
 	private Set<String> exclusions = new LinkedHashSet<>(1);
 
 	/**
 	 * Constructs a new JBangFileDetector for the given root directory, searching
-	 * for fileNames. By default, the search depth is limited to 5. Sub-directories
+	 * for fileNames. By default, the search depth is limited to 3. Sub-directories
 	 * of a found directory will be walked through. The ".metadata" folder is
 	 * excluded.
 	 *
@@ -63,19 +62,22 @@ public class JBangFileDetector {
 	 *            the names of the file to search
 	 */
 	public JBangFileDetector(Path rootDir) {
+		this(rootDir, null);
+	}
+
+	public JBangFileDetector(Path rootDir, List<String> exclusions) {
 		this.rootDir = rootDir;
 		scripts = new ArrayList<>();
 		builds = new ArrayList<>();
 		mains = new ArrayList<>();
 		addExclusions(METADATA_FOLDER);
-		List<String> javaImportExclusions = JavaLanguageServerPlugin.getPreferencesManager().getPreferences().getJavaImportExclusions();
-		if (javaImportExclusions != null) {
-			for (String pattern : javaImportExclusions) {
+		if (exclusions != null) {
+			for (String pattern : exclusions) {
 				addExclusions(pattern);
 			}
 		}
 	}
-
+	
 	/**
 	 * Adds the names of directories to exclude from the search. All its sub-directories will be skipped.
 	 *
@@ -134,7 +136,7 @@ public class JBangFileDetector {
 		try {
 			scanDir(rootDir, (monitor == null? new NullProgressMonitor(): monitor));
 		} catch (IOException e) {
-			throw new CoreException(StatusFactory.newErrorStatus("Failed to scan "+rootDir, e));
+			throw  ExceptionFactory.newException("Failed to scan "+rootDir, e);
 		}
 		if (!builds.isEmpty()) {
 			return getBuildFiles();
