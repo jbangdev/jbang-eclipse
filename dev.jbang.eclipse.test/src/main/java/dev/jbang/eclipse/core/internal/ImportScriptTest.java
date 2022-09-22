@@ -72,4 +72,16 @@ public class ImportScriptTest extends AbstractJBangTest {
 		var foo = build.getParent().getFile(new Path("foo.java"));
 		assertTrue(foo.exists(), foo.getName() + " doesn't exist");
 	}
+	
+	@Test
+	public void importWithSpaces() throws Exception {
+		var jbp = importJBangScript("gimme some space/hello.java");
+		assertNotNull(jbp);
+		assertEquals("hello.java", jbp.getProject().getName());
+		waitForJobsToComplete();
+		IProject project = jbp.getProject();
+		assertNoErrors(project);
+		var main = jbp.getMainSourceFile();
+		assertEquals("hello.java", main.getName());
+	}
 }
