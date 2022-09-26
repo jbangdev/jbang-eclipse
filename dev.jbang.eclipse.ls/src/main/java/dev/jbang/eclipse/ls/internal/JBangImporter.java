@@ -46,7 +46,7 @@ public class JBangImporter extends AbstractProjectImporter  {
 		var jbang = JBangCorePlugin.getJBangManager();
 		JBangProjectConfiguration configuration = new JBangProjectConfiguration();
 		configuration.setSourceFolder(ProjectUtils.WORKSPACE_LINK); 
-		boolean projectPerScript = MapFlattener.getBoolean(getPreferences().asMap(), "java.jbang.import.projectPerScript"); 
+		boolean projectPerScript = MapFlattener.getBoolean(getPreferences().asMap(), "java.import.jbang.projectPerScript"); 
 		if (!projectPerScript) {
 			configuration.setLinkedSourceFolder(rootFolder.toURI());//Linking whole directory doesn't work is messy if there are multiple JBang scripts in that directory			
 		}
