@@ -30,11 +30,17 @@ public class JBangRuntimesDiscoveryJob extends Job {
 		if (runtimeManager.getDefaultRuntime().isValid()) {
 			return Status.OK_STATUS;
 		}
+		if (monitor.isCanceled()) {
+			return Status.CANCEL_STATUS;
+		}
 		var existingRuntimes = new ArrayList<>(runtimeManager.getJBangRuntimes(false).stream().filter(r -> !JBangRuntime.SYSTEM.equals(r.getName())).collect(Collectors.toList()));
 		
 		var newRuntimes = new ArrayList<JBangRuntime>(usualSuspects.size());
 		
 		for (var candidate : usualSuspects.entrySet()) {
+			if (monitor.isCanceled()) {
+				return Status.CANCEL_STATUS;
+			}
 			if (!Files.isDirectory(candidate.getValue())) {
 				continue;
 			}
@@ -51,12 +57,19 @@ public class JBangRuntimesDiscoveryJob extends Job {
 			return Long.compare(j1.getExecutable().toFile().lastModified(), j2.getExecutable().toFile().lastModified());
 		});
 		existingRuntimes.addAll(newRuntimes);
+		if (monitor.isCanceled()) {
+			return Status.CANCEL_STATUS;
+		}
 		runtimeManager.setRuntimes(existingRuntimes);
 		var defaultRuntime = newRuntimes.get(0);// Most recent JBang runtime
 		System.out.println("Setting default runtime as "+defaultRuntime);
-		
 		runtimeManager.setDefaultRuntime(defaultRuntime);
 		return Status.OK_STATUS;
 	}
 
+
+	@Override
+	public boolean belongsTo(Object family) {
+		return this.getClass().equals(family);
+	}
 }

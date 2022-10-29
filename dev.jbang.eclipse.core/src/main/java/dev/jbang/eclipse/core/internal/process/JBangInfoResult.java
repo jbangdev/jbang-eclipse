@@ -27,6 +27,8 @@ public class JBangInfoResult {
 	private List<String> compileOptions;
 	
 	private List<String> runtimeOptions;
+	
+	private String availableJdkPath;
 
 	public List<String> getResolvedDependencies() {
 		return resolvedDependencies;
@@ -56,7 +58,10 @@ public class JBangInfoResult {
 			sb.append("]");
 		}
 		if (requestedJavaVersion != null && !requestedJavaVersion.isBlank()) {
-			sb.append(System.lineSeparator()).append("requestedJavaVersion: " + requestedJavaVersion);
+			sb.append(System.lineSeparator()).append("requestedJavaVersion: ").append(requestedJavaVersion);
+		}
+		if (availableJdkPath != null && !availableJdkPath.isBlank()) {
+			sb.append(System.lineSeparator()).append("availableJdkPath: ").append(availableJdkPath);
 		}
 		if (compileOptions != null && !compileOptions.isEmpty()) {
 			sb.append(System.lineSeparator()).append("compileOptions: " + compileOptions);
@@ -159,6 +164,14 @@ public class JBangInfoResult {
 
 	public void setRuntimeOptions(List<String> runtimeOptions) {
 		this.runtimeOptions = runtimeOptions;
+	}
+
+	public String getAvailableJdkPath() {
+		return availableJdkPath;
+	}
+
+	public void setAvailableJdkPath(String availableJdkPath) {
+		this.availableJdkPath = availableJdkPath;
 	}
 	
 	

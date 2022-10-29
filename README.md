@@ -9,6 +9,7 @@ This experimental plugin aims to let you author [JBang](https://github.com/jbang
 
 - Import JBang Scripts as projects
 - Synchronize JBang Dependencies to existing projects
+- Automatically configures JDKs managed by JBang
 - Validation of JBang scripts on file save
 - Automatic configuration of Annotation Processors
 - JBang runtime management
@@ -47,7 +48,7 @@ The source folder containing the JBang file will automatically be added to the p
 ## Recommended 3rd party plugins
 
 * Automatic source downloads: Currently, JBang dependencies sources are not automatically fetched. You can install the [PDE source lookup](https://marketplace.eclipse.org/content/pde-source-lookup) plugin to automatically download sources from Maven Central, when opening a type from a JBang dependency. 
-* Automatic JBang-managed JDK detection: The [JRE Discovery](https://marketplace.eclipse.org/content/jre-discovery) plugin will automatically detect JDKs installed by JBang, as soon as they're installed.
+
 
 Installation
 ------------
