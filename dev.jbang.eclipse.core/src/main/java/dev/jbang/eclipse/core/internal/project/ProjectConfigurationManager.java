@@ -60,6 +60,7 @@ import dev.jbang.eclipse.core.internal.process.JBangInfoResult;
 import dev.jbang.eclipse.core.internal.process.JBangInfoResult.JBangFile;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntime;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimeManager;
+import dev.jbang.eclipse.core.internal.vms.JBangManagedVMService;
 
 public class ProjectConfigurationManager {
 
@@ -99,6 +100,11 @@ public class ProjectConfigurationManager {
 					: new ArrayList<>(info.getResolvedDependencies());
 			IClasspathEntry[] classpath = jp.getRawClasspath();
 
+			if (info.getAvailableJdkPath() != null && !info.getAvailableJdkPath().isBlank()) {
+				//Ensure we'll have a proper Execution Environment available
+				new JBangManagedVMService().getJVM(new File(info.getAvailableJdkPath()), monitor);
+			}
+			
 			IExecutionEnvironment ee = null;
 			IClasspathEntry jbangContainerEntry = null;
 			for (IClasspathEntry entry : classpath) {

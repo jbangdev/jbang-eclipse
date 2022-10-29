@@ -43,6 +43,7 @@ public abstract class AbstractJBangTest {
 	    defaultRuntime.detectVersion(null);
 	    var jbangRuntimeManager = new JBangRuntimeManager();
 	    try {
+	    	Job.getJobManager().cancel(JBangRuntimesDiscoveryJob.class);
 			Job.getJobManager().join(JBangRuntimesDiscoveryJob.class, new NullProgressMonitor());
 		} catch (Exception e) {
 			//ignore

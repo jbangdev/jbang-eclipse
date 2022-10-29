@@ -36,6 +36,7 @@
 				<configuration>
 					<url>${jbang.download.url}</url>
 					<unpack>true</unpack>
+					<skipCache>true</skipCache>
 					<followRedirects>true</followRedirects>
 					<outputDirectory>${project.build.directory}/</outputDirectory>
 				</configuration>
