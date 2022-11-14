@@ -27,7 +27,7 @@ public class JBangFileUtils {
 
 	private static final Pattern JBANG_HEADER = Pattern.compile("//.*jbang.*");
 	
-	private static final Pattern JAVA_INSTRUCTION = Pattern.compile("//JAVA (\\S*).*");
+	public static final Pattern JAVA_INSTRUCTION = Pattern.compile("//JAVA (\\S*).*");
 
 	private static final Pattern SOURCES_INSTRUCTION = Pattern.compile("//SOURCES (\\S*).*");
 	

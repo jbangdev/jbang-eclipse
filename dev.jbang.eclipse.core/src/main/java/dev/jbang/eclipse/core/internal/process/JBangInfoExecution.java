@@ -29,6 +29,7 @@ public class JBangInfoExecution {
 	private static final Pattern RESOLUTION_ERROR_2 = Pattern.compile("\\[ERROR\\] Could not resolve dependency (.*)");
 	private static final Pattern RESOLUTION_ERROR_3 = Pattern.compile(".* Could not find artifact (.*) in ");
 	private static final Pattern RESOLUTION_ERROR_4 = Pattern.compile(".*The following artifacts could not be resolved: (.*?): Could");
+	private static final Pattern JAVA_ERROR = Pattern.compile("\\[ERROR\\] (Invalid JAVA version.*)");
 	
 	
 	public JBangInfoExecution(JBangRuntime jbang, File file, String javaHome) {
@@ -106,10 +107,16 @@ public class JBangInfoExecution {
 		
 		String error = errorLine.replace("\\[jbang\\] ", "");
 		
+		Matcher matcher = JAVA_ERROR.matcher(error);
+		if (matcher.find()) {
+			var message = matcher.group(1);
+			return Collections.singleton(new JBangJavaError(message)); 
+		}
 		//The following artifacts could not be resolved: com.pulumi:gcp:jar:6.11.0, com.pulumi:kubernetes:jar:3.15.1: 
 		//Could not find artifact com.pulumi:gcp:jar:6.11.0 in 
-
-		Matcher matcher = RESOLUTION_ERROR_4.matcher(error);
+		
+		
+		matcher = RESOLUTION_ERROR_4.matcher(error);
 		if (matcher.find()) {
 			var dependencies = matcher.group(1).split(", ");
 			return Stream.of(dependencies).map(d -> new JBangDependencyError(simplify(d))).collect(Collectors.toSet()); 

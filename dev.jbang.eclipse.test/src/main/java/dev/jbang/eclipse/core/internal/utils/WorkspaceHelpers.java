@@ -170,7 +170,7 @@ public class WorkspaceHelpers {
         continue;
       }
       if(type != null && type.startsWith(JBangConstants.MARKER_ID)) {
-        assertEquals(false, marker.getAttribute(IMarker.TRANSIENT), "Marker not persistent:" + toString(marker));
+        //assertEquals(false, marker.getAttribute(IMarker.TRANSIENT), "Marker not persistent:" + toString(marker));
       }
 
       if(resourceRelativePath == null) {
@@ -182,11 +182,6 @@ public class WorkspaceHelpers {
       return marker;
     }
     return null;
-  }
-
-  public static IMarker assertErrorMarker(String type, String message, Integer lineNumber, IResource resource)
-      throws Exception {
-    return assertMarker(type, IMarker.SEVERITY_ERROR, message, lineNumber, "pom.xml", resource);
   }
 
   public static IMarker assertMarker(String type, int severity, String message, Integer lineNumber,
