@@ -4,7 +4,7 @@ import static dev.jbang.eclipse.core.internal.utils.ClasspathHelpers.assertGener
 import static dev.jbang.eclipse.core.internal.utils.ClasspathHelpers.assertJava;
 import static dev.jbang.eclipse.core.internal.utils.ImportScriptUtils.importJBangScript;
 import static dev.jbang.eclipse.core.internal.utils.JobHelpers.waitForJobsToComplete;
-import static dev.jbang.eclipse.core.internal.utils.WorkspaceHelpers.assertNoErrors;
+import static dev.jbang.eclipse.core.internal.utils.WorkspaceHelpers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -55,5 +55,18 @@ public class JBangBuilderTest extends AbstractJBangTest {
 		waitForJobsToComplete();
 		assertNoErrors(project);
 		assertJava(project, "1.8");
+	}
+	
+	@Test
+	public void invalidJava() throws Exception {
+		IProject project = jbp.getProject();
+		assertJava(project, "11");
+		
+		IFile script = jbp.getMainSourceFile();
+		String content = ResourceUtil.getContent(script);
+		ResourceUtil.setContent(script, content.replace("//JAVA 11", "//JAVA xxx"));
+		
+		waitForJobsToComplete();
+		assertErrorMarker(JBangConstants.MARKER_RESOLUTION_ID, "Invalid JAVA version, should be a number optionally followed by a plus sign", 3, "src/hello.java", project);
 	}
 }
