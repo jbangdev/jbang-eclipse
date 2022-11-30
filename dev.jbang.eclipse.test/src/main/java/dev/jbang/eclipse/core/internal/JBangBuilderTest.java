@@ -69,4 +69,34 @@ public class JBangBuilderTest extends AbstractJBangTest {
 		waitForJobsToComplete();
 		assertErrorMarker(JBangConstants.MARKER_RESOLUTION_ID, "Invalid JAVA version, should be a number optionally followed by a plus sign", 3, "src/hello.java", project);
 	}
+	
+	@Test
+	public void setReleaseLevel() throws Exception {
+		IProject project = jbp.getProject();
+		assertGenerateParameters(project, false);
+		
+		IFile script = jbp.getMainSourceFile();
+		String content = ResourceUtil.getContent(script);
+		String compileOptions = "//COMPILE_OPTIONS --release 8\n";
+		ResourceUtil.setContent(script, content.replace("//JAVA 11", "//JAVA 11\n"+compileOptions));
+		
+		waitForJobsToComplete();
+		assertNoErrors(project);
+		assertJava(project, "1.8");
+	}
+	
+	@Test
+	public void setSourceLevel() throws Exception {
+		IProject project = jbp.getProject();
+		assertGenerateParameters(project, false);
+		
+		IFile script = jbp.getMainSourceFile();
+		String content = ResourceUtil.getContent(script);
+		String compileOptions = "//JAVAC_OPTIONS -source 8\n";
+		ResourceUtil.setContent(script, content.replace("//JAVA 11", "//JAVA 11\n"+compileOptions));
+		
+		waitForJobsToComplete();
+		assertNoErrors(project);
+		assertJava(project, "1.8");
+	}
 }

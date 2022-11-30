@@ -112,6 +112,7 @@ public class ProjectConfigurationManager {
 				if (isJRE(entry)) {
 					hasJRE = true;
 					String currentEnvironment = entry.getPath().lastSegment();
+					ee = getExecutionEnvironment(currentEnvironment);
 					if (environmentId != null && !environmentId.endsWith(currentEnvironment)) {
 						ee = getExecutionEnvironment(environmentId);
 						newEntries.add(newJRE(ee));
@@ -171,10 +172,25 @@ public class ProjectConfigurationManager {
 						: JavaCore.DO_NOT_GENERATE;
 				options.put(JavaCore.COMPILER_CODEGEN_METHOD_PARAMETERS_ATTR, parameters);
 
+
+				if (info.getCompileOptions() != null) {
+					int sourceIdx =  info.getCompileOptions().indexOf("-source");
+					if (sourceIdx > 0 && info.getCompileOptions().size() > sourceIdx+1) {
+						String sourceString = info.getCompileOptions().get(sourceIdx+1);
+						//XXX In theory, should not set compliance options, but this is more convenient
+						JavaCore.setComplianceOptions(sourceString, options);
+					}
+					//FIXME Having both --release and -source should be an error!
+					int releaseIdx =  info.getCompileOptions().indexOf("--release");
+					if (releaseIdx > 0 && info.getCompileOptions().size() > releaseIdx+1) {
+						String releaseString = info.getCompileOptions().get(releaseIdx+1);
+						JavaCore.setComplianceOptions(releaseString, options);
+					}
+				}
 				String previewFeatures = info.getCompileOptions() != null
 						&& info.getCompileOptions().contains("--enable-preview") ? JavaCore.ENABLED : JavaCore.DISABLED;
 				options.put(JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES, previewFeatures);
-
+				
 				if (!Objects.deepEquals(oldOptions, options)) {
 					jp.setOptions(options);
 					updateCache = true;
@@ -553,7 +569,7 @@ public class ProjectConfigurationManager {
 				i = l.indexOf(badVersion);
 				pos.line = line[0];
 				pos.start = lineOffset[0] + i;
-				pos.end = pos.start + badVersion.length();
+				pos.end = lineOffset[0] + l.length();
 			}
 			lineOffset[0] += (1 + l.length());
 			return i > 0;
