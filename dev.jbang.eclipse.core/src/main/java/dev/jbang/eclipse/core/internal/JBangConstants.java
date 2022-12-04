@@ -31,7 +31,7 @@ public final class JBangConstants {
 	public static final String P_DEFAULT_RUNTIME = PREFIX + "defaultRuntime"; //$NON-NLS-1$
 
 	public static final String JBANG_BUILD = "build.jbang";
-	
+
 	public static final String JBANG_MAIN = "main.java";
 
 	private JBangConstants() {

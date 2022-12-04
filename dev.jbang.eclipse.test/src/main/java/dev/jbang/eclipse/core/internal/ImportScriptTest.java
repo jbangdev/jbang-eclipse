@@ -60,7 +60,7 @@ public class ImportScriptTest extends AbstractJBangTest {
 		var dependency = script.getParent().getFile(new Path("dependency.java"));
 		assertTrue(dependency.exists(), dependency.getName() + " doesn't exist");
 	}
-	
+
 	@Test
 	public void importJBangBuild() throws Exception {
 		var jbp = importJBangScript("foo/build.jbang", "foo/foo.java");
@@ -74,7 +74,7 @@ public class ImportScriptTest extends AbstractJBangTest {
 		var foo = build.getParent().getFile(new Path("foo.java"));
 		assertTrue(foo.exists(), foo.getName() + " doesn't exist");
 	}
-	
+
 	@Test
 	public void importFolderAsProject() throws Exception {
 		var jbp = importJBangFolder("project-per-folder/");
@@ -85,11 +85,11 @@ public class ImportScriptTest extends AbstractJBangTest {
 		assertNoErrors(project);
 		var foo = jbp.getMainSourceFile();
 		assertTrue(foo.exists(), foo.getName() + " doesn't exist");
-		
+
 		var bar = project.getFile("src/bar.java");
 		assertTrue(bar.exists(), bar.getName() + " doesn't exist");
 	}
-	
+
 	@Test
 	public void importWithSpaces() throws Exception {
 		var jbp = importJBangScript("gimme some space/hello.java");

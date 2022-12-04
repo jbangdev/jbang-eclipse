@@ -62,11 +62,11 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 				modified.add(mainScriptFile);
 			} //TODO else find jbang source folder, find first jbang script ?
 		}
-		
+
 		int filesModified = modified.size();
 		int filesDeleted = deleted.size();
 		SubMonitor subMonitor = SubMonitor.convert(monitor, filesModified + filesDeleted);
-		
+
 		if (!modified.isEmpty()) {
 			long startConfig = System.currentTimeMillis();
 			var executedJBang = configure(modified, subMonitor.split(filesModified));
@@ -83,16 +83,16 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 	}
 
 	private boolean configure(List<IFile> files, IProgressMonitor monitor) throws CoreException {
-		
+
 		try {
 			//FIXME avoid potential deadlock
 			Job.getJobManager().join(JBangRuntimesDiscoveryJob.class, monitor);
 		} catch (Exception e) {
 			//ignore
 		}
-		
+
 		ProjectConfigurationManager configManager = JBangCorePlugin.getJBangManager().getProjectConfigurationManager();
-		
+
 		boolean executedJBang = false;
 		for (IFile file : files) {
 			Integer oldConfigHash = configCache.getOrDefault(file, MISSING_HASH);
@@ -172,7 +172,7 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 		if (!JavaCore.isJavaLikeFileName(file.getName()) && !isJBangBuildFile(file) ) {
 			return null;
 		}
-		
+
 		CompilationUnit root = null;
 		String source = null;
 		if (isJBangBuildFile(file)) {
@@ -181,16 +181,16 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 		} else {
 			ICompilationUnit typeRoot = JavaCore.createCompilationUnitFrom(file);
 			if (typeRoot != null) {
-				//FIXME This is uber slow. Once a file is saved, its AST is disposed, we're not benefiting from reusing a cached AST, 
+				//FIXME This is uber slow. Once a file is saved, its AST is disposed, we're not benefiting from reusing a cached AST,
 				// hence pay the price of recomputing it from scratch
 				root = CoreASTProvider.getInstance().getAST(typeRoot, CoreASTProvider.WAIT_YES, monitor);
-				source = typeRoot.getSource();				
+				source = typeRoot.getSource();
 			}
 		}
 		if (root == null) {
 			return 0;
 		}
-		
+
 		JBangConfigVisitor configCollector = new JBangConfigVisitor(source);
 		root.accept(configCollector);
 		for (Comment comment : (List<Comment>) root.getCommentList()) {

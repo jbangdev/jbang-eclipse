@@ -144,7 +144,7 @@ public class JBangRuntimeManager {
 	        IEclipsePreferences preferences = getRuntimePreferences(name, false);
 	        JBangRuntime runtime = createRuntime(name, preferences);
 	        if (runtime != null) {
-	        	runtimes.put(runtime.getName(), runtime);	        	
+	        	runtimes.put(runtime.getName(), runtime);
 	        }
 	      }
 	    }

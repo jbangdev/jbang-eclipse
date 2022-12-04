@@ -47,8 +47,7 @@ public class SynchronizeJBangHandler extends AbstractHandler {
 
 	private IFile[] getFileInActiveEditor(ExecutionEvent event) {
 		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
-		if (activePart instanceof IEditorPart) {
-			IEditorPart editorPart = (IEditorPart) activePart;
+		if (activePart instanceof IEditorPart editorPart) {
 			if (editorPart.getEditorInput() instanceof IFileEditorInput) {
 				IFile file = ((IFileEditorInput) editorPart.getEditorInput()).getFile();
 				IProject project = file.getProject();

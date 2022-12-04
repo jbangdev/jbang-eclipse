@@ -19,7 +19,7 @@ public class JBangManager implements IJBang {
 	public JBangRuntimeManager getJBangRuntimeManager() {
 		return JBangRuntimeManagerHolder.INSTANCE;
 	}
-	
+
 	private static class JBangRuntimeManagerHolder {
 		static final JBangRuntimeManager INSTANCE = new JBangRuntimeManager();
 	}

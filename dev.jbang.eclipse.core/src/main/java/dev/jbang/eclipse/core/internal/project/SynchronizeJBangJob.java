@@ -54,7 +54,7 @@ public class SynchronizeJBangJob extends WorkspaceJob {
 				if (project == null || !project.isAccessible()) {
 					continue;
 				}
-				
+
 				//check Java nature
 				boolean newJavaProject = false;
 				if (!isJavaProject(project)) {
@@ -89,7 +89,7 @@ public class SynchronizeJBangJob extends WorkspaceJob {
 			addJBangSourceToClasspath(javaProject, src,  monitor);
 		}
 	}
-	
+
 	private void addJBangSourceToClasspath(IJavaProject javaProject, IContainer src, IProgressMonitor monitor) throws CoreException {
 		var classpath = javaProject.getRawClasspath();
 		var newClasspath = new ArrayList<>(classpath.length);
@@ -113,9 +113,9 @@ public class SynchronizeJBangJob extends WorkspaceJob {
 			IPackageFragmentRoot root = javaProject.getPackageFragmentRoot(src);
 			IClasspathAttribute jbangScopeAttr = JavaCore.newClasspathAttribute("jbang.scope", "main");
 			srcClasspath = JavaCore.newSourceEntry(root.getPath(), null, null, null, new IClasspathAttribute[] {jbangScopeAttr} );
-			newClasspath.add(srcClasspath);				
+			newClasspath.add(srcClasspath);
 		}
-		
+
 		javaProject.setRawClasspath(newClasspath.toArray(new IClasspathEntry[0]), monitor);
 	}
 
@@ -129,24 +129,23 @@ public class SynchronizeJBangJob extends WorkspaceJob {
 				return sourceContainer;
 			}
 		}
-		
+
 		Path packagePath = new Path(packageName.replace(".", "/"));
 		String[] segments =  packagePath.segments();
-		
+
 		boolean mismatch = false;
 		IContainer currContainer = file.getParent();
 		for (int i = segments.length - 1;currContainer != null && i >= 0; i--) {
 			String packageSegment = segments[i];
-			if (packageSegment.equals(currContainer.getName())) {
-				currContainer = currContainer.getParent();
-			} else {
+			if (!packageSegment.equals(currContainer.getName())) {
 				mismatch = true;
 				break;
 			}
+			currContainer = currContainer.getParent();
 		}
 		if (currContainer != null && !mismatch) {
 			return currContainer;
-			
+
 		}
 		return null;
 	}

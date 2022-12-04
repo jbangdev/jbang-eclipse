@@ -1,5 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
+Automatic-Module-Name: dev.jbang.eclipse.ls
 Bundle-Name: JBang Eclipse LS Plugin
 Bundle-SymbolicName: dev.jbang.eclipse.ls;singleton:=true
 Bundle-Vendor: jbangdev
@@ -13,5 +14,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.ls.core,
  dev.jbang.eclipse.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: org.eclipse.core.resources

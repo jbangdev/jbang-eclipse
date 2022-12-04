@@ -160,10 +160,7 @@ public class WorkspaceHelpers {
   private static IMarker findMarker(String type, String message, Integer lineNumber, String resourceRelativePath,
       List<IMarker> markers) throws Exception {
     for(IMarker marker : markers) {
-      if(type != null && !type.equals(marker.getType())) {
-        continue;
-      }
-      if(message != null && !marker.getAttribute(IMarker.MESSAGE, "").startsWith(message)) {
+      if((type != null && !type.equals(marker.getType())) || (message != null && !marker.getAttribute(IMarker.MESSAGE, "").startsWith(message))) {
         continue;
       }
       if(lineNumber != null && !lineNumber.equals(marker.getAttribute(IMarker.LINE_NUMBER))) {

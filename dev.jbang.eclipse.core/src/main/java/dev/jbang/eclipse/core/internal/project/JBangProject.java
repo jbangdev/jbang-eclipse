@@ -73,7 +73,7 @@ public class JBangProject {
 		final IEclipsePreferences eclipsePreferences = context.getNode(JBangConstants.PLUGIN_ID);
 		return eclipsePreferences;
 	}
-	
+
 	private void savePreferences(IEclipsePreferences prefs) {
 		try {
 			prefs.flush();

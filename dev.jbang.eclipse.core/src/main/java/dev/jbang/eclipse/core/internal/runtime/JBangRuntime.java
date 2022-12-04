@@ -12,7 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 public class JBangRuntime {
-	
+
 	public static final String SYSTEM = "System";
 
 	private static final IPath EXECUTABLE;
@@ -37,13 +37,13 @@ public class JBangRuntime {
 	public JBangRuntime(String name, String path) {
 		this(name, path, null);
 	}
-	
+
 	public JBangRuntime(String name, String path, String version) {
 		this(path);
 		this.name = name;
 		this.version = version;
 	}
-	
+
 	public JBangRuntime(String path) {
 		this();
 		if (path != null && !path.isBlank()) {
@@ -70,14 +70,14 @@ public class JBangRuntime {
 	public String toString() {
 		return getExecutable().toOSString();
 	}
-	
+
 	public boolean isValid() {
 		//FIXME Doesn't make sense for jbang found on the PATH
 		return Files.isExecutable(getExecutable().toFile().toPath());
 	}
-	
+
 	public String detectVersion(IProgressMonitor monitor) {
-		var versionFile = java.nio.file.Path.of(location.toOSString(), "version.txt"); 
+		var versionFile = java.nio.file.Path.of(location.toOSString(), "version.txt");
 		//Since JBang 0.83.0
 		if (Files.exists(versionFile)) {
 			try {
@@ -101,7 +101,7 @@ public class JBangRuntime {
 					env.put("JAVA_HOME", javaHome);
 				}
 			}
-			
+
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 			try (BufferedReader processOutputReader = new BufferedReader(
@@ -109,16 +109,16 @@ public class JBangRuntime {
 				String v = processOutputReader.readLine();
 				process.waitFor();
 				if (!v.toLowerCase().contains("error")) {
-					version = v;					
+					version = v;
 				}
-				
+
 			}
 		} catch (IOException | InterruptedException e) {
 			System.err.println(e.getMessage());
 		}
 		return version;
 	}
-	
+
 	public String getVersion() {
 		return version;
 	}
@@ -126,11 +126,11 @@ public class JBangRuntime {
 	public String getName() {
 		return name;
 	}
-	
+
 	public boolean isEditable() {
 		return !SYSTEM.equals(this.name);
 	}
-	
+
 
 	@Override
 	public int hashCode() {
@@ -139,15 +139,15 @@ public class JBangRuntime {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		}
 		JBangRuntime other = (JBangRuntime) obj;
 		return Objects.equals(location, other.location) && Objects.equals(name, other.name)
 				&& Objects.equals(version, other.version);
 	}
-	
+
 }

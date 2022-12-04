@@ -17,7 +17,7 @@ public class ProjectUtils {
 	public static boolean isJBangProject(IProject project) {
 		return hasNature(project, JBangConstants.NATURE_ID);
 	}
-	
+
 
 	public static boolean isJavaProject(IProject project) {
 		return hasNature(project, JavaCore.NATURE_ID);
@@ -30,7 +30,7 @@ public class ProjectUtils {
 			return false;
 		}
 	}
-	
+
 	public static boolean isJBangProjectOnly(IProject project) {
 		IProjectDescription description;
 		try {
@@ -62,11 +62,11 @@ public class ProjectUtils {
 		}
 		return addedNature;
 	}
-	
+
 	public static boolean addJBangNature(IProject project, IProgressMonitor monitor) throws CoreException {
 		return addNature(project, JBangConstants.NATURE_ID, monitor);
 	}
-	
+
 	public static boolean addJavaNature(IProject project, IProgressMonitor monitor) throws CoreException {
 		return addNature(project, JavaCore.NATURE_ID, monitor);
 	}

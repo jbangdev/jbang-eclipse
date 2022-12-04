@@ -47,6 +47,7 @@ public class JBangInstallationWizardPage extends WizardPage {
 
 	}
 
+	@Override
 	public void createControl(Composite parent) {
 		Composite container = new Composite(parent, SWT.NULL);
 		setControl(container);
@@ -80,7 +81,7 @@ public class JBangInstallationWizardPage extends WizardPage {
 
 		version = new Label(container, SWT.BORDER);
 		version.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-		
+
 		if (original != null) {
 			location.setText(original.getLocation().toOSString());
 			name.setText(original.getName());
@@ -105,10 +106,11 @@ public class JBangInstallationWizardPage extends WizardPage {
 				var v = new JBangRuntime(dir).detectVersion(monitor);
 				if (v != null && !v.isBlank()) {
 					Display.getDefault().asyncExec(new Runnable() {
+						@Override
 						public void run() {
 							if (name != null && !name.isDisposed()) {
 								if (name.getText().isBlank()) {
-									name.setText("JBang " + v);									
+									name.setText("JBang " + v);
 								} else {
 									Matcher matcher = nameVersionPattern.matcher(name.getText());
 									if (matcher.find()) {

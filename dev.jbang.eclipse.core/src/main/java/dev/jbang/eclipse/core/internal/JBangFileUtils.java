@@ -22,36 +22,33 @@ import org.eclipse.jdt.internal.corext.dom.IASTSharedValues;
 public class JBangFileUtils {
 
 	public static final Pattern GROOVY_GRAPES = Pattern.compile("^\\s*(@Grab|@Grapes).*", Pattern.DOTALL);
-	
+
 	public static final Pattern JBANG_INSTRUCTIONS = Pattern.compile("^(//[A-Z_:]+ ).*$");
 
 	private static final Pattern JBANG_HEADER = Pattern.compile("//.*jbang.*");
-	
+
 	public static final Pattern JAVA_INSTRUCTION = Pattern.compile("//JAVA (\\S*).*");
 
 	private static final Pattern SOURCES_INSTRUCTION = Pattern.compile("//SOURCES (\\S*).*");
-	
+
 	private static final Pattern FILES_INSTRUCTION = Pattern.compile("//FILES (\\S*).*");
 
 	private static final int LINE_LIMIT = 300;
 
 	private static final Set<String> EXTENSIONS = new LinkedHashSet<>();
-	
+
 	static {
 		EXTENSIONS.add("java");
 		EXTENSIONS.add("jsh");
 		EXTENSIONS.add("kt");
 		EXTENSIONS.add("groovy");
 	}
-	
+
 	private JBangFileUtils() {
 	}
 
 	public static boolean isJBangFile(IResource resource) {
-		if (!(resource instanceof IFile)) {
-			return false;
-		}
-		if (EXTENSIONS.stream().filter(ext -> ext.equals(resource.getFileExtension())).findAny().isEmpty()) {
+		if (!(resource instanceof IFile) || EXTENSIONS.stream().filter(ext -> ext.equals(resource.getFileExtension())).findAny().isEmpty()) {
 			return false;
 		}
 		IFile file = (IFile) resource;
@@ -62,20 +59,20 @@ public class JBangFileUtils {
 		}
 		return false;
 	}
-	
+
 	public static boolean isJBangBuildFile(IResource resource) {
 		if (!(resource instanceof IFile)) {
 			return false;
 		}
 		return JBangConstants.JBANG_BUILD.equals(((IFile) resource).getName());
 	}
-	
+
 	public static boolean isJBangFile(Path file) {
-		if (!(Files.isRegularFile(file))) {
+		if (!Files.isRegularFile(file)) {
 			return false;
 		}
 		String fileName = file.getFileName().toString().toLowerCase();
-		
+
 		if (EXTENSIONS.stream().filter(ext -> fileName.endsWith("."+ext)).findAny().isEmpty()) {
 			return false;
 		}
@@ -86,21 +83,21 @@ public class JBangFileUtils {
 		}
 		return false;
 	}
-	
+
 	public static boolean isJBangBuildFile(Path file) {
-		if (!(Files.isRegularFile(file))) {
+		if (!Files.isRegularFile(file)) {
 			return false;
 		}
 		return JBangConstants.JBANG_BUILD.equals(file.getFileName().toString());
 	}
-	
+
 	public static boolean isMainFile(Path file) {
-		if (!(Files.isRegularFile(file))) {
+		if (!Files.isRegularFile(file)) {
 			return false;
 		}
 		return JBangConstants.JBANG_MAIN.equals(file.getFileName().toString());
 	}
-	
+
 	public static String getJavaVersion(String line) {
 		return getMatch(JAVA_INSTRUCTION, line);
 	}
@@ -120,7 +117,7 @@ public class JBangFileUtils {
 		}
 		return tuple;
 	}
-	
+
 	private static String getMatch(Pattern pattern, String line) {
 		var matcher = pattern.matcher(line);
 		if (matcher.matches()) {
@@ -140,7 +137,7 @@ public class JBangFileUtils {
 		}
 		return null;
 	}
-	
+
 	public static CompilationUnit createCompilationUnit(IFile file) {
 		String content = null;
 		try {
@@ -152,7 +149,7 @@ public class JBangFileUtils {
 			return null;
 		}
 		char[] source = content.toCharArray();
-		
+
 		ASTParser parser = ASTParser.newParser(IASTSharedValues.SHARED_AST_LEVEL);
 		parser.setIgnoreMethodBodies(true);
 		parser.setSource(source);

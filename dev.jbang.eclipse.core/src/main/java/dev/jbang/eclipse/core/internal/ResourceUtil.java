@@ -31,7 +31,7 @@ public class ResourceUtil {
 			folder.create(true, true, monitor);
 		}
 	}
-	
+
 	/**
 	 * Writes content to file, within the workspace. A change event is emitted.
 	 */

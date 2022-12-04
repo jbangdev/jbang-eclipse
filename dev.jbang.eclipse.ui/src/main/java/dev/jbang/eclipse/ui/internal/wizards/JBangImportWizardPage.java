@@ -34,7 +34,7 @@ public class JBangImportWizardPage extends WizardPage {
 	private Combo scriptCombo;
 
 	/** the Map of field ids to List of comboboxes that share the same history */
-	private final Map<String, List<Combo>> fieldsWithHistory = new HashMap<>();;
+	private final Map<String, List<Combo>> fieldsWithHistory = new HashMap<>();
 
 	private boolean isHistoryLoaded = false;
 
@@ -117,8 +117,8 @@ public class JBangImportWizardPage extends WizardPage {
 	      pluginSettings.addSection(dialogSettings);
 	    }
 	  }
-	
-	
+
+
 	/** Loads the input history from the dialog settings. */
 	private void loadInputHistory() {
 		for (Map.Entry<String, List<Combo>> e : fieldsWithHistory.entrySet()) {
@@ -161,6 +161,7 @@ public class JBangImportWizardPage extends WizardPage {
 		}
 	}
 
+	@Override
 	public void setVisible(boolean visible) {
 	    if(visible) {
 	      if(!isHistoryLoaded) {
@@ -173,8 +174,9 @@ public class JBangImportWizardPage extends WizardPage {
 	    }
 	    super.setVisible(visible);
 	  }
-	
-	
+
+
+	@Override
 	public void dispose() {
 		saveInputHistory();
 		super.dispose();

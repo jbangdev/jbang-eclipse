@@ -57,6 +57,7 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 		this.runtimeManager = JBangCorePlugin.getJBangManager().getJBangRuntimeManager();
 	}
 
+	@Override
 	public void init(IWorkbench workbench) {
 	}
 
@@ -79,6 +80,7 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 		return true;
 	}
 
+	@Override
 	protected Control createContents(Composite parent) {
 
 		Composite composite = new Composite(parent, SWT.NONE);
@@ -106,7 +108,8 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 		for (JBangRuntime runtime : runtimes) {
 			if (defaultRuntime.equals(runtime.getName())) {
 				return runtime;
-			} else if (JBangRuntime.SYSTEM.equals(runtime.getName())) {
+			}
+			if (JBangRuntime.SYSTEM.equals(runtime.getName())) {
 				systemRuntime = runtime;
 			}
 		}
@@ -140,9 +143,9 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 
 		runtimesViewer.setContentProvider(new IStructuredContentProvider() {
 
+			@Override
 			public Object[] getElements(Object input) {
-				if (input instanceof List<?>) {
-					List<?> list = (List<?>) input;
+				if (input instanceof List<?> list) {
 					if (list.size() > 0) {
 						return list.toArray(new JBangRuntime[list.size()]);
 					}
@@ -150,9 +153,11 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 				return new Object[0];
 			}
 
+			@Override
 			public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
 			}
 
+			@Override
 			public void dispose() {
 			}
 
@@ -256,6 +261,7 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 
 	static class RuntimesLabelProvider implements ITableLabelProvider, IColorProvider {
 
+		@Override
 		public String getColumnText(Object element, int columnIndex) {
 			JBangRuntime runtime = (JBangRuntime) element;
 			switch (columnIndex) {
@@ -272,6 +278,7 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 			return null;
 		}
 
+		@Override
 		public Image getColumnImage(Object element, int columnIndex) {
 			if (columnIndex == 1 && !((JBangRuntime) element).isValid()) {
 				return PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJS_WARN_TSK);
@@ -279,10 +286,12 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 			return null;
 		}
 
+		@Override
 		public Color getBackground(Object element) {
 			return null;
 		}
 
+		@Override
 		public Color getForeground(Object element) {
 			JBangRuntime runtime = (JBangRuntime) element;
 			if (!runtime.isEditable()) {
@@ -291,16 +300,20 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 			return null;
 		}
 
+		@Override
 		public void dispose() {
 		}
 
+		@Override
 		public boolean isLabelProperty(Object element, String property) {
 			return false;
 		}
 
+		@Override
 		public void addListener(ILabelProviderListener listener) {
 		}
 
+		@Override
 		public void removeListener(ILabelProviderListener listener) {
 		}
 	}

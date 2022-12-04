@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.jobs.IJobManager;
 import org.eclipse.core.runtime.jobs.Job;
 
 /**
- * 
+ *
  * Copied from https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/org.eclipse.m2e.tests.common/src/org/eclipse/m2e/tests/common/JobHelpers.java
  */
 @SuppressWarnings("restriction")
@@ -75,7 +75,7 @@ public class JobHelpers {
       workspace.run((IWorkspaceRunnable) monitor1 -> {
       }, workspace.getRoot(), 0, monitor);
 
-      
+
     } finally {
       jobManager.resume();
     }
@@ -157,7 +157,8 @@ public class JobHelpers {
 
     public static final IJobMatcher INSTANCE = new LaunchJobMatcher();
 
-    public boolean matches(Job job) {
+    @Override
+	public boolean matches(Job job) {
       return job.getClass().getName().matches("(.*\\.DebugUIPlugin.*)");
     }
 
@@ -167,8 +168,9 @@ public class JobHelpers {
 
     public static final IJobMatcher INSTANCE = new BuildJobMatcher();
 
-    public boolean matches(Job job) {
-      return (job instanceof WorkspaceJob) || job.getClass().getName().matches("(.*\\.AutoBuild.*)")
+    @Override
+	public boolean matches(Job job) {
+      return job instanceof WorkspaceJob || job.getClass().getName().matches("(.*\\.AutoBuild.*)")
           || job.getClass().getName().endsWith("JREUpdateJob");
     }
 

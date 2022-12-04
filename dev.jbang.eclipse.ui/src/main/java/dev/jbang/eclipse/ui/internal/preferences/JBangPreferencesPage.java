@@ -20,6 +20,7 @@ public class JBangPreferencesPage extends PreferencePage implements IWorkbenchPr
 	/* (non-Javadoc)
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
+	@Override
 	public void init(IWorkbench workbench) {
 	}
 
@@ -27,5 +28,5 @@ public class JBangPreferencesPage extends PreferencePage implements IWorkbenchPr
 	protected Control createContents(Composite parent) {
 		return null;
 	}
-	
+
 }

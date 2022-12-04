@@ -21,17 +21,17 @@ import dev.jbang.eclipse.core.internal.runtime.JBangRuntimeManager;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimesDiscoveryJob;
 
 public abstract class AbstractJBangTest {
-	
+
 	@BeforeAll
 	public static void beforeAll() throws IOException {
 		setupJBang();
 	}
-	
+
 	@BeforeEach
 	public void cleanUp() throws Exception {
 		cleanWorkspace();
 	}
-	
+
 	public static JBangRuntimeManager setupJBang() throws IOException {
 		PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:target/jbang*");
 		Path root = Paths.get("");

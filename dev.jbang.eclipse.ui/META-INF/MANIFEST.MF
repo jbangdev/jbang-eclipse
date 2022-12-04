@@ -13,6 +13,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.core,
  org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Automatic-Module-Name: dev.jbang.eclipse.ui
 Import-Package: dev.jbang.eclipse.core.internal.imports
