@@ -69,6 +69,8 @@ Alternatively, in Eclipse:
 Build
 -----
 
+**Requires Java 17 or more recent to build/run**
+
 Open a terminal and execute:
 
     ./mvnw clean package
