@@ -22,7 +22,7 @@ public class JBangCorePlugin extends Plugin {
 	private static JBangCorePlugin plugin;
 
 	private IJBang jbangManager;
-	
+
 	private JBangRuntimesDiscoveryJob jbangRuntimesDiscoveryJob;
 
 	@Override
@@ -55,13 +55,13 @@ public class JBangCorePlugin extends Plugin {
 	public static IJBang getJBangManager() {
 		return plugin == null ? null : plugin.jbangManager;
 	}
-	
+
 	public static void log(IStatus status) {
 		if (plugin != null) {
 			Platform.getLog(plugin.getBundle()).log(status);
 		}
 	}
-	
+
 	public static void log(CoreException e) {
 		log(e.getStatus());
 	}

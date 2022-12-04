@@ -24,15 +24,15 @@ public class JBangDependencyError extends JBangError {
 	public int hashCode() {
 		return Objects.hash(dependency);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		}
 		JBangDependencyError other = (JBangDependencyError) obj;
 		return Objects.equals(dependency, other.dependency);
 	}

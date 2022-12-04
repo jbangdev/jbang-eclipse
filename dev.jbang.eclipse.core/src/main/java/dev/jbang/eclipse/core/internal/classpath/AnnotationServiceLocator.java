@@ -31,9 +31,9 @@ import java.util.jar.JarFile;
  * Please note that most of this code was copied from the <code>org.eclipse.jdt.apt.core</code> plugin's
  * <code>org.eclipse.jdt.apt.core.internal.JarFactoryContainer</code> class.
  * </p>
- *   
+ *
  * @author karldavis
- * 
+ *
  * copied from https://github.com/eclipse-m2e/m2e-core/blob/46a93f248cec05794abb6dd2214eb1032a04311f/org.eclipse.m2e.apt.core/src/org/eclipse/m2e/apt/internal/utils/AnnotationServiceLocator.java
  */
 public class AnnotationServiceLocator {
@@ -131,7 +131,7 @@ public class AnnotationServiceLocator {
       });
     }
   }
-  
+
   /**
    * Represents a single SPI entry.
    */

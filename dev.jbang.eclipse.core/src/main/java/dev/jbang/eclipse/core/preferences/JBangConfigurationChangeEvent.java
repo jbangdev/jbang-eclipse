@@ -1,7 +1,7 @@
 package dev.jbang.eclipse.core.preferences;
 
 public class JBangConfigurationChangeEvent {
-	
+
 	  private final String key;
 
 	  private final Object newValue;

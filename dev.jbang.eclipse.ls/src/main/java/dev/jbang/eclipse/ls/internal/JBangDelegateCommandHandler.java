@@ -62,9 +62,7 @@ public class JBangDelegateCommandHandler implements IDelegateCommandHandler {
 			}
 			IFile[] files = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(uri);
 			if (files.length > 0) {
-				Arrays.sort(files, (f1, f2) -> {
-					return f1.getProjectRelativePath().segmentCount() - f2.getProjectRelativePath().segmentCount();
-				});
+				Arrays.sort(files, (f1, f2) -> (f1.getProjectRelativePath().segmentCount() - f2.getProjectRelativePath().segmentCount()));
 				IFile file = files[0];
 				if (file != null && (isJBangFile(file) || isJBangBuildFile(file)) ) {
 					jbangFiles.add(file);

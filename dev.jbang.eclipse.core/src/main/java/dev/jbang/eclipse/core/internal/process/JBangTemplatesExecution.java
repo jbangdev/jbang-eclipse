@@ -36,14 +36,14 @@ public class JBangTemplatesExecution {
 				if (javaHome == null || javaHome.isBlank()) {
 					javaHome = System.getProperty("java.home");
 				}
-				var envPath = env.get("PATH");
+				StringBuilder envPath = new StringBuilder().append(env.get("PATH"));
 				if (javaHome != null) {
 					env.put("JAVA_HOME", javaHome);
-					envPath =  envPath +File.pathSeparator+javaHome+ (javaHome.endsWith(File.separator)?"bin":File.separator +"bin");
+					envPath.append(File.pathSeparator).append(javaHome).append(javaHome.endsWith(File.separator)?"bin":File.separator +"bin");
 				}
-				env.put("PATH", envPath +File.pathSeparator+javaHome+"bin");
+				env.put("PATH", envPath.append(File.pathSeparator).append(javaHome).append("bin").toString());
 			}
-			
+
 			Process process = processBuilder.start();
 
 			try (BufferedReader processOutputReader = new BufferedReader(
@@ -64,7 +64,7 @@ public class JBangTemplatesExecution {
 		return templates;
 	}
 
-	
+
 	public static JBangTemplate parseTemplate(String line) {
 		if (line.isBlank() || line.indexOf('=') < 0) {
 			return null;
@@ -72,7 +72,7 @@ public class JBangTemplatesExecution {
 		String[] parts = line.split("=");
 		return new JBangTemplate(parts[0], parts[1]);
 	}
-	
+
 	public static void main(String[] args) throws CoreException {
 		var jbang = new JBangRuntime("/Users/fbricon/.sdkman/candidates/jbang/current/");
 		var exec = new JBangTemplatesExecution(jbang, null);

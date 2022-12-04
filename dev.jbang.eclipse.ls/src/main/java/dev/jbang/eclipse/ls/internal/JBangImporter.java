@@ -25,7 +25,7 @@ import dev.jbang.eclipse.core.internal.project.JBangProjectConfiguration;
 
 @SuppressWarnings("restriction")
 public class JBangImporter extends AbstractProjectImporter  {
-	
+
 	private Collection<Path> scripts = null;
 
 	@Override
@@ -45,14 +45,14 @@ public class JBangImporter extends AbstractProjectImporter  {
 
 		var jbang = JBangCorePlugin.getJBangManager();
 		JBangProjectConfiguration configuration = new JBangProjectConfiguration();
-		configuration.setSourceFolder(ProjectUtils.WORKSPACE_LINK); 
-		boolean projectPerScript = MapFlattener.getBoolean(getPreferences().asMap(), "java.import.jbang.projectPerScript"); 
+		configuration.setSourceFolder(ProjectUtils.WORKSPACE_LINK);
+		boolean projectPerScript = MapFlattener.getBoolean(getPreferences().asMap(), "java.import.jbang.projectPerScript");
 		if (!projectPerScript) {
-			configuration.setLinkedSourceFolder(rootFolder.toURI());//Linking whole directory doesn't work is messy if there are multiple JBang scripts in that directory			
+			configuration.setLinkedSourceFolder(rootFolder.toURI());//Linking whole directory doesn't work is messy if there are multiple JBang scripts in that directory
 		}
-		JavaLanguageServerPlugin.logInfo("JBang import : " + ((projectPerScript)?" 1 project per script" : "1 project per folder"));
-		
-		Collection<Path> toImport = (projectPerScript)? scripts: Set.of(scripts.iterator().next());
+		JavaLanguageServerPlugin.logInfo("JBang import : " + (projectPerScript?" 1 project per script" : "1 project per folder"));
+
+		Collection<Path> toImport = projectPerScript? scripts: Set.of(scripts.iterator().next());
 		for (Path script : toImport) {
 			try {
 				String name = script.getFileName().toString();
@@ -65,20 +65,20 @@ public class JBangImporter extends AbstractProjectImporter  {
 				if (project.exists() && dev.jbang.eclipse.core.internal.ProjectUtils.isJBangProject(project)) {
 					JavaLanguageServerPlugin.logInfo("JBang script " + script + " already imported");
 				} else {
-					JavaLanguageServerPlugin.logInfo("Importing JBang script " + script + ((configuration.getLinkedSourceFolder() == null)?"": " (linking "+configuration.getLinkedSourceFolder()+")"));
-					jbang.getProjectConfigurationManager().createJBangProject(script, configuration, monitor);		
+					JavaLanguageServerPlugin.logInfo("Importing JBang script " + script + (configuration.getLinkedSourceFolder() == null?"": " (linking "+configuration.getLinkedSourceFolder()+")"));
+					jbang.getProjectConfigurationManager().createJBangProject(script, configuration, monitor);
 				}
 			} catch (Exception e) {
 				JavaLanguageServerPlugin.logException("Error importing "+script, e);
 			}
 		}
 	}
-	
+
 	@Override
 	public boolean isResolved(File folder) throws OperationCanceledException, CoreException {
 		if (folder != null && scripts != null) {
 			Path folderPath = folder.toPath();
-			return scripts.stream().anyMatch(scriptPath -> scriptPath.startsWith(folderPath)); 
+			return scripts.stream().anyMatch(scriptPath -> scriptPath.startsWith(folderPath));
 		}
 		return false;
 	}

@@ -20,25 +20,25 @@ public class JBangTemplate {
 	public String getId() {
 		return id;
 	}
-	
+
 	@Override
 	public String toString() {
 		return "JBangTemplate [id=" + id + ", label=" + label + "]";
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return Objects.hash(id, label);
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
+		if (this == obj) {
 			return true;
-		if (obj == null)
+		}
+		if ((obj == null) || (getClass() != obj.getClass())) {
 			return false;
-		if (getClass() != obj.getClass())
-			return false;
+		}
 		JBangTemplate other = (JBangTemplate) obj;
 		return Objects.equals(id, other.id) && Objects.equals(label, other.label);
 	}

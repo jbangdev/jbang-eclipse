@@ -45,7 +45,7 @@ public class JBangFileDetector {
 	private List<Path> scripts;
 	private List<Path> mains;
 	private List<Path> builds;
-	
+
 	private Path rootDir;
 	private int maxDepth = 3;
 	private Set<String> exclusions = new LinkedHashSet<>(1);
@@ -77,7 +77,7 @@ public class JBangFileDetector {
 			}
 		}
 	}
-	
+
 	/**
 	 * Adds the names of directories to exclude from the search. All its sub-directories will be skipped.
 	 *
@@ -109,7 +109,7 @@ public class JBangFileDetector {
 	public Collection<Path> getScripts() {
 		return Collections.unmodifiableList(scripts);
 	}
-	
+
 	/**
 	 * Returns the "main.java" scripts found.
 	 * @return an unmodifiable collection of {@link Path}s.
@@ -117,7 +117,7 @@ public class JBangFileDetector {
 	public Collection<Path> getMains() {
 		return Collections.unmodifiableList(mains);
 	}
-	
+
 	/**
 	 * Returns the build.jbang files found.
 	 * @return an unmodifiable collection of {@link Path}s.
@@ -134,7 +134,7 @@ public class JBangFileDetector {
 	 */
 	public Collection<Path> scan(IProgressMonitor monitor) throws CoreException {
 		try {
-			scanDir(rootDir, (monitor == null? new NullProgressMonitor(): monitor));
+			scanDir(rootDir, monitor == null? new NullProgressMonitor(): monitor);
 		} catch (IOException e) {
 			throw  ExceptionFactory.newException("Failed to scan "+rootDir, e);
 		}
@@ -144,7 +144,7 @@ public class JBangFileDetector {
 		if (!mains.isEmpty()) {
 			return getMains();
 		}
-		
+
 		return getScripts();
 	}
 
@@ -161,7 +161,7 @@ public class JBangFileDetector {
 				}
 				return CONTINUE;
 			}
-			
+
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 				if (JBangFileUtils.isJBangBuildFile(file)) {
@@ -172,16 +172,15 @@ public class JBangFileDetector {
 					scripts.add(file);
 				}
 				return CONTINUE;
-			};
+			}
 
 			@Override
 			public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
 				Objects.requireNonNull(file);
     			if (exc instanceof FileSystemLoopException) {
         			return CONTINUE;
-    			} else {
-        			throw exc;
     			}
+				throw exc;
 			}
 
 		};

@@ -1,10 +1,11 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
+Automatic-Module-Name: dev.jbang.eclipse.core.test
 Bundle-Name: JBang Eclipse Test Fragment
 Bundle-SymbolicName: dev.jbang.eclipse.core.test
 Bundle-Vendor: jbangdev
 Bundle-Version: 0.0.3.qualifier
 Fragment-Host: dev.jbang.eclipse.core;bundle-version="0.0.2"
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: org.junit.jupiter.api;version="5.8.1"
 Require-Bundle: org.apache.commons.io;bundle-version="2.2.0"

@@ -14,9 +14,9 @@ import org.eclipse.core.runtime.jobs.Job;
 
 public class JBangRuntimesDiscoveryJob extends Job {
 
-	private Map<String, Path> usualSuspects; 
+	private Map<String, Path> usualSuspects;
 	private JBangRuntimeManager runtimeManager;
-	
+
 	public JBangRuntimesDiscoveryJob(JBangRuntimeManager runtimeManager) {
 		super("JBang Discovery");
 		usualSuspects = new LinkedHashMap<>();
@@ -34,9 +34,9 @@ public class JBangRuntimesDiscoveryJob extends Job {
 			return Status.CANCEL_STATUS;
 		}
 		var existingRuntimes = new ArrayList<>(runtimeManager.getJBangRuntimes(false).stream().filter(r -> !JBangRuntime.SYSTEM.equals(r.getName())).collect(Collectors.toList()));
-		
+
 		var newRuntimes = new ArrayList<JBangRuntime>(usualSuspects.size());
-		
+
 		for (var candidate : usualSuspects.entrySet()) {
 			if (monitor.isCanceled()) {
 				return Status.CANCEL_STATUS;
@@ -53,9 +53,7 @@ public class JBangRuntimesDiscoveryJob extends Job {
 		if (newRuntimes.size() == 0) {
 			return Status.OK_STATUS;
 		}
-		newRuntimes.sort((j1, j2) -> {
-			return Long.compare(j1.getExecutable().toFile().lastModified(), j2.getExecutable().toFile().lastModified());
-		});
+		newRuntimes.sort((j1, j2) -> Long.compare(j1.getExecutable().toFile().lastModified(), j2.getExecutable().toFile().lastModified()));
 		existingRuntimes.addAll(newRuntimes);
 		if (monitor.isCanceled()) {
 			return Status.CANCEL_STATUS;

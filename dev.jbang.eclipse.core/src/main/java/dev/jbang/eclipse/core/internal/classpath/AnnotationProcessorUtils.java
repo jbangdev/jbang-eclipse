@@ -32,7 +32,7 @@ import dev.jbang.eclipse.core.internal.classpath.AnnotationServiceLocator.Servic
  * AnnotationProcessorUtils
  *
  * @author Fred Bricon
- * 
+ *
  * copied from https://github.com/eclipse-m2e/m2e-core/blob/bb14b75bfa14a7548fd59707965e3e281c7bb415/org.eclipse.m2e.apt.core/src/org/eclipse/m2e/apt/internal/utils/ProjectUtils.java
  */
 public class AnnotationProcessorUtils {
@@ -46,7 +46,7 @@ public class AnnotationProcessorUtils {
    */
   public static Map<String, String> parseProcessorOptions(String compilerArgument) {
 
-    if((compilerArgument == null) || compilerArgument.trim().isEmpty()) {
+    if(compilerArgument == null || compilerArgument.trim().isEmpty()) {
       return Collections.emptyMap();
     }
     Map<String, String> ret = new HashMap<>();
@@ -91,7 +91,7 @@ public class AnnotationProcessorUtils {
   }
 
   public static Map<String, String> parseProcessorOptions(List<String> compilerArgs) {
-    if((compilerArgs == null) || compilerArgs.isEmpty()) {
+    if(compilerArgs == null || compilerArgs.isEmpty()) {
       return Collections.emptyMap();
     }
     Map<String, String> options = new HashMap<>();
@@ -108,7 +108,7 @@ public class AnnotationProcessorUtils {
    * Extract Annotation Processor options from a compiler-argument map
    */
   public static Map<String, String> extractProcessorOptions(Map<String, String> compilerArguments) {
-    if((compilerArguments == null) || compilerArguments.isEmpty()) {
+    if(compilerArguments == null || compilerArguments.isEmpty()) {
       return Collections.emptyMap();
     }
     Map<String, String> ret = new HashMap<>(compilerArguments.size());
@@ -118,7 +118,7 @@ public class AnnotationProcessorUtils {
 
       if(key.startsWith("A")) {
         String value = argument.getValue();
-        if((value != null) && (value.length() > 0)) {
+        if(value != null && value.length() > 0) {
           ret.put(key.substring(1), value);
         } else {
           ret.put(key.substring(1), null);
@@ -154,14 +154,12 @@ public class AnnotationProcessorUtils {
 
         startExpected = false;
 
-      } else {
-        if(codePoint == '.') {
-          startExpected = true;
+      } else if(codePoint == '.') {
+	  startExpected = true;
 
-        } else if(!Character.isJavaIdentifierPart(codePoint)) {
-          return false;
-        }
-      }
+	} else if(!Character.isJavaIdentifierPart(codePoint)) {
+	  return false;
+	}
     }
 
     return !startExpected;
@@ -187,7 +185,8 @@ public class AnnotationProcessorUtils {
     // Compute the relative path
     if(absoluteFile.equals(projectBasedirFile)) {
       return new File(".");
-    } else if(absoluteFilePath.startsWith(projectBasedirFilePath)) {
+    }
+	if(absoluteFilePath.startsWith(projectBasedirFilePath)) {
       String projectRelativePath = absoluteFilePath.substring(projectBasedirFilePath.length() + 1);
       return new File(projectRelativePath);
     } else {

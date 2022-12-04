@@ -49,8 +49,8 @@ public class AddJBangNatureHandler extends AbstractHandler {
             }
         }
         return projects;
-    }  
-    
+    }
+
     private static class ConfigJob extends Job {
 
 		private Collection<IProject> projects;
@@ -74,6 +74,6 @@ public class AddJBangNatureHandler extends AbstractHandler {
 			}
 			return Status.OK_STATUS;
 		}
-    	
+
     }
 }

@@ -11,23 +11,23 @@ public class JBangInfoResult {
 		public String backingResource;
 		public String target;
 	}
-	
+
 	private String backingResource;
 
 	private List<String> resolvedDependencies;
 
 	private List<JBangFile> sources;
-	
+
 	private List<JBangFile> files;
 
 	private Collection<JBangError> resolutionErrors;
 
 	private String requestedJavaVersion;
-	
+
 	private List<String> compileOptions;
-	
+
 	private List<String> runtimeOptions;
-	
+
 	private String availableJdkPath;
 
 	public List<String> getResolvedDependencies() {
@@ -145,7 +145,7 @@ public class JBangInfoResult {
 	public class File extends Resource {
 		public String target;
 	}
-	
+
 	public class Source extends Resource {
 		public List<Source> sources;
 	}
@@ -173,6 +173,6 @@ public class JBangInfoResult {
 	public void setAvailableJdkPath(String availableJdkPath) {
 		this.availableJdkPath = availableJdkPath;
 	}
-	
-	
+
+
 }

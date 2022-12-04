@@ -19,7 +19,7 @@ import org.eclipse.jdt.core.JavaCore;
 
 
 /**
- * BuildPath save helper. 
+ * BuildPath save helper.
  * Copied from m2e's <a href="https://github.com/eclipse-m2e/m2e-core/blob/342a148d91473a2bb7f4c186635936ccb277eb61/org.eclipse.m2e.jdt/src/org/eclipse/m2e/jdt/internal/MavenClasspathContainerSaveHelper.java">MavenClasspathContainerSaveHelper</a>
  *
  * @author Eugene Kuleshov
@@ -36,7 +36,8 @@ public class ClasspathContainerSaveHelper {
       protected Object resolveObject(Object o) throws IOException {
         if(o instanceof ProjectEntryReplace) {
           return ((ProjectEntryReplace) o).getEntry();
-        } else if(o instanceof LibraryEntryReplace) {
+        }
+		if(o instanceof LibraryEntryReplace) {
           return ((LibraryEntryReplace) o).getEntry();
         } else if(o instanceof ClasspathAttributeReplace) {
           return ((ClasspathAttributeReplace) o).getAttribute();
@@ -59,11 +60,11 @@ public class ClasspathContainerSaveHelper {
 
       @Override
       protected Object replaceObject(Object o) throws IOException {
-        if(o instanceof IClasspathEntry) {
-          IClasspathEntry e = (IClasspathEntry) o;
+        if(o instanceof IClasspathEntry e) {
           if(e.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
             return new ProjectEntryReplace(e);
-          } else if(e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+          }
+		if(e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
             return new LibraryEntryReplace(e);
           }
         } else if(o instanceof IClasspathAttribute) {

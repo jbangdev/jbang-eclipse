@@ -31,7 +31,7 @@ public class ExceptionFactory {
 	public static CoreException newException(Throwable e) {
 		return newException(e.getMessage(), e);
 	}
-	
+
 	public static CoreException newException(String message, Throwable e) {
 		return new CoreException(StatusFactory.newErrorStatus(message, e));
 	}

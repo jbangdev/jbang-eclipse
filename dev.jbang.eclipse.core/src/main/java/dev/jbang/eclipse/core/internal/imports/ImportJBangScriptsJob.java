@@ -43,14 +43,14 @@ public class ImportJBangScriptsJob extends WorkspaceJob	 {
 				return toStatus("Error configuring JBang Script", e);
 			}
 		}
-		
+
 		return Status.OK_STATUS;
 	}
 
 	private IStatus toStatus(String msg, Exception e) {
 		return new Status(IStatus.ERROR, JBangCorePlugin.PLUGIN_ID, msg, e);
 	}
-	
-	
+
+
 
 }

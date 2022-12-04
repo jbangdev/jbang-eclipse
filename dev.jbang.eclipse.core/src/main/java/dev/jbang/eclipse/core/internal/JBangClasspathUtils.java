@@ -25,7 +25,7 @@ import dev.jbang.eclipse.core.internal.classpath.ClasspathContainerSaveHelper;
 import dev.jbang.eclipse.core.internal.classpath.IClasspathManager;
 
 public class JBangClasspathUtils {
-	
+
 	private static final File STATE_LOCATION_DIR =  JBangCorePlugin.getDefault().getStateLocation().toFile();
 
 	private JBangClasspathUtils() {
@@ -52,7 +52,7 @@ public class JBangClasspathUtils {
 		}
 		return null;
 	}
-	
+
 	public static IClasspathEntry getDefaultContainerEntry() {
 		    return JavaCore.newContainerEntry(new Path(IClasspathManager.JBANG_CLASSPATH_CONTAINER_ID));
 	}
@@ -67,7 +67,7 @@ public class JBangClasspathUtils {
 		}
 		return null;
 	}
-	
+
 	public static void saveContainerState(IProject project, IClasspathContainer container) {
 	    File containerStateFile = getContainerStateFile(project);
 	    try (FileOutputStream is = new FileOutputStream(containerStateFile)) {
@@ -77,7 +77,7 @@ public class JBangClasspathUtils {
 	    }
 	  }
 
-	
+
 	public static IClasspathContainer getSavedContainer(IProject project) throws CoreException {
 	    File containerStateFile = getContainerStateFile(project);
 	    if(!containerStateFile.exists()) {
@@ -91,12 +91,12 @@ public class JBangClasspathUtils {
 	          "Can't read JBang classpath container state for " + project.getName(), ex);
 	    }
 	  }
-	  
+
 	static File getContainerStateFile(IProject project) {
 	    return new File(STATE_LOCATION_DIR, project.getName() + ".container"); //$NON-NLS-1$
 	}
 
-  
+
 	public static boolean isOnClasspath(IJavaProject javaProject, IFile script) throws CoreException {
 		if (script != null && (JavaCore.isJavaLikeFileName(script.getName()) || JBangFileUtils.isJBangBuildFile(script)) ) {
 			IClasspathEntry[] entries = javaProject.getRawClasspath();
@@ -109,13 +109,13 @@ public class JBangClasspathUtils {
 		}
 		return false;
 	}
-	
+
 	public static boolean isOnOutputLocation(IJavaProject javaProject, IFile script) throws CoreException {
 		if (script != null) {
 			if (javaProject.getOutputLocation() != null && javaProject.getOutputLocation().isPrefixOf(script.getFullPath())) {
 				return true;
 			}
-			
+
 			IClasspathEntry[] entries = javaProject.getRawClasspath();
 			for (IClasspathEntry entry : entries) {
 				if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE &&
@@ -127,8 +127,8 @@ public class JBangClasspathUtils {
 		}
 		return false;
 	}
-	
-	  
+
+
 	public static boolean hasAttribute(IClasspathEntry entry, String attribute) throws CoreException {
 		for (IClasspathAttribute attr : entry.getExtraAttributes()) {
 			if (Objects.equals(attribute, attr.getName())) {

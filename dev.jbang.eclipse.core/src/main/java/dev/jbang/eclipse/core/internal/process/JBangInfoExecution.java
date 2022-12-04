@@ -30,8 +30,8 @@ public class JBangInfoExecution {
 	private static final Pattern RESOLUTION_ERROR_3 = Pattern.compile(".* Could not find artifact (.*) in ");
 	private static final Pattern RESOLUTION_ERROR_4 = Pattern.compile(".*The following artifacts could not be resolved: (.*?): Could");
 	private static final Pattern JAVA_ERROR = Pattern.compile("\\[ERROR\\] (Invalid JAVA version.*)");
-	
-	
+
+
 	public JBangInfoExecution(JBangRuntime jbang, File file, String javaHome) {
 		this.jbang = jbang;
 		this.javaHome = javaHome;
@@ -52,14 +52,14 @@ public class JBangInfoExecution {
 				if (javaHome == null || javaHome.isBlank()) {
 					javaHome = System.getProperty("java.home");
 				}
-				var envPath = env.get("PATH");
+				StringBuilder envPath = new StringBuilder().append(env.get("PATH"));
 				if (javaHome != null) {
 					env.put("JAVA_HOME", javaHome);
-					envPath =  envPath +File.pathSeparator+javaHome+ (javaHome.endsWith(File.separator)?"bin":File.separator +"bin");
+					envPath.append(File.pathSeparator).append(javaHome).append(javaHome.endsWith(File.separator)?"bin":File.separator +"bin");
 				}
-				env.put("PATH", envPath +File.pathSeparator+javaHome+"bin");
+				env.put("PATH", envPath.append(File.pathSeparator).append(javaHome).append("bin").toString());
 			}
-			
+
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 			StringBuilder processOutput = new StringBuilder();
@@ -100,28 +100,28 @@ public class JBangInfoExecution {
 		}
 		return result;
 	}
-	
+
 	public static Set<JBangError> sanitizeError(String errorLine) {
 		// [jbang] Resolving eu.hansolo:tilesfx:1.3.4...[jbang] [ERROR] Could not
 		// resolve dependency
-		
+
 		String error = errorLine.replace("\\[jbang\\] ", "");
-		
+
 		Matcher matcher = JAVA_ERROR.matcher(error);
 		if (matcher.find()) {
 			var message = matcher.group(1);
-			return Collections.singleton(new JBangJavaError(message)); 
+			return Collections.singleton(new JBangJavaError(message));
 		}
-		//The following artifacts could not be resolved: com.pulumi:gcp:jar:6.11.0, com.pulumi:kubernetes:jar:3.15.1: 
-		//Could not find artifact com.pulumi:gcp:jar:6.11.0 in 
-		
-		
+		//The following artifacts could not be resolved: com.pulumi:gcp:jar:6.11.0, com.pulumi:kubernetes:jar:3.15.1:
+		//Could not find artifact com.pulumi:gcp:jar:6.11.0 in
+
+
 		matcher = RESOLUTION_ERROR_4.matcher(error);
 		if (matcher.find()) {
 			var dependencies = matcher.group(1).split(", ");
-			return Stream.of(dependencies).map(d -> new JBangDependencyError(simplify(d))).collect(Collectors.toSet()); 
+			return Stream.of(dependencies).map(d -> new JBangDependencyError(simplify(d))).collect(Collectors.toSet());
 		}
-		
+
 		matcher = RESOLUTION_ERROR_3.matcher(error);
 		String dependency = null;
 		if (matcher.find()) {
@@ -136,17 +136,17 @@ public class JBangInfoExecution {
 				if (matcher.find()) {
 					dependency = matcher.group(1);
 				}
-			}			
+			}
 		}
-		
-		
-		var jberror = (dependency == null)? new JBangError(error): new JBangDependencyError(dependency);
+
+
+		var jberror = dependency == null? new JBangError(error): new JBangDependencyError(dependency);
 		return Collections.singleton(jberror);
 	}
 
-	
+
 	private static String simplify(String dependency) {
 		return dependency.replace(":jar:", ":");
 	}
-	
+
 }

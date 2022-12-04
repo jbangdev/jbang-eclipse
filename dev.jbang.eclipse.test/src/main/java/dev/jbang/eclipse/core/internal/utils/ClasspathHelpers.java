@@ -16,7 +16,7 @@ public class ClasspathHelpers {
 		assertTrue(isJavaProject(project), project.getName() +" is not a Java project");
 		assertEquals(javaVersion, getJavaSourceLevel(project));
 	}
-	
+
 	public static void assertGenerateParameters(IProject project, boolean enabled) {
 		assertTrue(isJavaProject(project), project.getName() +" is not a Java project");
 		var options = getJavaOptions(project);
@@ -27,7 +27,7 @@ public class ClasspathHelpers {
 			assertEquals(enabled?JavaCore.GENERATE:JavaCore.DO_NOT_GENERATE, genParams, "Unexpected -parameters setting");
 		}
 	}
-	
+
 	public static String getJavaSourceLevel(IProject project) {
 		Map<String, String> options = getJavaOptions(project);
 		return options == null ? null : options.get(JavaCore.COMPILER_SOURCE);

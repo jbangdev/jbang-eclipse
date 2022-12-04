@@ -105,7 +105,7 @@ public class ProjectConfigurationManager {
 				//Ensure we'll have a proper Execution Environment available
 				new JBangManagedVMService().getJVM(new File(info.getAvailableJdkPath()), monitor);
 			}
-			
+
 			IExecutionEnvironment ee = null;
 			IClasspathEntry jbangContainerEntry = null;
 			for (IClasspathEntry entry : classpath) {
@@ -190,7 +190,7 @@ public class ProjectConfigurationManager {
 				String previewFeatures = info.getCompileOptions() != null
 						&& info.getCompileOptions().contains("--enable-preview") ? JavaCore.ENABLED : JavaCore.DISABLED;
 				options.put(JavaCore.COMPILER_PB_ENABLE_PREVIEW_FEATURES, previewFeatures);
-				
+
 				if (!Objects.deepEquals(oldOptions, options)) {
 					jp.setOptions(options);
 					updateCache = true;
@@ -205,7 +205,7 @@ public class ProjectConfigurationManager {
 			if (updateCache) {
 				cache.put(project, info);
 			}
-			
+
 			configureAnnotationProcessors(jp, info.getCompileOptions(), resolvedClasspath);
 		}
 	}
@@ -214,7 +214,7 @@ public class ProjectConfigurationManager {
 	@SuppressWarnings("restriction")
 	private void configureAnnotationProcessors(IJavaProject javaProject, List<String> options, List<String> resolvedClasspath) throws CoreException {
 
-		List<File> jars = resolvedClasspath.stream().map(s -> new File(s))
+		List<File> jars = resolvedClasspath.stream().map(File::new)
 			  				.filter(AnnotationProcessorUtils::isJar)
 			  				.collect(Collectors.toList());
 
@@ -242,7 +242,7 @@ public class ProjectConfigurationManager {
 	    for(File resolvedJarArtifact : resolvedJarArtifactsInReverseOrder) {
 	      IPath absolutePath = new Path(resolvedJarArtifact.getAbsolutePath());
 	      //reference jars in a portable way
-	      if((m2RepoPath != null) && m2RepoPath.isPrefixOf(absolutePath)) {
+	      if(m2RepoPath != null && m2RepoPath.isPrefixOf(absolutePath)) {
 	        IPath relativePath = absolutePath.removeFirstSegments(m2RepoPath.segmentCount()).makeRelative().setDevice(null);
 	        IPath variablePath = new Path(M2_REPO).append(relativePath);
 	        factoryPath.addVarJar(variablePath);
@@ -368,13 +368,13 @@ public class ProjectConfigurationManager {
 		if (configuration.getLinkedSourceFolder() != null) {
 			source.createLink(configuration.getLinkedSourceFolder(), IResource.REPLACE, monitor);
 		}
-		
+
 		IFolder bin = project.getFolder(".jbang/bin");
 		if (!bin.exists()) {
 			ResourceUtil.createFolder(bin, monitor);
 		}
 		IPackageFragmentRoot root = javaProject.getPackageFragmentRoot(source);
-		
+
 		IClasspathAttribute jbangScopeAttr = JavaCore.newClasspathAttribute("jbang.scope", "main");
 		IClasspathEntry srcClasspath = JavaCore.newSourceEntry(root.getPath(), null, null, null, new IClasspathAttribute[] {jbangScopeAttr} );
 		classpaths.add(srcClasspath);
@@ -383,17 +383,17 @@ public class ProjectConfigurationManager {
 		javaProject.setOutputLocation(bin.getFullPath(), monitor);
 
 		IFile mainFile = null;
-		
-		
+
+
 		if (configuration.getLinkedSourceFolder() == null) {
-						
+
 			if (JBangFileUtils.isJBangBuildFile(script)) {
 				mainFile = link(script.toAbsolutePath().toString(), project, configuration, monitor);
 			} else {
 				mainFile = link(info.getBackingResource(), project, configuration, monitor);
 			}
-			
-			
+
+
 			if (info.getSources() != null && !info.getSources().isEmpty()) {
 				for (JBangFile s : info.getSources()) {
 					link(s.originalResource, project, configuration, monitor);
@@ -408,7 +408,7 @@ public class ProjectConfigurationManager {
 						link(file.originalResource, file.target, project, configuration, monitor);
 					}
 				}
-			}			
+			}
 		} else {
 			var scriptUri = script.toAbsolutePath().toUri();
 			IFile[] mainCandidates = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(scriptUri);
@@ -425,7 +425,7 @@ public class ProjectConfigurationManager {
 					}
 				}
 			}
-			
+
 			for (IFile candidate : mainCandidates) {
 				if (project.equals(candidate.getProject())) {
 					mainFile = candidate;
@@ -439,7 +439,7 @@ public class ProjectConfigurationManager {
 
 		var jbp = new JBangProject(project);
 		jbp.setMainSourceFile(mainFile);
-		
+
 		configure(jbp, info, monitor);
 
 		return jbp;
@@ -463,23 +463,19 @@ public class ProjectConfigurationManager {
 		fakeFile.createLink(p.toUri(), IResource.REPLACE, monitor);
 		return fakeFile;
 	}
-	
+
 	public void synchronize(IFile file, IProgressMonitor monitor) throws CoreException {
 		//System.err.println(file + " configuration changed, checking jbang info");
 		IProject project = file.getProject();
 		JBangProject jbp = getJBangProject(project, monitor);
-		if (jbp == null) {
-			return;
-		}
-		
-		if (isJavaProject(project) && JBangClasspathUtils.isOnOutputLocation(JavaCore.create(project), file)) {
+		if ((jbp == null) || (isJavaProject(project) && JBangClasspathUtils.isOnOutputLocation(JavaCore.create(project), file))) {
 			return;
 		}
 		monitor.setTaskName("Updating JBang configuration from " + file.getName());
-		
+
 		jbp.setMainSourceFile(file);
 		var jbang = jbp.getRuntime();
-		
+
 		var execution = new JBangInfoExecution(jbang, file.getLocation().toFile(), null);
 		JBangInfoResult info = execution.getInfo(monitor);
 		clearMarkers(file);
@@ -498,7 +494,7 @@ public class ProjectConfigurationManager {
 			}
 		}
 	}
-	
+
 	private String getSource(IFile file) throws CoreException {
 		if (JBangFileUtils.isJBangBuildFile(file)) {
 			return ResourceUtil.getContent(file);
@@ -550,7 +546,7 @@ public class ProjectConfigurationManager {
 				pos.start = lineOffset[0] + i;
 				pos.end = pos.start + dependency.length();
 			}
-			lineOffset[0] += (1 + l.length());
+			lineOffset[0] += 1 + l.length();
 			return i > 0;
 		}).findFirst();
 		return pos;
@@ -571,7 +567,7 @@ public class ProjectConfigurationManager {
 				pos.start = lineOffset[0] + i;
 				pos.end = lineOffset[0] + l.length();
 			}
-			lineOffset[0] += (1 + l.length());
+			lineOffset[0] += 1 + l.length();
 			return i > 0;
 		}).findFirst();
 		return pos;

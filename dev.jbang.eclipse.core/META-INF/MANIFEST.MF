@@ -13,7 +13,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.core.expressions,
  org.eclipse.jdt.apt.core;bundle-version="3.7.50"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-11
+Bundle-RequiredExecutionEnvironment: JavaSE-17
 Import-Package: org.eclipse.core.resources
 Export-Package: dev.jbang.eclipse.core,
  dev.jbang.eclipse.core.internal;x-friends:="dev.jbang.eclipse.ui,dev.jbang.eclipse.ls",

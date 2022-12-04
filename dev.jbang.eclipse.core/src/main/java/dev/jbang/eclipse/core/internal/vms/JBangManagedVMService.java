@@ -57,10 +57,10 @@ public class JBangManagedVMService {
 		if (type == null) { // unlikely to happen but, you never know
 			return null;
 		}
-		
+
 		return createVM(availableJdkPath, type, monitor);
 	}
-	
+
 	public IVMInstall createVM(File directory, IVMInstallType type, IProgressMonitor monitor) throws CoreException {
 		var status = type.validateInstallLocation(directory);
 		if (!status.isOK()) { // No longer valid, we bail
@@ -186,5 +186,5 @@ public class JBangManagedVMService {
 		}
 		return null;
 	}
-	
+
 }

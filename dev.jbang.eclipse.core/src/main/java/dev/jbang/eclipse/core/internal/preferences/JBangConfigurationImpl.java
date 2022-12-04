@@ -67,7 +67,8 @@ public class JBangConfigurationImpl implements IPreferenceChangeListener, INodeC
     this.listeners.add(listener);
   }
 
-  public void preferenceChange(PreferenceChangeEvent event) {
+  @Override
+public void preferenceChange(PreferenceChangeEvent event) {
     JBangConfigurationChangeEvent jbangEvent = new JBangConfigurationChangeEvent(event.getKey(), event.getNewValue(), event.getOldValue());
     for(IJBangConfigurationChangeListener listener : listeners) {
       try {
@@ -78,10 +79,12 @@ public class JBangConfigurationImpl implements IPreferenceChangeListener, INodeC
     }
   }
 
-  public void added(NodeChangeEvent event) {
+  @Override
+public void added(NodeChangeEvent event) {
   }
 
-  public void removed(NodeChangeEvent event) {
+  @Override
+public void removed(NodeChangeEvent event) {
     if(event.getChild() == preferencesLookup[0] || event.getChild() == preferencesLookup[1]) {
       init();
     }
@@ -89,11 +92,13 @@ public class JBangConfigurationImpl implements IPreferenceChangeListener, INodeC
 
   private IPreferenceFilter getPreferenceFilter() {
     return new IPreferenceFilter() {
-      public String[] getScopes() {
+      @Override
+	public String[] getScopes() {
         return new String[] {InstanceScope.SCOPE, DefaultScope.SCOPE};
       }
 
-      @SuppressWarnings("rawtypes")
+      @Override
+	@SuppressWarnings("rawtypes")
       public Map<String, PreferenceFilterEntry[]> getMapping(String scope) {
         return null;
       }
