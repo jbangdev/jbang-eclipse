@@ -12,7 +12,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<tycho.version>2.7.5</tycho.version>
+		<tycho.version>3.0.0</tycho.version>
 		<tycho.extras.version>${tycho.version}</tycho.extras.version>
 		<tycho.test.platformArgs></tycho.test.platformArgs>
 		<tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
@@ -31,7 +31,7 @@
 		<repository>
 			<id>eclipse</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/2022-03</url>
+			<url>http://download.eclipse.org/releases/2022-09</url>
 		</repository>
 	</repositories>
 	<build>
@@ -205,15 +205,15 @@
 			<build>
 				<plugins>
 					<plugin>
-						<groupId>org.eclipse.tycho.extras</groupId>
-						<artifactId>tycho-source-feature-plugin</artifactId>
-						<version>${tycho.extras.version}</version>
+						<groupId>org.eclipse.tycho</groupId>
+						<artifactId>tycho-source-plugin</artifactId>
+						<version>${tycho.version}</version>
 						<executions>
 							<execution>
-								<id>source-feature</id>
+								<id>feature-source</id>
 								<phase>package</phase>
 								<goals>
-									<goal>source-feature</goal>
+									<goal>feature-source</goal>
 								</goals>
 							</execution>
 						</executions>

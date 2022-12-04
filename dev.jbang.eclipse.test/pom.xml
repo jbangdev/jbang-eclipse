@@ -16,6 +16,7 @@
 	<properties>
 	  <jbang.download.url>https://www.jbang.dev/releases/latest/download/jbang.zip</jbang.download.url>
 	  <jbang.version>latest</jbang.version>
+	  <download.cache.skip>true</download.cache.skip>
 	</properties>
 
 	<build>
@@ -36,7 +37,6 @@
 				<configuration>
 					<url>${jbang.download.url}</url>
 					<unpack>true</unpack>
-					<skipCache>true</skipCache>
 					<followRedirects>true</followRedirects>
 					<outputDirectory>${project.build.directory}/</outputDirectory>
 				</configuration>
