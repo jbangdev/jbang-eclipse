@@ -29,13 +29,13 @@ public class JBangDelegateCommandHandler implements IDelegateCommandHandler {
 		switch (commandId) {
 		case JDTLS_JBANG_SYNCHRONIZE_COMMAND:
 			if (arguments != null && !arguments.isEmpty() && arguments.get(0) instanceof Collection) {
-				return synchronize((Collection<Object>)arguments.get(0), monitor);
+				return synchronize((Collection<?>) arguments.get(0), monitor);
 			}
 		}
 		return null;
 	}
 
-	private Object synchronize(Collection<Object> uris, IProgressMonitor monitor) {
+	private Object synchronize(Collection<?> uris, IProgressMonitor monitor) {
 		Set<IFile> jbangFiles = collectFiles(uris);
 		if (!jbangFiles.isEmpty()) {
 			JBangCorePlugin.logInfo("Found "+jbangFiles.size()+" files to synchronize");
@@ -45,7 +45,7 @@ public class JBangDelegateCommandHandler implements IDelegateCommandHandler {
 		return null;
 	}
 
-	private Set<IFile> collectFiles(Collection<Object> params) {
+	private Set<IFile> collectFiles(Collection<?> params) {
 		Set<IFile> jbangFiles = new LinkedHashSet<>();
 		for (Object unknownUri : params) {
 			URI uri = null;
