@@ -26,9 +26,9 @@ import org.eclipse.core.runtime.jobs.Job;
 
 /**
  *
- * Copied from https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/org.eclipse.m2e.tests.common/src/org/eclipse/m2e/tests/common/JobHelpers.java
+ * Copied from
+ * https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/org.eclipse.m2e.tests.common/src/org/eclipse/m2e/tests/common/JobHelpers.java
  */
-@SuppressWarnings("restriction")
 public class JobHelpers {
 
   private static final int POLLING_DELAY = 10;

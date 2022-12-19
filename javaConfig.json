@@ -1,0 +1,9 @@
+{
+    "projects": [
+        "dev.jbang.eclipse.core",
+        "dev.jbang.eclipse.ui",
+        "dev.jbang.eclipse.tests",
+        "dev.jbang.eclipse.ls"
+    ],
+    "targetPlatform": "dev.jbang.eclipse.target/dev.jbang.eclipse.target"
+}

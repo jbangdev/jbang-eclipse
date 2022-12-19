@@ -39,10 +39,10 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import dev.jbang.eclipse.core.internal.JBangConstants;
 
 /**
- * Copied from https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/org.eclipse.m2e.tests.common/src/org/eclipse/m2e/tests/common/WorkspaceHelpers.java
+ * Copied from
+ * https://raw.githubusercontent.com/eclipse-m2e/m2e-core/master/org.eclipse.m2e.tests.common/src/org/eclipse/m2e/tests/common/WorkspaceHelpers.java
  *
  */
-@SuppressWarnings("restriction")
 public class WorkspaceHelpers {
 
   public static void cleanWorkspace() throws InterruptedException, CoreException {

@@ -19,6 +19,7 @@ import org.eclipse.jdt.ls.core.internal.IDelegateCommandHandler;
 import dev.jbang.eclipse.core.JBangCorePlugin;
 import dev.jbang.eclipse.core.internal.project.SynchronizeJBangJob;
 
+@SuppressWarnings("restriction")
 public class JBangDelegateCommandHandler implements IDelegateCommandHandler {
 
 	private static final String JDTLS_JBANG_SYNCHRONIZE_COMMAND = "jbang/synchronize";

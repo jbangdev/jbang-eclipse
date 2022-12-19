@@ -63,6 +63,7 @@ import dev.jbang.eclipse.core.internal.runtime.JBangRuntime;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimeManager;
 import dev.jbang.eclipse.core.internal.vms.JBangManagedVMService;
 
+@SuppressWarnings("restriction")
 public class ProjectConfigurationManager {
 
 	private static final String M2_REPO = "M2_REPO";
@@ -210,8 +211,8 @@ public class ProjectConfigurationManager {
 		}
 	}
 
-	//Code mostly copied from https://github.com/eclipse-m2e/m2e-core/blob/bb14b75bfa14a7548fd59707965e3e281c7bb415/org.eclipse.m2e.apt.core/src/org/eclipse/m2e/apt/internal/AbstractAptConfiguratorDelegate.java#L191-L225
-	@SuppressWarnings("restriction")
+	// Code mostly copied from
+	// https://github.com/eclipse-m2e/m2e-core/blob/bb14b75bfa14a7548fd59707965e3e281c7bb415/org.eclipse.m2e.apt.core/src/org/eclipse/m2e/apt/internal/AbstractAptConfiguratorDelegate.java#L191-L225
 	private void configureAnnotationProcessors(IJavaProject javaProject, List<String> options, List<String> resolvedClasspath) throws CoreException {
 
 		List<File> jars = resolvedClasspath.stream().map(File::new)

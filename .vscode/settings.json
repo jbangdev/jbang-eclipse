@@ -1,0 +1,12 @@
+{
+  "java.cleanup.actionsOnSave": [
+    "invertEquals",
+    "instanceofPatternMatch",
+    "stringConcatToTextBlock"
+  ],
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
+  "editor.formatOnSave": true,
+  "editor.formatOnSaveMode": "modificationsIfAvailable"
+}
