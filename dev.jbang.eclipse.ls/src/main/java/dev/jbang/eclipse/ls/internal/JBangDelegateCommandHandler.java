@@ -28,8 +28,8 @@ public class JBangDelegateCommandHandler implements IDelegateCommandHandler {
 	public Object executeCommand(String commandId, List<Object> arguments, IProgressMonitor monitor) throws Exception {
 		switch (commandId) {
 		case JDTLS_JBANG_SYNCHRONIZE_COMMAND:
-			if (arguments != null && !arguments.isEmpty() && arguments.get(0) instanceof Collection) {
-				return synchronize((Collection<?>) arguments.get(0), monitor);
+			if (arguments != null && !arguments.isEmpty() && arguments.get(0) instanceof Collection<?> uris) {
+				return synchronize(uris, monitor);
 			}
 		}
 		return null;
@@ -45,15 +45,15 @@ public class JBangDelegateCommandHandler implements IDelegateCommandHandler {
 		return null;
 	}
 
-	private Set<IFile> collectFiles(Collection<?> params) {
+	private Set<IFile> collectFiles(Collection<?> uris) {
 		Set<IFile> jbangFiles = new LinkedHashSet<>();
-		for (Object unknownUri : params) {
+		for (Object unknownUri : uris) {
 			URI uri = null;
-			if (unknownUri instanceof URI) {
-				uri = (URI) unknownUri;
-			} else if (unknownUri instanceof String) {
+			if (unknownUri instanceof URI someUri) {
+				uri = someUri;
+			} else if (unknownUri instanceof String someString) {
 				try {
-					uri = new URI(unknownUri.toString());
+					uri = new URI(someString);
 				} catch (URISyntaxException e) {
 					e.printStackTrace();
 				}

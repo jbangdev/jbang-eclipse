@@ -12,16 +12,16 @@ public class JBangManager implements IJBang {
 	}
 
 	private static class ProjectConfigurationManagerHolder {
-		static final ProjectConfigurationManager INSTANCE = new ProjectConfigurationManager(JBangRuntimeManagerHolder.INSTANCE);
+		static final ProjectConfigurationManager INSTANCE = new ProjectConfigurationManager(JBangRuntimeManagerHolder.JRM_INSTANCE);
 	}
 
 	@Override
 	public JBangRuntimeManager getJBangRuntimeManager() {
-		return JBangRuntimeManagerHolder.INSTANCE;
+		return JBangRuntimeManagerHolder.JRM_INSTANCE;
 	}
 
 	private static class JBangRuntimeManagerHolder {
-		static final JBangRuntimeManager INSTANCE = new JBangRuntimeManager();
+		static final JBangRuntimeManager JRM_INSTANCE = new JBangRuntimeManager();
 	}
 
 }

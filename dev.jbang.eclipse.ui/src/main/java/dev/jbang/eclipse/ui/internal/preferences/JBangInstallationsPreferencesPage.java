@@ -145,10 +145,8 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 
 			@Override
 			public Object[] getElements(Object input) {
-				if (input instanceof List<?> list) {
-					if (list.size() > 0) {
-						return list.toArray(new JBangRuntime[list.size()]);
-					}
+				if (input instanceof List<?> list && !list.isEmpty()) {
+					return list.toArray(new JBangRuntime[list.size()]);
 				}
 				return new Object[0];
 			}

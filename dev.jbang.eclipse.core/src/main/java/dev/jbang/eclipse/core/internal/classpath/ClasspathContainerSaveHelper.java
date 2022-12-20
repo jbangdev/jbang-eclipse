@@ -17,10 +17,10 @@ import org.eclipse.jdt.core.IClasspathContainer;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.JavaCore;
 
-
 /**
  * BuildPath save helper.
- * Copied from m2e's <a href="https://github.com/eclipse-m2e/m2e-core/blob/342a148d91473a2bb7f4c186635936ccb277eb61/org.eclipse.m2e.jdt/src/org/eclipse/m2e/jdt/internal/MavenClasspathContainerSaveHelper.java">MavenClasspathContainerSaveHelper</a>
+ * Copied from m2e's <a href=
+ * "https://github.com/eclipse-m2e/m2e-core/blob/342a148d91473a2bb7f4c186635936ccb277eb61/org.eclipse.m2e.jdt/src/org/eclipse/m2e/jdt/internal/MavenClasspathContainerSaveHelper.java">MavenClasspathContainerSaveHelper</a>
  *
  * @author Eugene Kuleshov
  */
@@ -34,17 +34,17 @@ public class ClasspathContainerSaveHelper {
 
       @Override
       protected Object resolveObject(Object o) throws IOException {
-        if(o instanceof ProjectEntryReplace) {
-          return ((ProjectEntryReplace) o).getEntry();
-        }
-		if(o instanceof LibraryEntryReplace) {
-          return ((LibraryEntryReplace) o).getEntry();
-        } else if(o instanceof ClasspathAttributeReplace) {
-          return ((ClasspathAttributeReplace) o).getAttribute();
-        } else if(o instanceof AccessRuleReplace) {
-          return ((AccessRuleReplace) o).getAccessRule();
-        } else if(o instanceof PathReplace) {
-          return ((PathReplace) o).getPath();
+        // Good candidate for switch + pattern expression, once it's out of preview
+        if (o instanceof ProjectEntryReplace replace) {
+          return replace.getEntry();
+        } else if (o instanceof LibraryEntryReplace replace) {
+          return replace.getEntry();
+        } else if (o instanceof ClasspathAttributeReplace replace) {
+          return replace.getAttribute();
+        } else if (o instanceof AccessRuleReplace replace) {
+          return replace.getAccessRule();
+        } else if (o instanceof PathReplace replace) {
+          return replace.getPath();
         }
         return super.resolveObject(o);
       }
@@ -60,19 +60,19 @@ public class ClasspathContainerSaveHelper {
 
       @Override
       protected Object replaceObject(Object o) throws IOException {
-        if(o instanceof IClasspathEntry e) {
-          if(e.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
+        if (o instanceof IClasspathEntry e) {
+          if (e.getEntryKind() == IClasspathEntry.CPE_PROJECT) {
             return new ProjectEntryReplace(e);
           }
-		if(e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
+          if (e.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
             return new LibraryEntryReplace(e);
           }
-        } else if(o instanceof IClasspathAttribute) {
-          return new ClasspathAttributeReplace((IClasspathAttribute) o);
-        } else if(o instanceof IAccessRule) {
-          return new AccessRuleReplace((IAccessRule) o);
-        } else if(o instanceof IPath) {
-          return new PathReplace((IPath) o);
+        } else if (o instanceof IClasspathAttribute elt) {
+          return new ClasspathAttributeReplace(elt);
+        } else if (o instanceof IAccessRule elt) {
+          return new AccessRuleReplace(elt);
+        } else if (o instanceof IPath elt) {
+          return new PathReplace(elt);
         }
         return super.replaceObject(o);
       }

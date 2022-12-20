@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -21,12 +23,11 @@ public class ResourceUtil {
 	private ResourceUtil() {
 	}
 
-
 	public static void createFolder(IFolder folder, IProgressMonitor monitor) throws CoreException {
 		if (!folder.exists()) {
 			IContainer parent = folder.getParent();
-			if (parent instanceof IFolder) {
-				createFolder((IFolder) parent,  monitor);
+			if (parent instanceof IFolder parentFolder) {
+				createFolder(parentFolder, monitor);
 			}
 			folder.create(true, true, monitor);
 		}
@@ -62,5 +63,16 @@ public class ResourceUtil {
 		} catch (IOException e) {
 			throw newException("Can not get " + file.getRawLocation() + " content", e);
 		}
+	}
+
+	public static String getContent(Path file) throws CoreException {
+		if (Files.isRegularFile(file) && Files.isReadable(file)) {
+			try {
+				return Files.readString(file);
+			} catch (IOException e) {
+				throw newException("Can not get " + file + " content", e);
+			}
+		}
+		return null;
 	}
 }

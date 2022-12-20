@@ -189,9 +189,8 @@ public class AnnotationProcessorUtils {
 	if(absoluteFilePath.startsWith(projectBasedirFilePath)) {
       String projectRelativePath = absoluteFilePath.substring(projectBasedirFilePath.length() + 1);
       return new File(projectRelativePath);
-    } else {
-      return absoluteFile;
     }
+	return absoluteFile;
   }
 
 
