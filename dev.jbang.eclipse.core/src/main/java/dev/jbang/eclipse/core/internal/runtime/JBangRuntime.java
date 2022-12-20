@@ -142,7 +142,7 @@ public class JBangRuntime {
 		if (this == obj) {
 			return true;
 		}
-		if ((obj == null) || (getClass() != obj.getClass())) {
+		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
 		JBangRuntime other = (JBangRuntime) obj;

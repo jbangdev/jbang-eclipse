@@ -29,8 +29,8 @@ public class AddJBangNatureHandler extends AbstractHandler {
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
         ISelection selection = HandlerUtil.getCurrentSelection(event);
-        if (selection instanceof StructuredSelection) {
-            List<?> elements = ((StructuredSelection) selection).toList();
+				if (selection instanceof StructuredSelection structuredSelection) {
+					List<?> elements = structuredSelection.toList();
             Set<IProject> projects = collectProjects(elements);
             if (projects.isEmpty()) {
             	return null;

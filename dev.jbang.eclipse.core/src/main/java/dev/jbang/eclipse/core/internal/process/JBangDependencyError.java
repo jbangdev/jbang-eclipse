@@ -30,7 +30,7 @@ public class JBangDependencyError extends JBangError {
 		if (this == obj) {
 			return true;
 		}
-		if ((obj == null) || (getClass() != obj.getClass())) {
+		if (obj == null || getClass() != obj.getClass()) {
 			return false;
 		}
 		JBangDependencyError other = (JBangDependencyError) obj;

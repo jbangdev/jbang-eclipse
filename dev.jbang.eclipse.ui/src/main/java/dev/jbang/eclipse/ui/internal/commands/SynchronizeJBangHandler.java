@@ -29,8 +29,8 @@ public class SynchronizeJBangHandler extends AbstractHandler {
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		ISelection selection = HandlerUtil.getCurrentSelection(event);
 		Object[] elements = null;
-		if (selection instanceof IStructuredSelection) {
-			elements = ((IStructuredSelection) selection).toArray();
+		if (selection instanceof IStructuredSelection structuredSelection) {
+			elements = structuredSelection.toArray();
 		} else {
 			elements = getFileInActiveEditor(event);
 		}
@@ -47,13 +47,12 @@ public class SynchronizeJBangHandler extends AbstractHandler {
 
 	private IFile[] getFileInActiveEditor(ExecutionEvent event) {
 		IWorkbenchPart activePart = HandlerUtil.getActivePart(event);
-		if (activePart instanceof IEditorPart editorPart) {
-			if (editorPart.getEditorInput() instanceof IFileEditorInput) {
-				IFile file = ((IFileEditorInput) editorPart.getEditorInput()).getFile();
-				IProject project = file.getProject();
-				if (project != null && project.isAccessible()) {
-					return new IFile[] { file };
-				}
+		if (activePart instanceof IEditorPart editorPart
+				&& editorPart.getEditorInput() instanceof IFileEditorInput fileEditorInput) {
+			IFile file = fileEditorInput.getFile();
+			IProject project = file.getProject();
+			if (project != null && project.isAccessible()) {
+				return new IFile[] { file };
 			}
 		}
 		return null;
