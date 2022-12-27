@@ -8,6 +8,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.ls.core.internal.JavaLanguageServerPlugin;
 import org.eclipse.jdt.ls.core.internal.managers.IBuildSupport;
 
@@ -47,6 +48,11 @@ public class JBangBuildSupport implements IBuildSupport {
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void discoverSource(IClassFile classFile, IProgressMonitor monitor) throws CoreException {
+		JavaLanguageServerPlugin.getDefaultSourceDownloader().discoverSource(classFile, monitor);
 	}
 
 }
