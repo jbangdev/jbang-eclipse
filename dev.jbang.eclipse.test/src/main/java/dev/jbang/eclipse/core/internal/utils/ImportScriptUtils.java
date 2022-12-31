@@ -11,6 +11,7 @@ import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.NullProgressMonitor;
 
 import dev.jbang.eclipse.core.JBangCorePlugin;
+import dev.jbang.eclipse.core.internal.JBangClasspathUtils;
 import dev.jbang.eclipse.core.internal.project.JBangFileDetector;
 import dev.jbang.eclipse.core.internal.project.JBangProject;
 import dev.jbang.eclipse.core.internal.project.JBangProjectConfiguration;
@@ -25,7 +26,7 @@ public class ImportScriptUtils {
 	public static JBangProject importJBangScript(String... relativePaths) throws Exception {
 		Path mainScript = null;
 
-		var workDir = Paths.get("target", "workdir");
+		var workDir = Paths.get("target", "workdir", System.currentTimeMillis()+"");
 		Files.createDirectories(workDir);
 
 		for (String relativePath : relativePaths) {
@@ -41,8 +42,12 @@ public class ImportScriptUtils {
 		}
 
 		var projectManager = JBangCorePlugin.getJBangManager().getProjectConfigurationManager();
-
-		var jbangProject = projectManager.createJBangProject(mainScript, new JBangProjectConfiguration() , new NullProgressMonitor());
+		var configuration = new JBangProjectConfiguration();
+		var sourceFolder = JBangClasspathUtils.inferSourceDirectory(mainScript.toAbsolutePath(), new NullProgressMonitor());
+		if (sourceFolder != null) {
+				configuration.setLinkedSourceFolder(sourceFolder);
+		}
+		var jbangProject = projectManager.createJBangProject(mainScript, configuration , new NullProgressMonitor());
 
 		return jbangProject;
 	}
@@ -73,7 +78,7 @@ public class ImportScriptUtils {
 
 		var projectManager = JBangCorePlugin.getJBangManager().getProjectConfigurationManager();
 		var config = new JBangProjectConfiguration();
-		config.setLinkedSourceFolder(destDir.toUri());
+		config.setLinkedSourceFolder(org.eclipse.core.runtime.Path.fromOSString(destDir.toAbsolutePath().toString()));
 		var jbangProject = projectManager.createJBangProject(mainScript, config,monitor);
 		return jbangProject;
 	}

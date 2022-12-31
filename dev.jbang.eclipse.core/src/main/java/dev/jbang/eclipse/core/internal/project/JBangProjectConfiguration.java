@@ -1,6 +1,6 @@
 package dev.jbang.eclipse.core.internal.project;
 
-import java.net.URI;
+import org.eclipse.core.runtime.IPath;
 
 public class JBangProjectConfiguration {
 
@@ -10,15 +10,25 @@ public class JBangProjectConfiguration {
 		sourceFolder = DEFAULT_SOURCE_FOLDER;
 	}
 
-	private URI linkedSourceFolder;
+	private IPath linkedSourceFolder;
+
+	private IPath rootFolder;
+
+	public IPath getRootFolder() {
+		return rootFolder;
+	}
+
+	public void setRootFolder(IPath rootFolder) {
+		this.rootFolder = rootFolder;
+	}
 
 	private String sourceFolder;
 
-	public URI getLinkedSourceFolder() {
+	public IPath getLinkedSourceFolder() {
 		return linkedSourceFolder;
 	}
 
-	public void setLinkedSourceFolder(URI linkedSourceFolder) {
+	public void setLinkedSourceFolder(IPath linkedSourceFolder) {
 		this.linkedSourceFolder = linkedSourceFolder;
 	}
 
