@@ -49,6 +49,7 @@ public class JBangFileDetector {
 	private Path rootDir;
 	private int maxDepth = 3;
 	private Set<String> exclusions = new LinkedHashSet<>(1);
+	private Path triggerFile;
 
 	/**
 	 * Constructs a new JBangFileDetector for the given root directory, searching
@@ -56,17 +57,16 @@ public class JBangFileDetector {
 	 * of a found directory will be walked through. The ".metadata" folder is
 	 * excluded.
 	 *
-	 * @param rootDir
-	 *            the root directory to search for files
-	 * @param fileNames
-	 *            the names of the file to search
+	 * @param rootDir   the root directory to search for files
+	 * @param fileNames the names of the file to search
 	 */
 	public JBangFileDetector(Path rootDir) {
-		this(rootDir, null);
+		this(rootDir, null, null);
 	}
 
-	public JBangFileDetector(Path rootDir, List<String> exclusions) {
+	public JBangFileDetector(Path rootDir, List<String> exclusions, Path triggerFile) {
 		this.rootDir = rootDir;
+		this.triggerFile = triggerFile;
 		scripts = new ArrayList<>();
 		builds = new ArrayList<>();
 		mains = new ArrayList<>();
@@ -79,12 +79,13 @@ public class JBangFileDetector {
 	}
 
 	/**
-	 * Adds the names of directories to exclude from the search. All its sub-directories will be skipped.
+	 * Adds the names of directories to exclude from the search. All its
+	 * sub-directories will be skipped.
 	 *
 	 * @param excludes directory name(s) to exclude from the search
 	 * @return a reference to this object.
 	 */
-	public JBangFileDetector addExclusions(String...excludes) {
+	public JBangFileDetector addExclusions(String... excludes) {
 		if (excludes != null) {
 			exclusions.addAll(Arrays.asList(excludes));
 		}
@@ -93,6 +94,7 @@ public class JBangFileDetector {
 
 	/**
 	 * Sets the maximum depth of the search
+	 * 
 	 * @param maxDepth the maximum depth of the search. Must be > 0.
 	 * @return a reference to this object.
 	 */
@@ -104,6 +106,7 @@ public class JBangFileDetector {
 
 	/**
 	 * Returns the scripts found.
+	 * 
 	 * @return an unmodifiable collection of {@link Path}s.
 	 */
 	public Collection<Path> getScripts() {
@@ -112,6 +115,7 @@ public class JBangFileDetector {
 
 	/**
 	 * Returns the "main.java" scripts found.
+	 * 
 	 * @return an unmodifiable collection of {@link Path}s.
 	 */
 	public Collection<Path> getMains() {
@@ -120,6 +124,7 @@ public class JBangFileDetector {
 
 	/**
 	 * Returns the build.jbang files found.
+	 * 
 	 * @return an unmodifiable collection of {@link Path}s.
 	 */
 	public Collection<Path> getBuildFiles() {
@@ -127,17 +132,36 @@ public class JBangFileDetector {
 	}
 
 	/**
-	 * Scan the  the directories found to be containing the sought-after file.
+	 * Scan the the directories found to be containing the sought-after file.
+	 * 
 	 * @param monitor the {@link IProgressMonitor} used to handle scan interruption.
 	 * @return an unmodifiable collection of {@link Path}s.
 	 * @throws CoreException if an error is encountered during the scan
 	 */
 	public Collection<Path> scan(IProgressMonitor monitor) throws CoreException {
 		try {
-			scanDir(rootDir, monitor == null? new NullProgressMonitor(): monitor);
+			scanDir(rootDir, monitor == null ? new NullProgressMonitor() : monitor);
 		} catch (IOException e) {
-			throw  ExceptionFactory.newException("Failed to scan "+rootDir, e);
+			throw ExceptionFactory.newException("Failed to scan " + rootDir, e);
 		}
+		
+		//If nothing was found, start from trigger file, if there's one and search there and upward
+		if (scripts.isEmpty() && mains.isEmpty() && builds.isEmpty() && triggerFile != null
+				&& triggerFile.startsWith(rootDir)) {
+			var relPath = triggerFile.relativize(rootDir).getParent();
+			int depth = relPath.getNameCount();
+			Path currentDir = triggerFile.getParent();
+			while (currentDir != null && depth > maxDepth) {
+				try {
+					Files.list(currentDir).forEach(this::analyzeFile);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+				currentDir = currentDir.getParent();
+				depth--;
+			}
+		}
+		
 		if (!builds.isEmpty()) {
 			return getBuildFiles();
 		}
@@ -146,6 +170,19 @@ public class JBangFileDetector {
 		}
 
 		return getScripts();
+	}
+
+	private void analyzeFile(Path file) {
+		if (!Files.isRegularFile(file)) {
+			return;
+		}
+		if (JBangFileUtils.isJBangBuildFile(file)) {
+			builds.add(file);
+		} else if (JBangFileUtils.isMainFile(file)) {
+			mains.add(file);
+		} else if (JBangFileUtils.isJBangFile(file)) {
+			scripts.add(file);
+		}
 	}
 
 	private void scanDir(Path dir, final IProgressMonitor monitor) throws IOException {
@@ -164,22 +201,16 @@ public class JBangFileDetector {
 
 			@Override
 			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				if (JBangFileUtils.isJBangBuildFile(file)) {
-					builds.add(file);
-				} else if (JBangFileUtils.isMainFile(file)) {
-					mains.add(file);
-				} else if (JBangFileUtils.isJBangFile(file)) {
-					scripts.add(file);
-				}
+				analyzeFile(file);
 				return CONTINUE;
 			}
 
 			@Override
 			public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
 				Objects.requireNonNull(file);
-    			if (exc instanceof FileSystemLoopException) {
-        			return CONTINUE;
-    			}
+				if (exc instanceof FileSystemLoopException) {
+					return CONTINUE;
+				}
 				throw exc;
 			}
 

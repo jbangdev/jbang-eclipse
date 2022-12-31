@@ -103,7 +103,7 @@ public class ProjectConfigurationManager {
 			IClasspathEntry[] classpath = jp.getRawClasspath();
 
 			if (info.getAvailableJdkPath() != null && !info.getAvailableJdkPath().isBlank()) {
-				//Ensure we'll have a proper Execution Environment available
+				// Ensure we'll have a proper Execution Environment available
 				new JBangManagedVMService().getJVM(new File(info.getAvailableJdkPath()), monitor);
 			}
 
@@ -152,7 +152,8 @@ public class ProjectConfigurationManager {
 			}
 			try {
 				IClasspathContainer container = new JBangClasspathContainer(jbangContainerEntry.getPath(), dependencies);
-				JavaCore.setClasspathContainer(container.getPath(), new IJavaProject[] { jp }, new IClasspathContainer[] { container }, monitor);
+				JavaCore.setClasspathContainer(container.getPath(), new IJavaProject[] { jp },
+						new IClasspathContainer[] { container }, monitor);
 				JBangClasspathUtils.saveContainerState(project, container);
 			} catch (CoreException ex) {
 				JBangCorePlugin.log(ex.getMessage(), ex);
@@ -173,18 +174,17 @@ public class ProjectConfigurationManager {
 						: JavaCore.DO_NOT_GENERATE;
 				options.put(JavaCore.COMPILER_CODEGEN_METHOD_PARAMETERS_ATTR, parameters);
 
-
 				if (info.getCompileOptions() != null) {
-					int sourceIdx =  info.getCompileOptions().indexOf("-source");
-					if (sourceIdx > 0 && info.getCompileOptions().size() > sourceIdx+1) {
-						String sourceString = info.getCompileOptions().get(sourceIdx+1);
-						//XXX In theory, should not set compliance options, but this is more convenient
+					int sourceIdx = info.getCompileOptions().indexOf("-source");
+					if (sourceIdx > 0 && info.getCompileOptions().size() > sourceIdx + 1) {
+						String sourceString = info.getCompileOptions().get(sourceIdx + 1);
+						// XXX In theory, should not set compliance options, but this is more convenient
 						JavaCore.setComplianceOptions(sourceString, options);
 					}
-					//FIXME Having both --release and -source should be an error!
-					int releaseIdx =  info.getCompileOptions().indexOf("--release");
-					if (releaseIdx > 0 && info.getCompileOptions().size() > releaseIdx+1) {
-						String releaseString = info.getCompileOptions().get(releaseIdx+1);
+					// FIXME Having both --release and -source should be an error!
+					int releaseIdx = info.getCompileOptions().indexOf("--release");
+					if (releaseIdx > 0 && info.getCompileOptions().size() > releaseIdx + 1) {
+						String releaseString = info.getCompileOptions().get(releaseIdx + 1);
 						JavaCore.setComplianceOptions(releaseString, options);
 					}
 				}
@@ -213,54 +213,55 @@ public class ProjectConfigurationManager {
 
 	// Code mostly copied from
 	// https://github.com/eclipse-m2e/m2e-core/blob/bb14b75bfa14a7548fd59707965e3e281c7bb415/org.eclipse.m2e.apt.core/src/org/eclipse/m2e/apt/internal/AbstractAptConfiguratorDelegate.java#L191-L225
-	private void configureAnnotationProcessors(IJavaProject javaProject, List<String> options, List<String> resolvedClasspath) throws CoreException {
+	private void configureAnnotationProcessors(IJavaProject javaProject, List<String> options,
+			List<String> resolvedClasspath) throws CoreException {
 
 		List<File> jars = resolvedClasspath.stream().map(File::new)
-			  				.filter(AnnotationProcessorUtils::isJar)
-			  				.collect(Collectors.toList());
+				.filter(AnnotationProcessorUtils::isJar)
+				.collect(Collectors.toList());
 
 		if (!AnnotationProcessorUtils.containsAptProcessors(jars)) {
-			if (AptConfig.isEnabled(javaProject) && ProjectUtils.isJBangProjectOnly(javaProject.getProject()) ) {
+			if (AptConfig.isEnabled(javaProject) && ProjectUtils.isJBangProjectOnly(javaProject.getProject())) {
 				AptConfig.setEnabled(javaProject, false);
 			}
 			return;
 		}
 
 		List<File> resolvedJarArtifactsInReverseOrder = new ArrayList<>(jars);
-	    Collections.reverse(resolvedJarArtifactsInReverseOrder);
-	    IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
+		Collections.reverse(resolvedJarArtifactsInReverseOrder);
+		IFactoryPath factoryPath = AptConfig.getDefaultFactoryPath(javaProject);
 
-	    //Disable Plugin factories, has they're unknown to JBang
-	    for(FactoryContainer fc : ((FactoryPath) factoryPath).getEnabledContainers().keySet()) {
-	      if(FactoryType.PLUGIN.equals(fc.getType())) {
-	        factoryPath.disablePlugin(fc.getId());
-	      }
-	    }
+		// Disable Plugin factories, has they're unknown to JBang
+		for (FactoryContainer fc : ((FactoryPath) factoryPath).getEnabledContainers().keySet()) {
+			if (FactoryType.PLUGIN.equals(fc.getType())) {
+				factoryPath.disablePlugin(fc.getId());
+			}
+		}
 
-	    //Reuse M2_REPO variable if it exists
-	    IPath m2RepoPath = JavaCore.getClasspathVariable(M2_REPO);
+		// Reuse M2_REPO variable if it exists
+		IPath m2RepoPath = JavaCore.getClasspathVariable(M2_REPO);
 
-	    for(File resolvedJarArtifact : resolvedJarArtifactsInReverseOrder) {
-	      IPath absolutePath = new Path(resolvedJarArtifact.getAbsolutePath());
-	      //reference jars in a portable way
-	      if(m2RepoPath != null && m2RepoPath.isPrefixOf(absolutePath)) {
-	        IPath relativePath = absolutePath.removeFirstSegments(m2RepoPath.segmentCount()).makeRelative().setDevice(null);
-	        IPath variablePath = new Path(M2_REPO).append(relativePath);
-	        factoryPath.addVarJar(variablePath);
-	      } else {
-	        //fall back on using absolute references.
-	        factoryPath.addExternalJar(resolvedJarArtifact);
-	      }
-	    }
+		for (File resolvedJarArtifact : resolvedJarArtifactsInReverseOrder) {
+			IPath absolutePath = new Path(resolvedJarArtifact.getAbsolutePath());
+			// reference jars in a portable way
+			if (m2RepoPath != null && m2RepoPath.isPrefixOf(absolutePath)) {
+				IPath relativePath = absolutePath.removeFirstSegments(m2RepoPath.segmentCount()).makeRelative().setDevice(null);
+				IPath variablePath = new Path(M2_REPO).append(relativePath);
+				factoryPath.addVarJar(variablePath);
+			} else {
+				// fall back on using absolute references.
+				factoryPath.addExternalJar(resolvedJarArtifact);
+			}
+		}
 
-	    Map<String, String> currentOptions = AptConfig.getRawProcessorOptions(javaProject);
-	    Map<String, String> newOptions = AnnotationProcessorUtils.parseProcessorOptions(options);
-	    if(!currentOptions.equals(newOptions)) {
-	      AptConfig.setProcessorOptions(newOptions, javaProject);
-	    }
+		Map<String, String> currentOptions = AptConfig.getRawProcessorOptions(javaProject);
+		Map<String, String> newOptions = AnnotationProcessorUtils.parseProcessorOptions(options);
+		if (!currentOptions.equals(newOptions)) {
+			AptConfig.setProcessorOptions(newOptions, javaProject);
+		}
 
-	    // Apply that IFactoryPath to the project
-	    AptConfig.setFactoryPath(javaProject, factoryPath);
+		// Apply that IFactoryPath to the project
+		AptConfig.setFactoryPath(javaProject, factoryPath);
 
 		AptConfig.setEnabled(javaProject, true);
 	}
@@ -305,7 +306,7 @@ public class ProjectConfigurationManager {
 			return null;
 		}
 		JBangProject jbp = new JBangProject(project);
-		//TODO use JBang runtime specific to this project
+		// TODO use JBang runtime specific to this project
 		JBangRuntime jbang = runtimeManager.getDefaultRuntime();
 		jbp.setRuntime(jbang);
 		return jbp;
@@ -334,14 +335,15 @@ public class ProjectConfigurationManager {
 		cache.remove(project);
 	}
 
-	public JBangProject createJBangProject(java.nio.file.Path script, JBangProjectConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+	public JBangProject createJBangProject(java.nio.file.Path script, JBangProjectConfiguration configuration,
+			IProgressMonitor monitor) throws CoreException {
 
 		var jbang = runtimeManager.getDefaultRuntime();
 		var execution = new JBangInfoExecution(jbang, script.toFile(), null);
 		var info = execution.getInfo(monitor);
 
 		String fileName = script.getFileName().toString();
-		String name = fileName; //fileName.substring(0, fileName.lastIndexOf("."));
+		String name = fileName; // fileName.substring(0, fileName.lastIndexOf("."));
 		if (JBangFileUtils.isJBangBuildFile(script) || JBangFileUtils.isMainFile(script)) {
 			name = script.getParent().getFileName().toString();
 		}
@@ -366,8 +368,10 @@ public class ProjectConfigurationManager {
 		if (!source.exists()) {
 			ResourceUtil.createFolder(source, monitor);
 		}
-		if (configuration.getLinkedSourceFolder() != null) {
-			source.createLink(configuration.getLinkedSourceFolder(), IResource.REPLACE, monitor);
+
+		var sourceDir = configuration.getLinkedSourceFolder();
+		if (sourceDir != null) {
+			source.createLink(sourceDir, IResource.REPLACE, monitor);
 		}
 
 		IFolder bin = project.getFolder(".jbang/bin");
@@ -377,7 +381,7 @@ public class ProjectConfigurationManager {
 		IPackageFragmentRoot root = javaProject.getPackageFragmentRoot(source);
 
 		IClasspathAttribute jbangScopeAttr = JavaCore.newClasspathAttribute("jbang.scope", "main");
-		IClasspathEntry srcClasspath = JavaCore.newSourceEntry(root.getPath(), null, null, null, new IClasspathAttribute[] {jbangScopeAttr} );
+		IClasspathEntry srcClasspath = JavaCore.newSourceEntry(root.getPath(), null, null, null, new IClasspathAttribute[] { jbangScopeAttr });
 		classpaths.add(srcClasspath);
 		javaProject.setRawClasspath(classpaths.toArray(new IClasspathEntry[0]), monitor);
 
@@ -385,15 +389,13 @@ public class ProjectConfigurationManager {
 
 		IFile mainFile = null;
 
-
-		if (configuration.getLinkedSourceFolder() == null) {
+		if (configuration.getLinkedSourceFolder() == null && sourceDir == null) {
 
 			if (JBangFileUtils.isJBangBuildFile(script)) {
 				mainFile = link(script.toAbsolutePath().toString(), project, configuration, monitor);
 			} else {
 				mainFile = link(info.getBackingResource(), project, configuration, monitor);
 			}
-
 
 			if (info.getSources() != null && !info.getSources().isEmpty()) {
 				for (JBangFile s : info.getSources()) {
@@ -414,15 +416,15 @@ public class ProjectConfigurationManager {
 			var scriptUri = script.toAbsolutePath().toUri();
 			IFile[] mainCandidates = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(scriptUri);
 			if (mainCandidates.length == 0) {
-				//FIXME Move that fugly hack to some other utility class
-				//FFS Eclipse on case-insensitive Macs!
+				// FIXME Move that fugly hack to some other utility class
+				// FFS Eclipse on case-insensitive Macs!
 				var sUri = scriptUri.toString();
 				if (sUri.startsWith("file:///Users/")) {
 					try {
 						scriptUri = new URI(sUri.replaceFirst("file:///Users", "file:/USERS"));
 						mainCandidates = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(scriptUri);
 					} catch (URISyntaxException nooope) {
-						//can't happen
+						// can't happen
 					}
 				}
 			}
@@ -434,7 +436,7 @@ public class ProjectConfigurationManager {
 				}
 			}
 			if (mainFile == null) {
-				throw newException("Couldn't file main script O_o" );
+				throw newException("Couldn't file main script O_o");
 			}
 		}
 
@@ -446,13 +448,15 @@ public class ProjectConfigurationManager {
 		return jbp;
 	}
 
-	private IFile link(String resource, IProject project,  JBangProjectConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+	private IFile link(String resource, IProject project, JBangProjectConfiguration configuration,
+			IProgressMonitor monitor) throws CoreException {
 		java.nio.file.Path p = Paths.get(resource);
 		String fileName = p.getFileName().toString();
 		return link(resource, fileName, project, configuration, monitor);
 	}
 
-	private IFile link(String resource, String link, IProject project, JBangProjectConfiguration configuration, IProgressMonitor monitor) throws CoreException {
+	private IFile link(String resource, String link, IProject project, JBangProjectConfiguration configuration,
+			IProgressMonitor monitor) throws CoreException {
 		IPath filePath = new Path(configuration.getSourceFolder()).append(link);
 		IFile fakeFile = project.getFile(filePath);
 		if (fakeFile.exists()) {
@@ -466,10 +470,11 @@ public class ProjectConfigurationManager {
 	}
 
 	public void synchronize(IFile file, IProgressMonitor monitor) throws CoreException {
-		//System.err.println(file + " configuration changed, checking jbang info");
+		// System.err.println(file + " configuration changed, checking jbang info");
 		IProject project = file.getProject();
 		JBangProject jbp = getJBangProject(project, monitor);
-		if ((jbp == null) || (isJavaProject(project) && JBangClasspathUtils.isOnOutputLocation(JavaCore.create(project), file))) {
+		if (jbp == null
+				|| isJavaProject(project) && JBangClasspathUtils.isOnOutputLocation(JavaCore.create(project), file)) {
 			return;
 		}
 		monitor.setTaskName("Updating JBang configuration from " + file.getName());
@@ -513,8 +518,8 @@ public class ProjectConfigurationManager {
 		marker.setAttribute(IMarker.MESSAGE, e.getMessage());
 		marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 		marker.setAttribute(IMarker.TRANSIENT, true);
-		if (e instanceof JBangDependencyError) {
-			String dependency = ((JBangDependencyError) e).getDependency();
+		if (e instanceof JBangDependencyError dependencyError) {
+			String dependency = dependencyError.getDependency();
 			TextPosition pos = findPosition(dependency, source);
 			marker.setAttribute(IMarker.LINE_NUMBER, pos.line);
 			if (pos.start > 0) {
@@ -537,8 +542,9 @@ public class ProjectConfigurationManager {
 		TextPosition pos = new TextPosition();
 		int line[] = new int[1];
 		int lineOffset[] = new int[1];
-		//FIXME only apply to //DEPS or @Grab lines
-		//FIXME also match @Grab annotations using the verbose @Grab(group = "ch.qos.reload4j", module = "reload4j", version = "1.2.19") notation
+		// FIXME only apply to //DEPS or @Grab lines
+		// FIXME also match @Grab annotations using the verbose @Grab(group =
+		// "ch.qos.reload4j", module = "reload4j", version = "1.2.19") notation
 		source.lines().filter(l -> {
 			line[0]++;
 			int i = l.indexOf(dependency);

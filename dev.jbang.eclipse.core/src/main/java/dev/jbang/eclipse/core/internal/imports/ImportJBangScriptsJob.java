@@ -5,10 +5,12 @@ import java.nio.file.Path;
 import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 
 import dev.jbang.eclipse.core.JBangCorePlugin;
+import dev.jbang.eclipse.core.internal.JBangClasspathUtils;
 import dev.jbang.eclipse.core.internal.JBangFileUtils;
 import dev.jbang.eclipse.core.internal.project.JBangProjectConfiguration;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimesDiscoveryJob;
@@ -32,11 +34,19 @@ public class ImportJBangScriptsJob extends WorkspaceJob	 {
 		} catch (Exception e) {
 			//ignore
 		}
+		if (monitor == null) {
+			monitor = new NullProgressMonitor();
+		}
 		var projectManager = JBangCorePlugin.getJBangManager().getProjectConfigurationManager();
-		var configuration = new JBangProjectConfiguration();
 		for (Path script : scripts) {
+			//XXX handle monitor
 			try {
 				if (JBangFileUtils.isJBangFile(script) || JBangFileUtils.isJBangBuildFile(script)) {
+					var configuration = new JBangProjectConfiguration();
+					var sourceFolder = JBangClasspathUtils.inferSourceDirectory(script, monitor);
+					if (sourceFolder != null) {
+							configuration.setLinkedSourceFolder(sourceFolder);
+					}
 					projectManager.createJBangProject(script, configuration, monitor);
 				}
 			} catch (Exception e) {

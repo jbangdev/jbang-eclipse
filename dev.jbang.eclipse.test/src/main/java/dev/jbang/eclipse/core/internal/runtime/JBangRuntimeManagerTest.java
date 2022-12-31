@@ -16,7 +16,7 @@ public class JBangRuntimeManagerTest {
 	private JBangRuntimeManager jBangRuntimeManager;
 
 	@BeforeEach
-	private void setUp() throws IOException {
+	public void setUp() throws IOException {
 		jBangRuntimeManager = AbstractJBangTest.setupJBang();
 	}
 

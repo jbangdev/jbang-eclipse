@@ -10,6 +10,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.util.List;
 
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
 import org.junit.jupiter.api.Assertions;
@@ -29,7 +30,13 @@ public abstract class AbstractJBangTest {
 
 	@BeforeEach
 	public void cleanUp() throws Exception {
+		deleteWorkDir();
 		cleanWorkspace();
+	}
+	
+	private static void deleteWorkDir() throws IOException {
+		 var workDir = Paths.get("target", "workdir");
+		 FileUtils.deleteDirectory(workDir.toFile());
 	}
 
 	public static JBangRuntimeManager setupJBang() throws IOException {

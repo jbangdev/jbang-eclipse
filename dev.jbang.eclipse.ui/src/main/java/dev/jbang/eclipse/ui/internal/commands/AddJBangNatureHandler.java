@@ -28,30 +28,30 @@ public class AddJBangNatureHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-        ISelection selection = HandlerUtil.getCurrentSelection(event);
-				if (selection instanceof StructuredSelection structuredSelection) {
-					List<?> elements = structuredSelection.toList();
-            Set<IProject> projects = collectProjects(elements);
-            if (projects.isEmpty()) {
-            	return null;
-            }
-            new ConfigJob(projects).schedule();
-        }
+		ISelection selection = HandlerUtil.getCurrentSelection(event);
+		if (selection instanceof StructuredSelection structuredSelection) {
+			List<?> elements = structuredSelection.toList();
+			Set<IProject> projects = collectProjects(elements);
+			if (projects.isEmpty()) {
+				return null;
+			}
+			new ConfigJob(projects).schedule();
+		}
 		return null;
 	}
 
-    private Set<IProject> collectProjects(List<?> elements) {
-        Set<IProject> projects = new LinkedHashSet<>();
-        for (Object element : elements) {
-            IProject project = Adapters.adapt(element, IProject.class);
-            if (project != null && !isJBangProject(project) && project.getLocation() != null) {
-                projects.add(project);
-            }
-        }
-        return projects;
-    }
+	private Set<IProject> collectProjects(List<?> elements) {
+		Set<IProject> projects = new LinkedHashSet<>();
+		for (Object element : elements) {
+			IProject project = Adapters.adapt(element, IProject.class);
+			if (project != null && !isJBangProject(project) && project.getLocation() != null) {
+				projects.add(project);
+			}
+		}
+		return projects;
+	}
 
-    private static class ConfigJob extends Job {
+	private static class ConfigJob extends Job {
 
 		private Collection<IProject> projects;
 
@@ -62,10 +62,10 @@ public class AddJBangNatureHandler extends AbstractHandler {
 
 		@Override
 		protected IStatus run(IProgressMonitor monitor) {
-            for (IProject project : projects) {
-            	if (monitor.isCanceled()) {
-            		return Status.CANCEL_STATUS;
-            	}
+			for (IProject project : projects) {
+				if (monitor.isCanceled()) {
+					return Status.CANCEL_STATUS;
+				}
 				try {
 					addJBangNature(project, monitor);
 				} catch (CoreException e) {
@@ -75,5 +75,5 @@ public class AddJBangNatureHandler extends AbstractHandler {
 			return Status.OK_STATUS;
 		}
 
-    }
+	}
 }

@@ -15,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import dev.jbang.eclipse.core.internal.project.JBangProject;
+import dev.jbang.eclipse.core.internal.utils.ImportScriptUtils;
 
 public class JBangBuilderTest extends AbstractJBangTest {
 
@@ -22,7 +23,7 @@ public class JBangBuilderTest extends AbstractJBangTest {
 
 	@BeforeEach
 	public void importScript() throws Exception {
-		jbp = importJBangScript("hello.java");
+		jbp = ImportScriptUtils.importJBangScript("hello.java");
 		assertNotNull(jbp);
 		assertEquals("hello.java", jbp.getProject().getName());
 		waitForJobsToComplete();

@@ -89,6 +89,20 @@ public class ImportScriptTest extends AbstractJBangTest {
 		var bar = project.getFile("src/bar.java");
 		assertTrue(bar.exists(), bar.getName() + " doesn't exist");
 	}
+	
+	@Test
+	public void importNestedScript() throws Exception {
+		var jbp = importJBangScript("nested/src/main/jbang/foo/bar/hello.java");
+		assertNotNull(jbp);
+		assertEquals("hello.java", jbp.getProject().getName());
+		waitForJobsToComplete();
+		IProject project = jbp.getProject();
+		assertNoErrors(project);
+		var foo = jbp.getMainSourceFile();
+		System.err.println(foo);
+		assertTrue(jbp.getProject().getFile("src/foo/bar/hello.java").exists(), foo + "not found");
+
+	}
 
 	@Test
 	public void importWithSpaces() throws Exception {
