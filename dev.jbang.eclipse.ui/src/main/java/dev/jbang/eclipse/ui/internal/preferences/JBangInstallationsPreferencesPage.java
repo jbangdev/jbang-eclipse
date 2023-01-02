@@ -64,7 +64,7 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 	@Override
 	protected void performDefaults() {
 		runtimeManager.reset();
-		defaultRuntime = runtimeManager.getRuntime(JBangRuntime.SYSTEM).getName();
+		defaultRuntime = JBangRuntime.SYSTEM.getName();
 		runtimes = runtimeManager.getJBangRuntimes(false);
 
 		runtimesViewer.setInput(runtimes);
@@ -109,7 +109,7 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 			if (defaultRuntime.equals(runtime.getName())) {
 				return runtime;
 			}
-			if (JBangRuntime.SYSTEM.equals(runtime.getName())) {
+			if (JBangRuntime.SYSTEM.equals(runtime)) {
 				systemRuntime = runtime;
 			}
 		}
@@ -166,7 +166,7 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 		table.setHeaderVisible(true);
 		GridData gd_table = new GridData(SWT.FILL, SWT.FILL, true, true, 2, 3);
 		gd_table.heightHint = 151;
-		gd_table.widthHint = 333;
+		gd_table.widthHint = 500;
 		table.setLayoutData(gd_table);
 
 		TableColumn tblclmnName = new TableColumn(table, SWT.NONE);
@@ -176,6 +176,10 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 		TableColumn tblclmnDetails = new TableColumn(table, SWT.NONE);
 		tblclmnDetails.setWidth(100);
 		tblclmnDetails.setText("Details");
+		
+        TableColumn tblclmnVersion = new TableColumn(table, SWT.NONE);
+        tblclmnVersion.setWidth(15);
+        tblclmnVersion.setText("Version");
 
 		Button addButton = new Button(composite, SWT.NONE);
 		addButton.setLayoutData(new GridData(SWT.FILL, SWT.TOP, false, false));
@@ -272,6 +276,8 @@ public class JBangInstallationsPreferencesPage extends PreferencePage implements
 				}
 				sb.append(runtime.toString());
 				return sb.toString();
+            case 2:
+                return runtime.getVersion();
 			}
 			return null;
 		}

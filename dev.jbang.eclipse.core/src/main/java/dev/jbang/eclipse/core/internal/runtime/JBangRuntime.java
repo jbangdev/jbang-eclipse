@@ -9,11 +9,32 @@ import java.util.Objects;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 
 public class JBangRuntime {
 
-	public static final String SYSTEM = "System";
+	private static final Path JBANG = new Path("jbang");
+
+    public static final JBangRuntime SYSTEM = new JBangRuntime() {
+        @Override
+        public IPath getExecutable() {
+            return JBANG;
+        }
+
+        @Override
+        public boolean isValid() {
+            if (version == null) {
+                detectVersion(new NullProgressMonitor());
+                if (version == null) {
+                    version = "";
+                }
+            }
+            return !version.isBlank();
+        }
+    };
+    
+    public static final String SYSTEM_NAME = "System";
 
 	private static final IPath EXECUTABLE;
 
@@ -21,17 +42,17 @@ public class JBangRuntime {
 		if (System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).contains("windows")) {
 			EXECUTABLE = new Path("jbang.cmd");
 		} else {
-			EXECUTABLE = new Path("jbang");
+			EXECUTABLE = JBANG;
 		}
 	}
 
 	private IPath location;
-	private String version;
+	String version;
 
 	private String name;
 
 	public JBangRuntime() {
-		name = SYSTEM;
+		name = SYSTEM_NAME;
 	}
 
 	public JBangRuntime(String name, String path) {
@@ -77,18 +98,20 @@ public class JBangRuntime {
 	}
 
 	public String detectVersion(IProgressMonitor monitor) {
-		var versionFile = java.nio.file.Path.of(location.toOSString(), "version.txt");
-		//Since JBang 0.83.0
-		if (Files.exists(versionFile)) {
-			try {
-				var v = Files.readString(versionFile);
-				if (v != null) {
-					version = v;
-					return version;
+		if (location != null) {
+			var versionFile = java.nio.file.Path.of(location.toOSString(), "version.txt");
+			//Since JBang 0.83.0
+			if (Files.exists(versionFile)) {
+				try {
+					var v = Files.readString(versionFile);
+					if (v != null) {
+						version = v;
+						return version;
+					}
+				} catch (IOException O_o) {
+					//ignore
 				}
-			} catch (IOException O_o) {
-				//ignore
-			}
+			}			
 		}
 		// Can't read version.txt for some reason (likely older than 0.83.0)
 		try {
@@ -102,17 +125,24 @@ public class JBangRuntime {
 				}
 			}
 
-			processBuilder.redirectErrorStream(true);
+			processBuilder.redirectErrorStream(false);
 			Process process = processBuilder.start();
 			try (BufferedReader processOutputReader = new BufferedReader(
 					new InputStreamReader(process.getInputStream()));) {
 				String v = processOutputReader.readLine();
 				process.waitFor();
-				if (!v.toLowerCase().contains("error")) {
+				if (v != null && !v.toLowerCase().contains("error")) {
 					version = v;
 				}
-
 			}
+            try (BufferedReader processOutputReader = new BufferedReader(
+                    new InputStreamReader(process.getErrorStream()));) {
+                String s;
+                while ((s = processOutputReader.readLine()) != null) {
+                    System.err.println(s);
+                }
+
+            }
 		} catch (IOException | InterruptedException e) {
 			System.err.println(e.getMessage());
 		}
@@ -128,7 +158,7 @@ public class JBangRuntime {
 	}
 
 	public boolean isEditable() {
-		return !SYSTEM.equals(this.name);
+		return !this.equals(SYSTEM);
 	}
 
 

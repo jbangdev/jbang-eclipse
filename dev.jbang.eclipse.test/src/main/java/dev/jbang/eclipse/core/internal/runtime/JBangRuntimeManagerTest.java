@@ -32,7 +32,7 @@ public class JBangRuntimeManagerTest {
 		jBangRuntimeManager.reset();
 		var systemRuntime = jBangRuntimeManager.getDefaultRuntime();
 		assertNotNull(systemRuntime, "System runtime is null");
-		assertEquals(JBangRuntime.SYSTEM, systemRuntime.getName());
+		assertEquals(JBangRuntime.SYSTEM, systemRuntime);
 		var runtimes = jBangRuntimeManager.getRuntimes();
 		assertEquals(1, runtimes.size(), "runtimes were not reset");
 		assertEquals(systemRuntime, runtimes.values().iterator().next());
@@ -46,9 +46,10 @@ public class JBangRuntimeManagerTest {
 		var runtimes = jBangRuntimeManager.getJBangRuntimes(false);
 		assertEquals(3, runtimes.size(), "Found "+runtimes);
 
+		int expectedRuntimes = JBangRuntime.SYSTEM.isValid()? 2:1;
 		runtimes = jBangRuntimeManager.getJBangRuntimes(true);
-		assertEquals(1, runtimes.size());
-		assertEquals("tests", runtimes.get(0).getName());
+		assertEquals(expectedRuntimes, runtimes.size(), "Unexpected JBang runtimes. Found:\n"+runtimes.toString());
+		assertEquals("tests", runtimes.get(runtimes.size()-1).getName());
 	}
 
 	@Test
@@ -59,7 +60,7 @@ public class JBangRuntimeManagerTest {
 
 		assertEquals(runtime1, jBangRuntimeManager.getRuntime(runtime1.getName()));
 		assertEquals(runtime2, jBangRuntimeManager.getRuntime(runtime2.getName()));
-		assertEquals(JBangRuntime.SYSTEM, jBangRuntimeManager.getRuntime("nope").getName());
+		assertEquals(JBangRuntime.SYSTEM, jBangRuntimeManager.getRuntime("nope"));
 	}
 
 }
