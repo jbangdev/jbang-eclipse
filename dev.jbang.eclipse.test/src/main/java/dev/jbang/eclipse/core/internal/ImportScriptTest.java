@@ -9,9 +9,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.Map;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.jdt.apt.core.util.AptConfig;
+import org.eclipse.jdt.core.JavaCore;
 import org.junit.jupiter.api.Test;
 
 import dev.jbang.eclipse.core.internal.utils.WorkspaceHelpers;
@@ -101,7 +105,6 @@ public class ImportScriptTest extends AbstractJBangTest {
 		var foo = jbp.getMainSourceFile();
 		System.err.println(foo);
 		assertTrue(jbp.getProject().getFile("src/foo/bar/hello.java").exists(), foo + "not found");
-
 	}
 
 	@Test
@@ -114,5 +117,23 @@ public class ImportScriptTest extends AbstractJBangTest {
 		assertNoErrors(project);
 		var main = jbp.getMainSourceFile();
 		assertEquals("hello.java", main.getName());
+	}
+	
+	@Test
+	public void importAnnotationProcessedScript() throws Exception {
+		var jbp = importJBangScript("mapstruct.java");
+		assertNotNull(jbp);
+		assertEquals("mapstruct.java", jbp.getProject().getName());
+		waitForJobsToComplete();
+		IProject project = jbp.getProject();
+		assertNoErrors(project);
+		
+		var script = jbp.getMainSourceFile();
+		assertEquals("mapstruct.java", script.getName());
+
+		var javaProject = JavaCore.create(project);
+		assertTrue(AptConfig.isEnabled(javaProject));
+		Map<String, String> options = AptConfig.getRawProcessorOptions(javaProject);
+		assertEquals("true", options.get("mapstruct.verbose"));
 	}
 }
