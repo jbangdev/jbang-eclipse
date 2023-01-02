@@ -517,7 +517,7 @@ public class ProjectConfigurationManager {
 		IMarker marker = file.createMarker(JBangConstants.MARKER_RESOLUTION_ID);
 		marker.setAttribute(IMarker.MESSAGE, e.getMessage());
 		marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-		marker.setAttribute(IMarker.TRANSIENT, true);
+		marker.setAttribute(IMarker.TRANSIENT, false);
 		if (e instanceof JBangDependencyError dependencyError) {
 			String dependency = dependencyError.getDependency();
 			TextPosition pos = findPosition(dependency, source);
