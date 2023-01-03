@@ -59,7 +59,6 @@ public class JBangInfoExecution {
 				}
 				env.put("PATH", envPath.append(File.pathSeparator).append(javaHome).append("bin").toString());
 			}
-
 			processBuilder.redirectErrorStream(true);
 			Process process = processBuilder.start();
 			StringBuilder processOutput = new StringBuilder();
@@ -74,7 +73,7 @@ public class JBangInfoExecution {
 					System.err.println(readLine);
 					if (readLine.contains("[ERROR]") || readLine.contains(" not ")) { //from stderr
 						resolutionErrors.addAll(sanitizeError(readLine));
-					} else if (!readLine.startsWith("[jbang]") && !readLine.startsWith("Done" )) {
+					} else if (!readLine.startsWith("[jbang]") && !readLine.startsWith("Done" )  && !readLine.startsWith("Picked up" ) ) {
 						processOutput.append(readLine + System.lineSeparator());
 					}
 				}
