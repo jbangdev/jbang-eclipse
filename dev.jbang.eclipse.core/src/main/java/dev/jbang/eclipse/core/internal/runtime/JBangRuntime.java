@@ -131,7 +131,7 @@ public class JBangRuntime {
 					new InputStreamReader(process.getInputStream()));) {
 				String v = processOutputReader.readLine();
 				process.waitFor();
-				if (v != null && !v.toLowerCase().contains("error")) {
+				if (v != null && !v.toLowerCase().contains("error") && !v.startsWith("Picked up")) {
 					version = v;
 				}
 			}
