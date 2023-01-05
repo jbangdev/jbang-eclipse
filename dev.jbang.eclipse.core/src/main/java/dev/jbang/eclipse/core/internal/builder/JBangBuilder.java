@@ -100,7 +100,9 @@ public class JBangBuilder extends IncrementalProjectBuilder {
 			if (Objects.equals(oldConfigHash, newConfigHash)) {
 				continue;
 			}
-			configCache.put(file, newConfigHash);
+			if (newConfigHash != null) {
+				configCache.put(file, newConfigHash);
+			}
 			configManager.synchronize(file, monitor);
 			executedJBang = true;
 		}
