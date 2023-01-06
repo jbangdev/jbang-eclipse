@@ -149,16 +149,18 @@ public class JBangFileDetector {
 		if (scripts.isEmpty() && mains.isEmpty() && builds.isEmpty() && triggerFile != null
 				&& triggerFile.startsWith(rootDir)) {
 			var relPath = triggerFile.relativize(rootDir).getParent();
-			int depth = relPath.getNameCount();
-			Path currentDir = triggerFile.getParent();
-			while (currentDir != null && depth > maxDepth) {
-				try {
-					Files.list(currentDir).forEach(this::analyzeFile);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				currentDir = currentDir.getParent();
-				depth--;
+			if (relPath != null) {
+				int depth = relPath.getNameCount();
+				Path currentDir = triggerFile.getParent();
+				while (currentDir != null && depth > maxDepth) {
+					try {
+						Files.list(currentDir).forEach(this::analyzeFile);
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+					currentDir = currentDir.getParent();
+					depth--;
+				}				
 			}
 		}
 		
