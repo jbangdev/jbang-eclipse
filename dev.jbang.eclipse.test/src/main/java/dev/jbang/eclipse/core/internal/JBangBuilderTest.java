@@ -71,6 +71,30 @@ public class JBangBuilderTest extends AbstractJBangTest {
 		waitForJobsToComplete();
 		assertErrorMarker(JBangConstants.MARKER_RESOLUTION_ID, "Invalid JAVA version, should be a number optionally followed by a plus sign", 3, "src/hello.java", project);
 	}
+	
+	@Test
+	public void invalidSource() throws Exception {
+		IProject project = jbp.getProject();
+		IFile script = jbp.getMainSourceFile();
+		String content = ResourceUtil.getContent(script);
+		String sources = "//SOURCES missing.java\n";
+		ResourceUtil.setContent(script, content.replace("//JAVA 11", "//JAVA 11\n"+sources));
+
+		waitForJobsToComplete();
+		assertErrorMarker(JBangConstants.MARKER_RESOLUTION_ID, "Could not find missing.java", 4, "src/hello.java", project);
+	}
+	
+	@Test
+	public void invalidFile() throws Exception {
+		IProject project = jbp.getProject();
+		IFile script = jbp.getMainSourceFile();
+		String content = ResourceUtil.getContent(script);
+		String files = "//FILES foo.java=missing.java\n";
+		ResourceUtil.setContent(script, content.replace("//JAVA 11", "//JAVA 11\n"+files));
+
+		waitForJobsToComplete();
+		assertErrorMarker(JBangConstants.MARKER_RESOLUTION_ID, "Could not find 'missing.java'", 4, "src/hello.java", project);
+	}
 
 	@Test
 	public void setReleaseLevel() throws Exception {

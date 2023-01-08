@@ -30,6 +30,8 @@ public class JBangInfoExecution {
 	private static final Pattern RESOLUTION_ERROR_3 = Pattern.compile(".* Could not find artifact (.*) in ");
 	private static final Pattern RESOLUTION_ERROR_4 = Pattern.compile(".*The following artifacts could not be resolved: (.*?): Could");
 	private static final Pattern JAVA_ERROR = Pattern.compile("\\[ERROR\\] (Invalid JAVA version.*)");
+	private static final Pattern UNRESOLVED_FILE = Pattern.compile("\\[ERROR\\] (Could not find '(.*?)' when resolving .*)"); //TODO extract filename declaring the missing file
+	private static final Pattern UNRESOLVED_SOURCE = Pattern.compile("\\[ERROR\\] (Could not find (.*))");
 
 
 	public JBangInfoExecution(JBangRuntime jbang, File file, String javaHome) {
@@ -82,7 +84,7 @@ public class JBangInfoExecution {
 			}
 			String output = processOutput.toString().trim();
 			if (resolutionErrors.isEmpty() && output.isBlank()) {
-				resolutionErrors.add(new JBangError("Failed to get JBang informations"));
+				resolutionErrors.add(new JBangError("Failed to get JBang informations", ErrorKind.UnknownError));
 			}
 			if (!output.isBlank() && !output.startsWith("{")) {
 				resolutionErrors.add(new JBangError(output));
@@ -109,8 +111,23 @@ public class JBangInfoExecution {
 		Matcher matcher = JAVA_ERROR.matcher(error);
 		if (matcher.find()) {
 			var message = matcher.group(1);
-			return Collections.singleton(new JBangJavaError(message));
+			return Collections.singleton(new JBangError(message, ErrorKind.JavaError));
 		}
+		
+		matcher = UNRESOLVED_FILE.matcher(error);
+		if (matcher.find()) {
+			var message = matcher.group(1);
+			var resource = matcher.group(2);
+			return Collections.singleton(new JBangMissingResource(message, resource, ErrorKind.UnresolvedFile));
+		}
+		
+		matcher = UNRESOLVED_SOURCE.matcher(error);
+		if (matcher.find()) {
+			var message = matcher.group(1);
+			var resource = matcher.group(2);
+			return Collections.singleton(new JBangMissingResource(message, resource, ErrorKind.UnresolvedSource));
+		}
+		
 		//The following artifacts could not be resolved: com.pulumi:gcp:jar:6.11.0, com.pulumi:kubernetes:jar:3.15.1:
 		//Could not find artifact com.pulumi:gcp:jar:6.11.0 in
 

@@ -58,7 +58,7 @@ import dev.jbang.eclipse.core.internal.process.JBangError;
 import dev.jbang.eclipse.core.internal.process.JBangInfoExecution;
 import dev.jbang.eclipse.core.internal.process.JBangInfoResult;
 import dev.jbang.eclipse.core.internal.process.JBangInfoResult.JBangFile;
-import dev.jbang.eclipse.core.internal.process.JBangJavaError;
+import dev.jbang.eclipse.core.internal.process.JBangMissingResource;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntime;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimeManager;
 import dev.jbang.eclipse.core.internal.vms.JBangManagedVMService;
@@ -492,6 +492,7 @@ public class ProjectConfigurationManager {
 				String source = getSource(file);
 				info.getResolutionErrors().forEach(e -> {
 					try {
+						//TODO set marker on source file actually causing the error
 						addErrorMarker(file, source, e);
 					} catch (CoreException e1) {
 						log(e1);
@@ -518,23 +519,35 @@ public class ProjectConfigurationManager {
 		marker.setAttribute(IMarker.MESSAGE, e.getMessage());
 		marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
 		marker.setAttribute(IMarker.TRANSIENT, true);
+		TextPosition pos = null;
 		if (e instanceof JBangDependencyError dependencyError) {
 			String dependency = dependencyError.getDependency();
-			TextPosition pos = findPosition(dependency, source);
-			marker.setAttribute(IMarker.LINE_NUMBER, pos.line);
-			if (pos.start > 0) {
-				marker.setAttribute(IMarker.CHAR_START, pos.start);
-				marker.setAttribute(IMarker.CHAR_END, pos.end);
-			}
-		} else if (e instanceof JBangJavaError) {
-			TextPosition pos = findJavaPosition(source);
-			marker.setAttribute(IMarker.LINE_NUMBER, pos.line);
-			if (pos.start > 0) {
-				marker.setAttribute(IMarker.CHAR_START, pos.start);
-				marker.setAttribute(IMarker.CHAR_END, pos.end);
-			}
+			pos = findPosition(dependency, source);
+		} else if (e instanceof JBangMissingResource missingResourceError) {
+			String missingResource = missingResourceError.getResource();
+			marker.setAttribute("JBANG_MISSING_RESOURCE", missingResource);
+			pos = switch(e.getKind()) {
+				case UnresolvedFile -> findMissingResourcePosition(source, "//FILES ", missingResource);				
+				case UnresolvedSource -> findMissingResourcePosition(source, "//SOURCES ", missingResource);
+				default -> null;
+			};
 		} else {
+			switch(e.getKind()) {
+				case JavaError -> {
+					pos = findJavaPosition(source);
+				}
+				default -> {
+				}
+			}
+		}
+		if (pos == null) {
 			marker.setAttribute(IMarker.LINE_NUMBER, 1);
+		} else {
+			marker.setAttribute(IMarker.LINE_NUMBER, pos.line);
+			if (pos.start > 0) {
+				marker.setAttribute(IMarker.CHAR_START, pos.start);
+				marker.setAttribute(IMarker.CHAR_END, pos.end);
+			}	
 		}
 	}
 
@@ -573,6 +586,25 @@ public class ProjectConfigurationManager {
 				pos.line = line[0];
 				pos.start = lineOffset[0] + i;
 				pos.end = lineOffset[0] + l.length();
+			}
+			lineOffset[0] += 1 + l.length();
+			return i > 0;
+		}).findFirst();
+		return pos;
+	}
+	
+	private TextPosition findMissingResourcePosition(String source, String prefix, String missingSource) {
+		TextPosition pos = new TextPosition();
+		int line[] = new int[1];
+		int lineOffset[] = new int[1];
+		source.lines().filter(l -> {
+			line[0]++;
+			int i = -1;
+			if (l.startsWith(prefix)) {
+				i = l.indexOf(missingSource);
+				pos.line = line[0];
+				pos.start = lineOffset[0] + i;
+				pos.end = pos.start + missingSource.length();
 			}
 			lineOffset[0] += 1 + l.length();
 			return i > 0;
