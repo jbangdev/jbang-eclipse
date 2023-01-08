@@ -28,9 +28,9 @@ public class JBangFileUtils {
 
 	public static final Pattern JAVA_INSTRUCTION = Pattern.compile("//JAVA (\\S*).*");
 
-	private static final Pattern SOURCES_INSTRUCTION = Pattern.compile("//SOURCES (\\S*).*");
+	public static final Pattern SOURCES_INSTRUCTION = Pattern.compile("//SOURCES (\\S*).*");
 
-	private static final Pattern FILES_INSTRUCTION = Pattern.compile("//FILES (\\S*).*");
+	public static final Pattern FILES_INSTRUCTION = Pattern.compile("//FILES (\\S*).*");
 
 	private static final int LINE_LIMIT = 300;
 

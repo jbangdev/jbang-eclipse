@@ -8,7 +8,7 @@ public class JBangDependencyError extends JBangError {
 
 
 	public JBangDependencyError(String dependency) {
-		super("Could not resolve dependency " + dependency);
+		super("Could not resolve dependency " + dependency, ErrorKind.UnresolvedDependency);
 		this.setDependency(dependency);
 	}
 
