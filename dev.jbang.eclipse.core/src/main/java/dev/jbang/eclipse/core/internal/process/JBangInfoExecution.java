@@ -49,7 +49,6 @@ public class JBangInfoExecution {
 			ProcessBuilder processBuilder = new ProcessBuilder(jbang.getExecutable().toOSString(), "--quiet", "info", "tools", file);
 			var env = processBuilder.environment();
 			env.put("NO_COLOR", "true");
-			env.put("JBANG_DOWNLOAD_SOURCES", "true");
 			var processJavaHome = env.get("JAVA_HOME");
 			if (processJavaHome == null || processJavaHome.isBlank()) {
 				if (javaHome == null || javaHome.isBlank()) {
@@ -76,7 +75,7 @@ public class JBangInfoExecution {
 					System.err.println(readLine);
 					if (readLine.contains("[ERROR]") || readLine.contains(" not ")) { //from stderr
 						resolutionErrors.addAll(sanitizeError(readLine));
-					} else if (!readLine.startsWith("[jbang]") && !readLine.startsWith("Done" )  && !readLine.startsWith("Picked up" ) ) {
+					} else if (!readLine.startsWith("[jbang]") && !readLine.startsWith("Done" )  && !readLine.startsWith("Picked up" ) && !readLine.startsWith("JAVA_HOME") ) {
 						processOutput.append(readLine + System.lineSeparator());
 					}
 				}
