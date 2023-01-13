@@ -49,6 +49,7 @@ public class JBangInfoExecution {
 			ProcessBuilder processBuilder = new ProcessBuilder(jbang.getExecutable().toOSString(), "--quiet", "info", "tools", file);
 			var env = processBuilder.environment();
 			env.put("NO_COLOR", "true");
+			env.put("JBANG_DOWNLOAD_SOURCES", "true");
 			var processJavaHome = env.get("JAVA_HOME");
 			if (processJavaHome == null || processJavaHome.isBlank()) {
 				if (javaHome == null || javaHome.isBlank()) {
