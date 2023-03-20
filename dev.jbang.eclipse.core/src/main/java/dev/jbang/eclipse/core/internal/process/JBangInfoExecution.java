@@ -30,6 +30,7 @@ public class JBangInfoExecution {
 	private static final Pattern RESOLUTION_ERROR_3 = Pattern.compile(".* Could not find artifact (.*) in ");
 	private static final Pattern RESOLUTION_ERROR_4 = Pattern.compile(".*The following artifacts could not be resolved: (.*?): Could");
 	private static final Pattern JAVA_ERROR = Pattern.compile("\\[ERROR\\] (Invalid JAVA version.*)");
+	private static final Pattern MODULE_ERROR= Pattern.compile("\\[ERROR\\] (//MODULE .*)");
 	private static final Pattern UNRESOLVED_FILE = Pattern.compile("\\[ERROR\\] (Could not find '(.*?)' when resolving .*)"); //TODO extract filename declaring the missing file
 	private static final Pattern UNRESOLVED_SOURCE = Pattern.compile("\\[ERROR\\] (Could not find (.*))");
 
@@ -113,6 +114,12 @@ public class JBangInfoExecution {
 		if (matcher.find()) {
 			var message = matcher.group(1);
 			return Collections.singleton(new JBangError(message, ErrorKind.JavaError));
+		}
+		
+		matcher = MODULE_ERROR.matcher(error);
+		if (matcher.find()) {
+			var message = matcher.group(1);
+			return Collections.singleton(new JBangError(message, ErrorKind.ModuleError));
 		}
 		
 		matcher = UNRESOLVED_FILE.matcher(error);

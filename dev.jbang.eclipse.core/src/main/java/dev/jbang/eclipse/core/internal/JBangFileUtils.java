@@ -28,6 +28,8 @@ public class JBangFileUtils {
 
 	public static final Pattern JAVA_INSTRUCTION = Pattern.compile("//JAVA (\\S*).*");
 
+	public static final Pattern MODULE_INSTRUCTION = Pattern.compile("//MODULE (\\S*).*");
+
 	public static final Pattern SOURCES_INSTRUCTION = Pattern.compile("//SOURCES (\\S*).*");
 
 	public static final Pattern FILES_INSTRUCTION = Pattern.compile("//FILES (\\S*).*");
