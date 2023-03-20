@@ -536,6 +536,9 @@ public class ProjectConfigurationManager {
 				case JavaError -> {
 					pos = findJavaPosition(source);
 				}
+				case ModuleError -> {
+					pos = findModulePosition(source);
+				}
 				default -> {
 				}
 			}
@@ -583,6 +586,27 @@ public class ProjectConfigurationManager {
 			if (m.matches()) {
 				var badVersion = m.group(1);
 				i = l.indexOf(badVersion);
+				pos.line = line[0];
+				pos.start = lineOffset[0] + i;
+				pos.end = lineOffset[0] + l.length();
+			}
+			lineOffset[0] += 1 + l.length();
+			return i > 0;
+		}).findFirst();
+		return pos;
+	}
+	
+	private TextPosition findModulePosition(String source) {
+		TextPosition pos = new TextPosition();
+		int line[] = new int[1];
+		int lineOffset[] = new int[1];
+		source.lines().filter(l -> {
+			line[0]++;
+			var m = JBangFileUtils.MODULE_INSTRUCTION.matcher(l);
+			int i = -1;
+			if (m.matches()) {
+				var badModule = m.group(1);
+				i = l.indexOf(badModule);
 				pos.line = line[0];
 				pos.start = lineOffset[0] + i;
 				pos.end = lineOffset[0] + l.length();

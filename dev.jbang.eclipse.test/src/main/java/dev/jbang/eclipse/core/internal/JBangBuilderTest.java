@@ -2,7 +2,6 @@ package dev.jbang.eclipse.core.internal;
 
 import static dev.jbang.eclipse.core.internal.utils.ClasspathHelpers.assertGenerateParameters;
 import static dev.jbang.eclipse.core.internal.utils.ClasspathHelpers.assertJava;
-import static dev.jbang.eclipse.core.internal.utils.ImportScriptUtils.importJBangScript;
 import static dev.jbang.eclipse.core.internal.utils.JobHelpers.waitForJobsToComplete;
 import static dev.jbang.eclipse.core.internal.utils.WorkspaceHelpers.assertErrorMarker;
 import static dev.jbang.eclipse.core.internal.utils.WorkspaceHelpers.assertNoErrors;
@@ -124,5 +123,23 @@ public class JBangBuilderTest extends AbstractJBangTest {
 		waitForJobsToComplete();
 		assertNoErrors(project);
 		assertJava(project, "1.8");
+	}
+	
+	@Test
+	public void invalidModule() throws Exception {
+		IProject project = jbp.getProject();
+		assertGenerateParameters(project, false);
+
+		IFile script = jbp.getMainSourceFile();
+		String content = ResourceUtil.getContent(script);
+		String badModule = "//MODULE bad module\n";
+		ResourceUtil.setContent(script, content.replace("//JAVA 11", "//JAVA 11\n"+badModule));
+
+		waitForJobsToComplete();
+		assertErrorMarker(JBangConstants.MARKER_RESOLUTION_ID, "//MODULE line has wrong format, should be '//MODULE [identifier]'", 4, "src/hello.java", project);
+		
+		ResourceUtil.setContent(script, content.replace("bad module", "goodmodule"));
+		waitForJobsToComplete();
+		assertNoErrors(project);
 	}
 }
