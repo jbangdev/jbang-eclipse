@@ -35,7 +35,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Collections;
 import java.util.jar.JarInputStream;
 import java.util.stream.Collectors;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.file.PathUtils;
 import org.tukaani.xz.LZMA2Options;

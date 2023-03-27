@@ -19,6 +19,11 @@ import dev.jbang.eclipse.core.internal.ProjectUtils;
 public class JBangBuildSupport implements IBuildSupport {
 
 	@Override
+	public String buildToolName() {
+		return "JBang";
+	}
+	
+	@Override
 	public boolean applies(IProject project) {
 		return ProjectUtils.isJBangProject(project);
 	}
