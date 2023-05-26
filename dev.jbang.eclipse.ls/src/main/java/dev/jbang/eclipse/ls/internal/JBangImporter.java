@@ -43,7 +43,7 @@ public class JBangImporter extends AbstractProjectImporter {
 		Collection<IPath> triggerFiles = preferences.getTriggerFiles();
 
 		IPath rootPath = ResourceUtils.filePathFromURI(rootFolder.toPath().toUri().toString());
-		var triggerFile = triggerFiles.stream().filter(tf -> rootPath.isPrefixOf(tf)).findFirst().map(tf -> Path.of(tf.toOSString())).orElse(null);
+		var triggerFile = triggerFiles == null? null : triggerFiles.stream().filter(tf -> rootPath.isPrefixOf(tf)).findFirst().map(tf -> Path.of(tf.toOSString())).orElse(null);
 		
 		JBangFileDetector scanner = new JBangFileDetector(Paths.get(rootFolder.toURI()), javaImportExclusions, triggerFile);
 		scripts.addAll(scanner.scan(monitor));
