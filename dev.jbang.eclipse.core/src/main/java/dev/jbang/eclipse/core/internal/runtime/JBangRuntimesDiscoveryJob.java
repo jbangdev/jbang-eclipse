@@ -33,7 +33,7 @@ public class JBangRuntimesDiscoveryJob extends Job {
 		if (monitor.isCanceled()) {
 			return Status.CANCEL_STATUS;
 		}
-		var existingRuntimes = new ArrayList<>(runtimeManager.getJBangRuntimes(false).stream().filter(r -> !JBangRuntime.SYSTEM.equals(r.getName())).collect(Collectors.toList()));
+		var existingRuntimes = new ArrayList<>(runtimeManager.getJBangRuntimes(false).stream().filter(r -> !JBangRuntime.SYSTEM.equals(r)).collect(Collectors.toList()));
 
 		var newRuntimes = new ArrayList<JBangRuntime>(usualSuspects.size());
 
