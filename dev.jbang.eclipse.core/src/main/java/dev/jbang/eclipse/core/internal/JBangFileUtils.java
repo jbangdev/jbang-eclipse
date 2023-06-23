@@ -22,7 +22,7 @@ public class JBangFileUtils {
 
 	public static final Pattern GROOVY_GRAPES = Pattern.compile("^\\s*(@Grab|@Grapes).*", Pattern.DOTALL);
 
-	public static final Pattern JBANG_INSTRUCTIONS = Pattern.compile("^(//[A-Z_:]+ ).*$");
+	public static final Pattern JBANG_INSTRUCTIONS = Pattern.compile("^//([A-Z_:]+)(\\s+.*)?$");
 
 	private static final Pattern JBANG_HEADER = Pattern.compile("//.*jbang.*");
 
@@ -207,4 +207,5 @@ public class JBangFileUtils {
 	public static boolean isJBangInstruction(String line) {
 		return JBANG_HEADER.matcher(line).matches() || isConfigElement(line);
 	}
+
 }

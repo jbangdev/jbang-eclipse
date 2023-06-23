@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -98,11 +100,33 @@ public class JBangInfoExecution {
 
 			Gson gson = new GsonBuilder().create();
 			result = gson.fromJson(output, JBangInfoResult.class);
+			postProcessing(result);
 		} catch (IOException | InterruptedException e) {
 			resolutionErrors.add(new JBangError("Failed to execute JBang:" + e.getMessage()));
 		}
 		return result;
 	}
+
+	private void postProcessing(JBangInfoResult result) {
+		//Hacky way to check if preview feature flag needs to be enabled 
+		if (result.getCompileOptions() != null && !result.getCompileOptions().contains("--enable-preview")) {
+			boolean hasPreview = containsPrefixLine(result.getBackingResource(), "//PREVIEW");
+			if (hasPreview) {
+				result.getCompileOptions().add("--enable-preview");
+			}
+		}
+		
+	}
+	
+	public static boolean containsPrefixLine(String filePath, String prefix) {
+        try {
+            return Files.lines(Path.of(filePath))
+                    .anyMatch(line -> line.startsWith(prefix));
+        } catch (IOException e) {
+            // ignore
+        }
+        return false;
+    }
 
 	public static Set<JBangError> sanitizeError(String errorLine) {
 		// [jbang] Resolving eu.hansolo:tilesfx:1.3.4...[jbang] [ERROR] Could not
