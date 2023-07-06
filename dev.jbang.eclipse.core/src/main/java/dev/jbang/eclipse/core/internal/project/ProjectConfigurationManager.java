@@ -170,7 +170,10 @@ public class ProjectConfigurationManager {
 				Map<String, String> oldOptions = jp.getOptions(false);
 				Map<String, String> options = new HashMap<>(oldOptions);
 				if (ee != null) {
-					options.putAll(ee.getComplianceOptions());
+					var complianceOptions = ee.getComplianceOptions();
+					if (complianceOptions != null) {
+						options.putAll(complianceOptions);
+					}
 				}
 				// TODO support more JBANG_JAVAC_OPTIONS, JDK_JAVAC_OPTIONS, JAVAC_OPTIONS
 				String parameters = info.getCompileOptions() != null && info.getCompileOptions().contains("-parameters")
