@@ -134,9 +134,13 @@ public class ProjectConfigurationManager {
 			}
 			if (!hasJRE) {
 				ee = getExecutionEnvironment(environmentId);
+				if (ee == null) {
+					ee = getExecutionEnvironment("JAVASE-11");
+				}
 				newEntries.add(newJRE(ee));
 				changedJRE = true;
 			}
+			
 			// iterate over dependencies
 			List<IClasspathEntry> dependenciesList = new ArrayList<>();
 			for (String path : resolvedClasspath) {
@@ -291,13 +295,7 @@ public class ProjectConfigurationManager {
 			return null;
 		}
 		IExecutionEnvironmentsManager manager = JavaRuntime.getExecutionEnvironmentsManager();
-		IExecutionEnvironment[] environments = manager.getExecutionEnvironments();
-		for (IExecutionEnvironment environment : environments) {
-			if (environment.getId().equals(environmentId)) {
-				return environment;
-			}
-		}
-		return null;
+		return manager.getEnvironment(environmentId);
 	}
 
 	public JBangProject getJBangProject(IProject project, IProgressMonitor monitor) {
