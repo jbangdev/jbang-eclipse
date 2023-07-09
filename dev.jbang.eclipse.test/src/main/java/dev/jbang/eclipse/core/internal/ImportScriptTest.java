@@ -50,6 +50,42 @@ public class ImportScriptTest extends AbstractJBangTest {
 		assertEquals(2, jbangDepError.getAttribute(IMarker.LINE_NUMBER));
 		assertEquals("Could not resolve dependency com.github.lalyos:jfiglet:6.6.6", jbangDepError.getAttribute(IMarker.MESSAGE));
 	}
+	
+	@Test
+	public void importBrokenScriptUnresolvedLocalDep() throws Exception {
+		var jbp = importJBangScript("brokendeps2.java");
+		assertNotNull(jbp);
+		assertEquals("brokendeps2.java", jbp.getProject().getName());
+		waitForJobsToComplete();
+		var script = jbp.getMainSourceFile();
+		var markers = script.findMarkers(JBangConstants.MARKER_ID, true, 0);
+		assertEquals(1, markers.length, "Unexpected markers. Received:" + WorkspaceHelpers.toString(markers));
+		//Old JBang ( < 0.99.0 ) versions generate an extra marker
+		// IMarker jbangError = markers[0];
+		// assertEquals(1, jbangError.getAttribute(IMarker.LINE_NUMBER));
+		// assertEquals("[jbang] [ERROR] Could not resolve dependencies from mavencentral=https://repo1.maven.org/maven2/", jbangError.getAttribute(IMarker.MESSAGE));
+		IMarker jbangDepError = markers[0];
+		assertEquals(2, jbangDepError.getAttribute(IMarker.LINE_NUMBER));
+		assertEquals("Could not resolve dependency missing.jar", jbangDepError.getAttribute(IMarker.MESSAGE));
+	}
+	
+	@Test
+	public void importBrokenScriptUnresolvedRemoteDep() throws Exception {
+		var jbp = importJBangScript("brokendeps3.java");
+		assertNotNull(jbp);
+		assertEquals("brokendeps3.java", jbp.getProject().getName());
+		waitForJobsToComplete();
+		var script = jbp.getMainSourceFile();
+		var markers = script.findMarkers(JBangConstants.MARKER_ID, true, 0);
+		assertEquals(1, markers.length, "Unexpected markers. Received:" + WorkspaceHelpers.toString(markers));
+		//Old JBang ( < 0.99.0 ) versions generate an extra marker
+		// IMarker jbangError = markers[0];
+		// assertEquals(1, jbangError.getAttribute(IMarker.LINE_NUMBER));
+		// assertEquals("[jbang] [ERROR] Could not resolve dependencies from mavencentral=https://repo1.maven.org/maven2/", jbangError.getAttribute(IMarker.MESSAGE));
+		IMarker jbangDepError = markers[0];
+		assertEquals(2, jbangDepError.getAttribute(IMarker.LINE_NUMBER));
+		assertEquals("Could not resolve dependency https://foo.bar/missing.jar", jbangDepError.getAttribute(IMarker.MESSAGE));
+	}
 
 	@Test
 	public void importScriptWithDependency() throws Exception {

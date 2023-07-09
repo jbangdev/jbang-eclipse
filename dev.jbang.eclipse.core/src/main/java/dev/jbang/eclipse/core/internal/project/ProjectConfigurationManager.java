@@ -529,7 +529,17 @@ public class ProjectConfigurationManager {
 			marker.setAttribute("JBANG_MISSING_RESOURCE", missingResource);
 			pos = switch(e.getKind()) {
 				case UnresolvedFile -> findMissingResourcePosition(source, "//FILES ", missingResource);				
-				case UnresolvedSource -> findMissingResourcePosition(source, "//SOURCES ", missingResource);
+				case UnresolvedSource -> {
+					TextPosition sourcePos = findMissingResourcePosition(source, "//SOURCES ", missingResource);
+					if (sourcePos.start == 0) {
+						//Maybe unresolved source is actually an unresolved dependency
+						sourcePos = findMissingResourcePosition(source, "//DEPS ", missingResource);
+						if (sourcePos.start > 0) {
+							marker.setAttribute(IMarker.MESSAGE, "Could not resolve dependency "+missingResource);
+						}
+					}
+					yield sourcePos;
+				}
 				default -> null;
 			};
 		} else {
