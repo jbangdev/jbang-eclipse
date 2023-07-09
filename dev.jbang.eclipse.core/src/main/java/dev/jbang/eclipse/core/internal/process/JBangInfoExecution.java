@@ -31,6 +31,7 @@ public class JBangInfoExecution {
 	private static final Pattern RESOLUTION_ERROR_2 = Pattern.compile("\\[ERROR\\] Could not resolve dependency (.*)");
 	private static final Pattern RESOLUTION_ERROR_3 = Pattern.compile(".* Could not find artifact (.*) in ");
 	private static final Pattern RESOLUTION_ERROR_4 = Pattern.compile(".*The following artifacts could not be resolved: (.*?): Could");
+	private static final Pattern RESOLUTION_ERROR_5 = Pattern.compile("\\[ERROR\\] Could not download (.*)");
 	private static final Pattern JAVA_ERROR = Pattern.compile("\\[ERROR\\] (Invalid JAVA version.*)");
 	private static final Pattern MODULE_ERROR= Pattern.compile("\\[ERROR\\] (//MODULE .*)");
 	private static final Pattern UNRESOLVED_FILE = Pattern.compile("\\[ERROR\\] (Could not find '(.*?)' when resolving .*)"); //TODO extract filename declaring the missing file
@@ -155,15 +156,18 @@ public class JBangInfoExecution {
 		
 		matcher = UNRESOLVED_SOURCE.matcher(error);
 		if (matcher.find()) {
-			var message = matcher.group(1);
 			var resource = matcher.group(2);
+			var message = matcher.group(1);
 			return Collections.singleton(new JBangMissingResource(message, resource, ErrorKind.UnresolvedSource));
+		}
+		
+		matcher = RESOLUTION_ERROR_5.matcher(error); //DEPS https://bad.url (since JBang 0.109.0)
+		if (matcher.find()) {
+			return Collections.singleton(new JBangDependencyError(matcher.group(1)));
 		}
 		
 		//The following artifacts could not be resolved: com.pulumi:gcp:jar:6.11.0, com.pulumi:kubernetes:jar:3.15.1:
 		//Could not find artifact com.pulumi:gcp:jar:6.11.0 in
-
-
 		matcher = RESOLUTION_ERROR_4.matcher(error);
 		if (matcher.find()) {
 			var dependencies = matcher.group(1).split(", ");
