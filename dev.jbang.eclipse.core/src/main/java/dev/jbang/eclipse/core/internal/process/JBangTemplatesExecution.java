@@ -28,7 +28,7 @@ public class JBangTemplatesExecution {
 	public List<JBangTemplate> getTemplates(IProgressMonitor monitor) throws CoreException {
 		List<JBangTemplate> templates = new ArrayList<>();
 		try {
-			ProcessBuilder processBuilder = new ProcessBuilder(jbang.getExecutable().toOSString(), "template", "list");
+			ProcessBuilder processBuilder = jbang.createProcessBuilder("template", "list");
 			var env = processBuilder.environment();
 			env.put("NO_COLOR", "true");
 			var processJavaHome = env.get("JAVA_HOME");
