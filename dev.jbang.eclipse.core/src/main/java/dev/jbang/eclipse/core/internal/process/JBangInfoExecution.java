@@ -50,7 +50,7 @@ public class JBangInfoExecution {
 		result.setResolutionErrors(resolutionErrors);
 		result.setBackingResource(file);
 		try {
-			ProcessBuilder processBuilder = new ProcessBuilder(jbang.getExecutable().toOSString(), "--quiet", "info", "tools", file);
+			ProcessBuilder processBuilder = jbang.createProcessBuilder("--quiet", "info", "tools", file);
 			var env = processBuilder.environment();
 			env.put("NO_COLOR", "true");
 			env.put("JBANG_DOWNLOAD_SOURCES", "true");

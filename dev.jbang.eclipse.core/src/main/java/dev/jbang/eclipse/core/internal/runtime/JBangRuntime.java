@@ -4,6 +4,9 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -36,15 +39,9 @@ public class JBangRuntime {
     
     public static final String SYSTEM_NAME = "System";
 
-	private static final IPath EXECUTABLE;
-
-	static {
-		if (System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).contains("windows")) {
-			EXECUTABLE = new Path("jbang.cmd");
-		} else {
-			EXECUTABLE = JBANG;
-		}
-	}
+	private static final boolean IS_WINDOWS = System.getProperty("os.name", "").toLowerCase(Locale.ENGLISH).contains("windows");
+	
+	private static final IPath EXECUTABLE = IS_WINDOWS ? new Path("jbang.cmd") : JBANG ;
 
 	private IPath location;
 	String version;
@@ -115,7 +112,7 @@ public class JBangRuntime {
 		}
 		// Can't read version.txt for some reason (likely older than 0.83.0)
 		try {
-			ProcessBuilder processBuilder = new ProcessBuilder(getExecutable().toOSString(), "version");
+			ProcessBuilder processBuilder = createProcessBuilder("version");
 			var env = processBuilder.environment();
 			var processJavaHome = env.get("JAVA_HOME");
 			if (processJavaHome == null || processJavaHome.isBlank()) {
@@ -167,6 +164,17 @@ public class JBangRuntime {
 		return Objects.hash(location, name, version);
 	}
 
+	public ProcessBuilder createProcessBuilder(String...args) {
+		List<String> command = new ArrayList<>();
+		if (IS_WINDOWS) {
+			command.add("cmd.exe");
+			command.add("/C");
+		}
+		command.add(getExecutable().toOSString());
+		command.addAll(Arrays.asList(args));
+		return new ProcessBuilder(command);
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
