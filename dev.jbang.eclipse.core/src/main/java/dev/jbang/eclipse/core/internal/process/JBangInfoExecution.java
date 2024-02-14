@@ -30,7 +30,7 @@ public class JBangInfoExecution {
 	private static final Pattern RESOLUTION_ERROR_1 = Pattern.compile("Resolving (.*)\\.\\.\\.\\[ERROR\\] Could not resolve dependency");
 	private static final Pattern RESOLUTION_ERROR_2 = Pattern.compile("\\[ERROR\\] Could not resolve dependency (.*)");
 	private static final Pattern RESOLUTION_ERROR_3 = Pattern.compile(".* Could not find artifact (.*) in ");
-	private static final Pattern RESOLUTION_ERROR_4 = Pattern.compile(".*The following artifacts could not be resolved: (.*?): Could");
+	private static final Pattern RESOLUTION_ERROR_4 = Pattern.compile(".*The following artifacts could not be resolved: (.*?)( \\(.*\\))?: Could");
 	private static final Pattern RESOLUTION_ERROR_5 = Pattern.compile("\\[ERROR\\] Could not download (.*)");
 	private static final Pattern JAVA_ERROR = Pattern.compile("\\[ERROR\\] (Invalid JAVA version.*)");
 	private static final Pattern MODULE_ERROR= Pattern.compile("\\[ERROR\\] (//MODULE .*)");

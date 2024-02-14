@@ -12,7 +12,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<tycho.version>4.0.4</tycho.version>
+		<tycho.version>4.0.5</tycho.version>
 		<tycho.extras.version>${tycho.version}</tycho.extras.version>
 		<tycho.test.platformArgs></tycho.test.platformArgs>
 		<tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
@@ -31,7 +31,7 @@
 		<repository>
 			<id>eclipse</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/2022-09</url>
+			<url>http://download.eclipse.org/releases/2023-12</url>
 		</repository>
 	</repositories>
 	<build>
