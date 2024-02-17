@@ -29,7 +29,7 @@ jobs:
         run: ./mvnw --batch-mode --update-snapshots verify -Pflat-repo
 
       - name: Upload p2 update site
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: runner.os == 'Linux'
         with:
           name: jbang.eclipse
