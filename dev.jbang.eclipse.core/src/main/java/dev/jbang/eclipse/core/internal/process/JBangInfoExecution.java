@@ -30,7 +30,8 @@ public class JBangInfoExecution {
 	private static final Pattern RESOLUTION_ERROR_1 = Pattern.compile("Resolving (.*)\\.\\.\\.\\[ERROR\\] Could not resolve dependency");
 	private static final Pattern RESOLUTION_ERROR_2 = Pattern.compile("\\[ERROR\\] Could not resolve dependency (.*)");
 	private static final Pattern RESOLUTION_ERROR_3 = Pattern.compile(".* Could not find artifact (.*) in ");
-	private static final Pattern RESOLUTION_ERROR_4 = Pattern.compile(".*The following artifacts could not be resolved: (.*?)( \\(.*\\))?: Could");
+	private static final Pattern RESOLUTION_ERROR_4 = Pattern.compile(".*The following artifacts could not be resolved: ((.*?)( \\(.*\\))?): Could");
+	private static final Pattern DEPENDENCY_PATTERN = Pattern.compile("\\S+");
 	private static final Pattern RESOLUTION_ERROR_5 = Pattern.compile("\\[ERROR\\] Could not download (.*)");
 	private static final Pattern JAVA_ERROR = Pattern.compile("\\[ERROR\\] (Invalid JAVA version.*)");
 	private static final Pattern MODULE_ERROR= Pattern.compile("\\[ERROR\\] (//MODULE .*)");
@@ -133,7 +134,7 @@ public class JBangInfoExecution {
 		// [jbang] Resolving eu.hansolo:tilesfx:1.3.4...[jbang] [ERROR] Could not
 		// resolve dependency
 
-		String error = errorLine.replace("\\[jbang\\] ", "");
+		String error = errorLine.replace("[jbang] ", "");
 
 		Matcher matcher = JAVA_ERROR.matcher(error);
 		if (matcher.find()) {
@@ -163,7 +164,7 @@ public class JBangInfoExecution {
 		
 		matcher = RESOLUTION_ERROR_5.matcher(error); //DEPS https://bad.url (since JBang 0.109.0)
 		if (matcher.find()) {
-			return Collections.singleton(new JBangDependencyError(matcher.group(1)));
+			return Collections.singleton(new JBangDependencyError(sanitize(matcher.group(1))));
 		}
 		
 		//The following artifacts could not be resolved: com.pulumi:gcp:jar:6.11.0, com.pulumi:kubernetes:jar:3.15.1:
@@ -171,13 +172,13 @@ public class JBangInfoExecution {
 		matcher = RESOLUTION_ERROR_4.matcher(error);
 		if (matcher.find()) {
 			var dependencies = matcher.group(1).split(", ");
-			return Stream.of(dependencies).map(d -> new JBangDependencyError(simplify(d))).collect(Collectors.toSet());
+			return Stream.of(dependencies).map(d -> new JBangDependencyError(sanitize(d))).collect(Collectors.toSet());
 		}
 
 		matcher = RESOLUTION_ERROR_3.matcher(error);
 		String dependency = null;
 		if (matcher.find()) {
-			dependency = simplify(matcher.group(1));
+			dependency = matcher.group(1);
 		} else {
 			//[ERROR] Could not resolve dependency info.picocli:picocli:4.4965.0
 			matcher = RESOLUTION_ERROR_2.matcher(error);
@@ -192,12 +193,16 @@ public class JBangInfoExecution {
 		}
 
 
-		var jberror = dependency == null? new JBangError(error): new JBangDependencyError(dependency);
+		var jberror = dependency == null? new JBangError(error): new JBangDependencyError(sanitize(dependency));
 		return Collections.singleton(jberror);
 	}
 
 
-	private static String simplify(String dependency) {
+	private static String sanitize(String dependency) {
+		var matcher = DEPENDENCY_PATTERN.matcher(dependency);
+		if (matcher.find()) {
+			dependency = matcher.group(0);
+		}
 		return dependency.replace(":jar:", ":");
 	}
 
