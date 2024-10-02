@@ -14,7 +14,7 @@ This experimental plugin aims to let you author [JBang](https://github.com/jbang
 - Automatic configuration of Annotation Processors
 - JBang runtime management
 
-Cuurently supports 
+Currently supports 
 - `//DEPS` / `@Grab` dependencies
 - `//JAVA` version
 - `//SOURCES` additional sources 
