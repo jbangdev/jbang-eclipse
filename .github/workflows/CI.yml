@@ -46,7 +46,7 @@ jobs:
           files: |
             dev.jbang.eclipse.site/target/flat-repository/*
       - name: Upload code coverage
-        uses: codecov/codecov-action@v4-beta
+        uses: codecov/codecov-action@v5-beta
         if:  runner.os == 'Linux'
         with:
           files: ./coverage/target/site/jacoco-aggregate/jacoco.xml
