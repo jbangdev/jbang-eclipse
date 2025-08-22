@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.jbang.eclipse</groupId>
 	<artifactId>dev.jbang.eclipse</artifactId>
-	<version>0.0.3-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>dev.jbang.eclipse :: parent</name>
 	<description>JBang Eclipse integration</description>
@@ -15,7 +15,7 @@
 		<tycho.version>4.0.13</tycho.version>
 		<tycho.extras.version>${tycho.version}</tycho.extras.version>
 		<tycho.test.platformArgs></tycho.test.platformArgs>
-		<tycho.test.jvmArgs>-Xmx512m</tycho.test.jvmArgs>
+		<tycho.test.jvmArgs>-Xmx1024m</tycho.test.jvmArgs>
 		<tycho.scmUrl>scm:git:https://github.com/jbangdev/jbang-eclipse.git</tycho.scmUrl>
 		<coverage.filter>dev.jbang.eclipse.*</coverage.filter>
 		<generateSourceRef>true</generateSourceRef>
@@ -31,7 +31,7 @@
 		<repository>
 			<id>eclipse</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/2023-12</url>
+			<url>http://download.eclipse.org/releases/2025-06</url>
 		</repository>
 	</repositories>
 	<build>
@@ -48,7 +48,6 @@
 				<version>${tycho.version}</version>
 				<?m2e ignore?>
 				<configuration>
-					<resolver>p2</resolver>
 					<pomDependencies>consider</pomDependencies>
 					<target>
 						<artifact>
@@ -72,6 +71,11 @@
 							<os>macosx</os>
 							<ws>cocoa</ws>
 							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>aarch64</arch>
 						</environment>
 					</environments>
 				</configuration>
@@ -124,7 +128,7 @@
 						<useUIHarness>false</useUIHarness>
 						<useUIThread>false</useUIThread>
 						<argLine>${tycho.testArgLine} ${tycho.test.jvmArgs}</argLine>
-						<!-- kill test JVM if tests take more than 1 minute (60 seconds) to 
+						<!-- kill test JVM if tests take more than 1 minute (60 seconds) to
 							finish -->
 						<forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
 					</configuration>

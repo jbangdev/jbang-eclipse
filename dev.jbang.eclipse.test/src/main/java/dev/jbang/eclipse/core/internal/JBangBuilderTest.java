@@ -2,6 +2,7 @@ package dev.jbang.eclipse.core.internal;
 
 import static dev.jbang.eclipse.core.internal.utils.ClasspathHelpers.assertGenerateParameters;
 import static dev.jbang.eclipse.core.internal.utils.ClasspathHelpers.assertJava;
+import static dev.jbang.eclipse.core.internal.utils.JBangVersionHelper.isHigherOrEqual;
 import static dev.jbang.eclipse.core.internal.utils.JobHelpers.waitForJobsToComplete;
 import static dev.jbang.eclipse.core.internal.utils.WorkspaceHelpers.assertErrorMarker;
 import static dev.jbang.eclipse.core.internal.utils.WorkspaceHelpers.assertNoErrors;
@@ -31,6 +32,9 @@ public class JBangBuilderTest extends AbstractJBangTest {
 
 	@Test
 	public void enableParameters() throws Exception {
+		if (isHigherOrEqual(getDefaultRuntime().getVersion(), "0.122.0")) {
+			return;
+		}
 		IProject project = jbp.getProject();
 		assertGenerateParameters(project, false);
 
@@ -51,11 +55,11 @@ public class JBangBuilderTest extends AbstractJBangTest {
 
 		IFile script = jbp.getMainSourceFile();
 		String content = ResourceUtil.getContent(script);
-		ResourceUtil.setContent(script, content.replace("//JAVA 11", "//JAVA 8"));
+		ResourceUtil.setContent(script, content.replace("//JAVA 11", "//JAVA 17"));
 
 		waitForJobsToComplete();
 		assertNoErrors(project);
-		assertJava(project, "1.8");
+		assertJava(project, "17");
 	}
 
 	@Test
@@ -98,7 +102,7 @@ public class JBangBuilderTest extends AbstractJBangTest {
 	@Test
 	public void setReleaseLevel() throws Exception {
 		IProject project = jbp.getProject();
-		assertGenerateParameters(project, false);
+		assertGenerateParameters(project, true);
 
 		IFile script = jbp.getMainSourceFile();
 		String content = ResourceUtil.getContent(script);
@@ -113,7 +117,7 @@ public class JBangBuilderTest extends AbstractJBangTest {
 	@Test
 	public void setSourceLevel() throws Exception {
 		IProject project = jbp.getProject();
-		assertGenerateParameters(project, false);
+		assertGenerateParameters(project, true);
 
 		IFile script = jbp.getMainSourceFile();
 		String content = ResourceUtil.getContent(script);
@@ -128,7 +132,7 @@ public class JBangBuilderTest extends AbstractJBangTest {
 	@Test
 	public void invalidModule() throws Exception {
 		IProject project = jbp.getProject();
-		assertGenerateParameters(project, false);
+		assertGenerateParameters(project, true);
 
 		IFile script = jbp.getMainSourceFile();
 		String content = ResourceUtil.getContent(script);

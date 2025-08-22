@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: JBang Eclipse UI Plugin
 Bundle-SymbolicName: dev.jbang.eclipse.ui;singleton:=true
 Bundle-Vendor: jbangdev
-Bundle-Version: 0.0.3.qualifier
+Bundle-Version: 0.0.4.qualifier
 Bundle-Activator: dev.jbang.eclipse.ui.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -13,6 +13,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.core,
  org.eclipse.ui.ide
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Automatic-Module-Name: dev.jbang.eclipse.ui
 Import-Package: dev.jbang.eclipse.core.internal.imports

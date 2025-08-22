@@ -4,7 +4,7 @@ Automatic-Module-Name: dev.jbang.eclipse.ls
 Bundle-Name: JBang Eclipse LS Plugin
 Bundle-SymbolicName: dev.jbang.eclipse.ls;singleton:=true
 Bundle-Vendor: jbangdev
-Bundle-Version: 0.0.3.qualifier
+Bundle-Version: 0.0.4.qualifier
 Bundle-Activator: dev.jbang.eclipse.ls.internal.JBangLSPlugin
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.core,
@@ -14,5 +14,5 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.jdt.ls.core,
  dev.jbang.eclipse.core
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-17
+Bundle-RequiredExecutionEnvironment: JavaSE-21
 Import-Package: org.eclipse.core.resources

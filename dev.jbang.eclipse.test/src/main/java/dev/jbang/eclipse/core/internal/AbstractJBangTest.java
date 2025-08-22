@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 
+import dev.jbang.eclipse.core.JBangCorePlugin;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntime;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimeManager;
 import dev.jbang.eclipse.core.internal.runtime.JBangRuntimesDiscoveryJob;
@@ -34,6 +35,10 @@ public abstract class AbstractJBangTest {
 		cleanWorkspace();
 	}
 	
+	protected JBangRuntime getDefaultRuntime() {
+		return JBangCorePlugin.getJBangManager().getJBangRuntimeManager().getDefaultRuntime();
+	}
+
 	private static void deleteWorkDir() throws IOException {
 		 var workDir = Paths.get("target", "workdir");
 		 FileUtils.deleteDirectory(workDir.toFile());
@@ -42,13 +47,15 @@ public abstract class AbstractJBangTest {
 	public static JBangRuntimeManager setupJBang() throws IOException {
 		PathMatcher pathMatcher = FileSystems.getDefault().getPathMatcher("glob:target/jbang*");
 		Path root = Paths.get("");
-	    var jbangInstall = Files.walk(root).filter(pathMatcher::matches).findFirst();
+	    var jbangInstall = Files.walk(root)
+	        .filter(path -> pathMatcher.matches(path) && Files.isDirectory(path))
+	        .findFirst();
 	    if (jbangInstall.isEmpty()) {
 	    	Assertions.fail("No target/jbang runtime detected. Please run 'mvn validate' from a terminal");
 	    }
 	    var defaultRuntime = new JBangRuntime("tests", jbangInstall.get().toAbsolutePath().toString());
 	    defaultRuntime.detectVersion(null);
-	    var jbangRuntimeManager = new JBangRuntimeManager();
+	    var jbangRuntimeManager = JBangCorePlugin.getJBangManager().getJBangRuntimeManager();
 	    try {
 	    	Job.getJobManager().cancel(JBangRuntimesDiscoveryJob.class);
 			Job.getJobManager().join(JBangRuntimesDiscoveryJob.class, new NullProgressMonitor());

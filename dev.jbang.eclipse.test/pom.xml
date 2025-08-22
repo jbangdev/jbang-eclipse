@@ -5,7 +5,7 @@
 	<parent>
 		<artifactId>dev.jbang.eclipse</artifactId>
 		<groupId>dev.jbang.eclipse</groupId>
-		<version>0.0.3-SNAPSHOT</version>
+		<version>0.0.4-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>dev.jbang.eclipse.core.test</artifactId>
@@ -27,6 +27,7 @@
 				<version>1.13.0</version>
 				<executions>
 					<execution>
+						<?m2e ignore?>
 						<id>install-jbang</id>
 						<phase>validate</phase>
 						<goals>

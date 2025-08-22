@@ -141,7 +141,7 @@ public class JBangRuntime {
 
             }
 		} catch (IOException | InterruptedException e) {
-			System.err.println(e.getMessage());
+			System.err.println("Failed to detect version for "+this +":"+e.getMessage());
 		}
 		return version;
 	}
